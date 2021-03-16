@@ -1,0 +1,2143 @@
+<style>
+    .func-btns {
+        padding: 0 7px;
+        margin-bottom: 10px;
+    }
+    .func-btns button {
+        margin: 5px;
+    }
+    #in-out-panel,
+
+    .custom-communicate,
+    #detail-panel {
+        display: none;
+    }
+    #variable-tr input[type='checkbox'] {
+        margin-top: 1rem;
+    }
+    #variable-tr {
+        cursor: pointer;
+    }
+</style>
+
+<div class="modal fade" id="action-modal" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document" style="max-width: 700px !important;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">동작편집</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="alert alert-danger insert-alert" role="alert">
+                    값을 입력하세요
+                </div>
+                <input type="hidden" id="selid" value=""/>
+                <div class="form-group row">
+                    <div class="col-2">
+                        <label class="input-label">사용</label>
+                    </div>
+                    <div class="col-5">
+                        <div class="dark">
+                            <div class="ckbx-style-1">
+                                <input type="checkbox" checked id="ckbx-style-1-1" value="0">
+                                <label for="ckbx-style-1-1"></label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group row">
+                    <div class="col-2">
+                        <label class="input-label" for="action-name">이름</label>
+                    </div>
+                    <div class="col-5">
+                        <input class="form-control" placeholder="이름입력" id="action-name">
+                    </div>
+                </div>
+                <div class="form-group row">
+                    <div class="col-2">
+                        <label class="input-label" for="action-order">실행순서</label>
+                    </div>
+                    <div class="col-5">
+                        <input type="number" class="form-control" placeholder="실행순서" id="action-order" value="1" onkeypress="return event.charCode >= 48 && event.charCode <= 57">
+                    </div>
+                </div>
+                <div class="form-group row">
+                    <div class="col-2">
+                        <label class="input-label" for="type-select">동작타입</label>
+                    </div>
+                    <div class="col-5">
+                        <select class="form-control" id="type-select">
+                            <option value="digital">디지털</option>
+                            <option value="analog">아날로그</option>
+                            <option value="string">문자열</option>
+                            <option value="time">시간</option>
+                            <option value="date">날짜</option>
+                            <option value="delay">지연</option>
+                            <option value="user_calc">사용자수식</option>
+                            <option value="function">함수실행</option>
+                            <option value="recipe">레시피실행</option>
+                            <option value="shell_exec">Shell명령실행</option>
+                            <option value="user_def_comm">사용자정의통신</option>
+                            <option value="act_group">동작그룹실행</option>
+                            <option value="control">제어실행</option>
+                        </select>
+                    </div>
+                </div>
+                <div id="digital-input" class="type-div">
+                    <div class="form-group row">
+                        <div class="col-2">
+                            <label class="input-label" for="digital-variable">변수</label>
+                        </div>
+                        <div class="col-5">
+                            <div class="input-group">
+                                <input type="text" class="form-control" id="digital-variable" readonly>
+                                <span class="input-group-append dropdown">
+                                    <button class="btn btn-primary dropdown-toggle" data-toggle="dropdown"></button>
+                                    <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                                        <a class="dropdown-item" href="#" onclick="showFixed('digital-variable', 'digital');">고정변수</a>
+                                        <a class="dropdown-item" href="#" onclick="showFluid('digital-variable', 'digital');">가변변수</a>
+                                    </div>
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <div class="col-2">
+                            <label class="input-label" for="digital-value">값</label>
+                        </div>
+                        <div class="col-5">
+                            <div class="value-radio">
+                                <div class="form-check mb-2">
+                                    <input type="checkbox" class="form-check-input" id="digital-value-radio" checked>
+                                    <label class="form-check-label" for="digital-value-radio">변수</label>
+                                </div>
+                                <select class="form-control alt-input">
+                                    <option value="0">FALSE</option>
+                                    <option value="1">TRUE</option>
+                                </select>
+                                <div class="input-group">
+                                    <input type="text" class="form-control" id="digital-value" readonly />
+                                    <span class="input-group-append dropdown">
+                                        <button class="btn btn-primary dropdown-toggle" data-toggle="dropdown"></button>
+                                        <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                                            <a class="dropdown-item" href="#" onclick="showFixed('digital-value', 'digital');">고정변수</a>
+                                            <a class="dropdown-item" href="#" onclick="showFluid('digital-value', 'digital');">가변변수</a>
+                                        </div>
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div id="analog-input" class="type-div">
+                    <div class="form-group row">
+                        <div class="col-2">
+                            <label class="input-label" for="analog-variable">변수</label>
+                        </div>
+                        <div class="col-5">
+                            <div class="input-group">
+                                <input type="text" class="form-control" id="analog-variable" readonly>
+                                <span class="input-group-append dropdown">
+                                    <button class="btn btn-primary dropdown-toggle" data-toggle="dropdown"></button>
+                                    <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                                        <a class="dropdown-item" href="#" onclick="showFixed('analog-variable', 'analog');">고정변수</a>
+                                        <a class="dropdown-item" href="#" onclick="showFluid('analog-variable', 'analog');">가변변수</a>
+                                    </div>
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <div class="col-2">
+                            <label class="input-label" for="analog-value">값</label>
+                        </div>
+                        <div class="col-5">
+                            <div class="value-radio">
+                                <div class="form-check mb-2">
+                                    <input type="checkbox" class="form-check-input" id="analog-value-radio" checked>
+                                    <label class="form-check-label" for="analog-value-radio">변수</label>
+                                </div>
+                                <input type="number" class="form-control alt-input">
+                                <div class="input-group">
+                                    <input type="text" class="form-control" id="analog-value" readonly>
+                                    <span class="input-group-append dropdown">
+                                        <button class="btn btn-primary dropdown-toggle" data-toggle="dropdown"></button>
+                                        <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                                            <a class="dropdown-item" href="#" onclick="showFixed('analog-value', 'analog');">고정변수</a>
+                                            <a class="dropdown-item" href="#" onclick="showFluid('analog-value', 'analog');">가변변수</a>
+                                        </div>
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div id="string-input" class="type-div">
+                    <div class="form-group row">
+                        <div class="col-2">
+                            <label class="input-label" for="string-variable">변수</label>
+                        </div>
+                        <div class="col-5">
+                            <div class="input-group">
+                                <input type="text" class="form-control" id="string-variable" readonly>
+                                <span class="input-group-append dropdown">
+                                    <button class="btn btn-primary dropdown-toggle" data-toggle="dropdown"></button>
+                                    <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                                        <a class="dropdown-item" href="#" onclick="showFixed('string-variable', 'string');">고정변수</a>
+                                        <a class="dropdown-item" href="#" onclick="showFluid('string-variable', 'string');">가변변수</a>
+                                    </div>
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <div class="col-2">
+                            <label class="input-label" for="string-value">값</label>
+                        </div>
+                        <div class="col-5">
+                            <div class="value-radio">
+                                <div class="form-check mb-2">
+                                    <input type="checkbox" class="form-check-input" id="string-value-radio" checked>
+                                    <label class="form-check-label" for="string-value-radio">변수</label>
+                                </div>
+                                <input type="text" class="form-control alt-input">
+                                <div class="input-group">
+                                    <input type="text" class="form-control" id="string-value" readonly>
+                                    <span class="input-group-append dropdown">
+                                        <button class="btn btn-primary dropdown-toggle" data-toggle="dropdown"></button>
+                                        <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                                            <a class="dropdown-item" href="#" onclick="showFixed('string-value', 'string');">고정변수</a>
+                                            <a class="dropdown-item" href="#" onclick="showFluid('string-value', 'string');">가변변수</a>
+                                        </div>
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div id="time-input" class="type-div">
+                    <div class="form-group row">
+                        <div class="col-2">
+                            <label class="input-label" for="time-variable">변수</label>
+                        </div>
+                        <div class="col-5">
+                            <div class="input-group">
+                                <input type="text" class="form-control" id="time-variable" readonly>
+                                <span class="input-group-append dropdown">
+                                    <button class="btn btn-primary dropdown-toggle" data-toggle="dropdown"></button>
+                                    <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                                        <a class="dropdown-item" href="#" onclick="showFixed('time-variable', 'time');">고정변수</a>
+                                        <a class="dropdown-item" href="#" onclick="showFluid('time-variable', 'time');">가변변수</a>
+                                    </div>
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <div class="col-2">
+                            <label class="input-label" for="time-value">값</label>
+                        </div>
+                        <div class="col-5">
+                            <div class="value-radio">
+                                <div class="form-check mb-2">
+                                    <input type="checkbox" class="form-check-input" id="time-value-radio" checked>
+                                    <label class="form-check-label" for="time-value-radio">변수</label>
+                                </div>
+                                <input type="text" class="form-control alt-input mask-time">
+                                <div class="input-group">
+                                    <input type="text" class="form-control" id="time-value" readonly>
+                                    <span class="input-group-append dropdown">
+                                        <button class="btn btn-primary dropdown-toggle" data-toggle="dropdown"></button>
+                                        <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                                            <a class="dropdown-item" href="#" onclick="showFixed('time-value', 'time');">고정변수</a>
+                                            <a class="dropdown-item" href="#" onclick="showFluid('time-value', 'time');">가변변수</a>
+                                        </div>
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div id="date-input" class="type-div">
+                    <div class="form-group row">
+                        <div class="col-2">
+                            <label class="input-label" for="date-variable">변수</label>
+                        </div>
+                        <div class="col-5">
+                            <div class="input-group">
+                                <input type="text" class="form-control" id="date-variable" readonly>
+                                <span class="input-group-append dropdown">
+                                    <button class="btn btn-primary dropdown-toggle" data-toggle="dropdown"></button>
+                                    <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                                        <a class="dropdown-item" href="#" onclick="showFixed('date-variable', 'date');">고정변수</a>
+                                        <a class="dropdown-item" href="#" onclick="showFluid('date-variable', 'date');">가변변수</a>
+                                    </div>
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <div class="col-2">
+                            <label class="input-label" for="time-value">값</label>
+                        </div>
+                        <div class="col-5">
+                            <div class="value-radio">
+                                <div class="form-check mb-2">
+                                    <input type="checkbox" class="form-check-input" id="date-value-radio" checked>
+                                    <label class="form-check-label" for="date-value-radio">변수</label>
+                                </div>
+                                <input type="text" class="form-control alt-input date-picker">
+                                <div class="input-group">
+                                    <input type="text" class="form-control" id="date-value" readonly>
+                                    <span class="input-group-append dropdown">
+                                        <button class="btn btn-primary dropdown-toggle" data-toggle="dropdown"></button>
+                                        <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                                            <a class="dropdown-item" href="#" onclick="showFixed('date-value', 'date');">고정변수</a>
+                                            <a class="dropdown-item" href="#" onclick="showFluid('date-value', 'date');">가변변수</a>
+                                        </div>
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div id="delay-input" class="type-div">
+                    <div class="form-group row">
+                        <div class="col-2">
+                            <label class="input-label" for="delay-value">지연시간</label>
+                        </div>
+                        <div class="col-5">
+                            <div class="input-group">
+                                <input type="text" class="form-control" id="delay-value" readonly>
+                                <span class="input-group-append dropdown">
+                                    <button class="btn btn-primary dropdown-toggle" data-toggle="dropdown"></button>
+                                    <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                                        <a class="dropdown-item" href="#" onclick="showFixed('delay-value', 'time');">고정변수</a>
+                                        <a class="dropdown-item" href="#" onclick="showFluid('delay-value', 'time');">가변변수</a>
+                                    </div>
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div id="user_calc-input" class="type-div">
+                    <div class="form-group row">
+                        <div class="col-2">
+                            <label class="input-label" for="formula-value">수식</label>
+                        </div>
+                        <div class="col-9">
+                            <div class="input-group">
+                                <input type="text" class="form-control" id="formula-value" readonly>
+                                <span class="input-group-append">
+                                    <button class="btn btn-primary" onclick="selectFormula();">수식편집</button>
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <div class="col-2">
+                            <label class="input-label" for="formula-variable">결과변수</label>
+                        </div>
+                        <div class="col-5">
+                            <div class="input-group">
+                                <input type="number" class="form-control" id="formula-variable" readonly>
+                                <span class="input-group-append dropdown">
+                                    <button class="btn btn-primary dropdown-toggle" data-toggle="dropdown"></button>
+                                    <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                                        <a class="dropdown-item" href="#" onclick="showFixed('formula-variable', 'analog');">고정변수</a>
+                                        <a class="dropdown-item" href="#" onclick="showFluid('formula-variable', 'analog');">가변변수</a>
+                                    </div>
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div id="function-input" class="type-div">
+                    <div class="form-group row">
+                        <div class="col-2">
+                            <label class="input-label" for="func-select">함수선택</label>
+                        </div>
+                        <div class="col-5">
+                            <div class="input-group">
+                                <input type="text" id="func-select" class="form-control" readonly />
+                                <span class="input-group-append">
+                                    <button class="btn btn-primary" onclick="funcSelect('#func-select');">선택</button>
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                    <div id="in-out-panel">
+                        <div class="form-group row">
+                            <div class="col-2">
+                                <label class="input-label">입력</label>
+                            </div>
+                            <div class="col-9">
+                                <div class="table-responsive">
+                                    <table class="table table-bordered no-context">
+                                        <thead>
+                                            <tr>
+                                                <th style="width: 30%">이름</th>
+                                                <th style="width: 50%">값</th>
+                                                <th style="width: 20%">타입</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="func-input-tbody"></tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <div class="col-2">
+                                <label class="input-label">출력</label>
+                            </div>
+                            <div class="col-9">
+                                <div class="table-responsive">
+                                    <table class="table table-bordered no-context">
+                                        <thead>
+                                            <tr>
+                                                <th style="width: 30%">이름</th>
+                                                <th style="width: 50%">변수</th>
+                                                <th style="width: 20%">타입</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="func-output-tbody"></tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div id="recipe-input" class="type-div">
+                    <div class="form-group row">
+                        <div class="col-2">
+                            <label class="input-label" for="recipe-value">레시피선택</label>
+                        </div>
+                        <div class="col-5">
+                            <div class="input-group">
+                                <input type="text" id="recipe-value" class="form-control" readonly />
+                                <span class="input-group-append">
+                                    <button class="btn btn-primary" data-toggle="modal" data-target="#recipe-select-modal">선택</button>
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div id="shell_exec-input" class="type-div">
+                    <div class="form-group row">
+                        <div class="col-2">
+                            <label class="input-label" for="shell-application">어플리케이션</label>
+                        </div>
+                        <div class="col-5">
+                            <input type="text" id="shell-application" class="form-control" />
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <div class="col-2">
+                            <label class="input-label" for="shell-param">파라미터</label>
+                        </div>
+                        <div class="col-5">
+                            <input type="text" id="shell-param" class="form-control" />
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <div class="col-12">
+                            <div class="form-check">
+                                <input type="checkbox" class="form-check-input" id="shell-exec" checked>
+                                <label class="form-check-label" for="shell-exec">숨김상태로 실행</label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <div class="col-2">
+                            <label class="input-label" for="shell-duplicate">중복실행옵션</label>
+                        </div>
+                        <div class="col-5">
+                            <select class="form-control" id="shell-duplicate" name="shell_duplicate">
+                                <option value="KILL_PREV_PROCESS">이전프로세스 종료</option>
+                                <option value="NO_START_IF_EXIST">중복실행안함</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <div id="user_def_comm-input" class="type-div">
+                    <div class="form-group row">
+                        <div class="col-2">
+                            <label class="input-label" for="comm-channel">통신채널선택</label>
+                        </div>
+                        <div class="col-5">
+                            <div class="input-group">
+                                <input type="text" class="form-control" id="comm-channel" readonly>
+                                <span class="input-group-append">
+                                    <button class="btn btn-primary" data-toggle="modal" data-target="#custom-channel-modal">선택</button>
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <div class="col-2">
+                            <label class="input-label" for="comm-frame">프레임선택</label>
+                        </div>
+                        <div class="col-5">
+                            <div class="input-group">
+                                <input type="text" class="form-control" id="comm-frame" readonly>
+                                <span class="input-group-append">
+                                    <button class="btn btn-primary" data-toggle="modal" data-target="#custom-frame-modal">선택</button>
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <div class="col-2">
+                            <label class="input-label" for="comm-frame-type">프레임타입</label>
+                        </div>
+                        <div class="col-5">
+                            <div class="input-group">
+                                <select class="form-control" id="comm-frame-type" name="comm_frame_type">
+                                    <option value="SEND">보내기</option>
+                                    <option value="RECV">받기</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <div class="col-2">
+                            <label class="input-label" for="comm-variable">송수신완료변수</label>
+                        </div>
+                        <div class="col-5">
+                            <div class="input-group">
+                                <div class="input-group">
+                                    <input type="text" class="form-control" id="comm-variable" readonly>
+                                    <span class="input-group-append dropdown">
+                                        <button class="btn btn-primary dropdown-toggle" data-toggle="dropdown"></button>
+                                        <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                                            <a class="dropdown-item" href="#" onclick="showFixed('comm-variable', 'digital');">고정변수</a>
+                                            <a class="dropdown-item" href="#" onclick="showFluid('comm-variable', 'digital');">가변변수</a>
+                                        </div>
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div id="act_group-input" class="type-div">
+                    <div class="form-group row">
+                        <div class="col-2">
+                            <label class="input-label" for="act-group-select">그룹선택</label>
+                        </div>
+                        <div class="col-5">
+                            <div class="input-group">
+                                <input type="text" class="form-control" id="act-group-select" readonly>
+                                <span class="input-group-append">
+                                    <button class="btn btn-primary" data-toggle="modal" data-target="#actgroup-modal">선택</button>
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div id="control-input" class="type-div">
+                    <div class="form-group row">
+                        <div class="col-2">
+                            <label class="input-label" for="control-select">선택</label>
+                        </div>
+                        <div class="col-5">
+                            <div class="input-group">
+                                <input type="text" class="form-control" id="control-select" readonly>
+                                <span class="input-group-append">
+                                    <button class="btn btn-primary" data-toggle="modal" data-target="#control-select-modal">선택</button>
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary btn-icon-split" data-dismiss="modal">
+                    <span class="icon text-white-50">
+                        <i class="fas fa-times"></i>
+                    </span>
+                    <span class="text">취소</span>
+                </button>
+                <button class="btn btn-primary btn-icon-split" onclick="doFuncSave();">
+                    <span class="icon text-white-50">
+                        <i class="fas fa-check"></i>
+                    </span>
+                    <span class="text">확인</span>
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="formula-modal" tabindex="-1" role="dialog" style="z-index: 1042">
+    <div class="modal-dialog" role="document" style="max-width: 700px !important;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">수식편집</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="func-btns">
+                    <button class="btn btn-secondary func" data-toggle="tooltip" data-placement="bottom" title="절대값 , 예) ABS(-2)=2">ABS</button>
+                    <button class="btn btn-secondary func" data-toggle="tooltip" data-placement="bottom" title="제곱근 , 예) SQRT(4)=2">SQRT</button>
+                    <button class="btn btn-secondary func" data-toggle="tooltip" data-placement="bottom" title="a의 b제곱근, 예) SQRT(8,3)=2">SQRTN</button>
+                    <button class="btn btn-secondary func" data-toggle="tooltip" data-placement="bottom" title="e를 밑으로 하는 자연로그, 예) LN(3)=1.0986">LN</button>
+                    <button class="btn btn-secondary func" data-toggle="tooltip" data-placement="bottom" title="10을 밑으로 하는 로그, 예) LOG(3)=0.47712">LOG</button>
+                    <button class="btn btn-secondary func" data-toggle="tooltip" data-placement="bottom" title="e의 자승, 예) EXP(3)=20.0855">EXP</button>
+                    <button class="btn btn-secondary func" data-toggle="tooltip" data-placement="bottom" title="a의 b승, 예) EXPT(3,2) = 9">EXPT</button>
+                    <button class="btn btn-secondary func" data-toggle="tooltip" data-placement="bottom" title="SIN함수, 예) SIN(0.5)=0.479426 (입력단위: Rad)">SIN</button>
+                    <button class="btn btn-secondary func" data-toggle="tooltip" data-placement="bottom" title="ArcSIN함수, 예) ASIN(0.5)= 0.52359">ASIN</button>
+                    <button class="btn btn-secondary func" data-toggle="tooltip" data-placement="bottom" title="COS함수, 예) COS(0.5)=0.877582 (입력단위: Rad)">COS</button>
+                    <button class="btn btn-secondary func" data-toggle="tooltip" data-placement="bottom" title="ArcCOS함수, 예) ACOS(0.5)= 1.04719">ACOS</button>
+                    <button class="btn btn-secondary func" data-toggle="tooltip" data-placement="bottom" title="TAN함수, 예) TAN(0.5)=0.54630 (입력단위: Rad)">TAN</button>
+                    <button class="btn btn-secondary func" data-toggle="tooltip" data-placement="bottom" title="ArcTAN함수, 예) ATAN(0.5)= 0.46364">ATAN</button>
+                    <button class="btn btn-secondary func" data-toggle="tooltip" data-placement="bottom" title="소수점 버리기, 예) TRUNC(-.1.7)=-1">TRUNC</button>
+                    <button class="btn btn-secondary func" data-toggle="tooltip" data-placement="bottom" title="나머지 구하기, 예) MOD(5,2)=1">MOD</button>
+                    <button class="btn btn-secondary func" data-toggle="tooltip" data-placement="bottom" title="입력값보다 작은 정수중 가장 큰 값을 반환, 예) FLOOR(-3.14)=-4">FLOOR</button>
+                    <button class="btn btn-secondary func" data-toggle="tooltip" data-placement="bottom" title="입력값보다 큰 정수중 가장 작은 값을 반환 ,예) CEIL(-3.14)=-3">CEIL</button>
+                    <button class="btn btn-secondary func" data-toggle="tooltip" data-placement="bottom" title="소수점 자리수 기준 반올림, 예) ROUND(3.141592,4)=3.1416">ROUND</button>
+                    <button class="btn btn-secondary">(</button>
+                    <button class="btn btn-secondary">)</button>
+                    <button class="btn btn-secondary">+</button>
+                    <button class="btn btn-secondary">-</button>
+                    <button class="btn btn-secondary">*</button>
+                    <button class="btn btn-secondary">/</button>
+                    <span class="dropdown">
+                        <button class="btn btn-primary dropdown-toggle" data-toggle="dropdown">변수입력</button>
+                        <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                            <a class="dropdown-item" href="#" onclick="showFixed('formula-var', 'analog');">고정변수</a>
+                            <a class="dropdown-item" href="#" onclick="showFluid('formula-var', 'analog');">가변변수</a>
+                        </div>
+                    </span>
+                </div>
+                <div class="form-group row">
+                    <div class="col-12">
+                        <input type="hidden" id="formula-var" />
+                        <textarea id="formula-area" class="form-control" rows="3"></textarea>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary btn-icon-split" data-dismiss="modal">
+                    <span class="icon text-white-50">
+                        <i class="fas fa-times"></i>
+                    </span>
+                    <span class="text">취소</span>
+                </button>
+                <button class="btn btn-primary btn-icon-split" onclick="calcSelect();">
+                    <span class="icon text-white-50">
+                        <i class="fas fa-check"></i>
+                    </span>
+                    <span class="text">확인</span>
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="function-modal" tabindex="-1" role="dialog" style="z-index: 1042">
+    <div class="modal-dialog" role="document" style="max-width: 700px !important;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">함수선택</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="table-responsive">
+                    <table class="table table-bordered datatable-tbl no-context" id="func-table">
+                        <thead>
+                            <tr>
+                                <td style="width: 10%">선택</td>
+                                <td style="width: 20%">그룹</td>
+                                <td style="width: 20%">이름</td>
+                                <td style="width: 50%">설명</td>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary btn-icon-split" data-dismiss="modal">
+                    <span class="icon text-white-50">
+                        <i class="fas fa-times"></i>
+                    </span>
+                    <span class="text">취소</span>
+                </button>
+                <button class="btn btn-primary btn-icon-split" onclick="selectFunc();">
+                    <span class="icon text-white-50">
+                        <i class="fas fa-check"></i>
+                    </span>
+                    <span class="text">확인</span>
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="control-select-modal" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document" style="max-width: 1200px !important;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">제어선택</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="table-responsive">
+                    <table class="table table-bordered datatable-tbl no-context" id="logic-control-table">
+                        <thead>
+                            <tr>
+                                <th class="text-center">
+                                    <div class="form-check">
+                                        <input type="checkbox" class="form-check-input check-all">
+                                        <label class="form-check-label"></label>
+                                    </div>
+                                </th>
+                                <th>번호</th>
+                                <th>사용</th>
+                                <th>이름</th>
+                                <th>우선순위</th>
+                                <th>우선모드적용</th>
+                                <th>할당</th>
+                            </tr>
+                        </thead>
+                    </table>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-info btn-icon-split" onclick="controlSelect();">
+                    <span class="icon text-white-50">
+                        <i class="fas fa-check"></i>
+                    </span>
+                    <span class="text">선택</span>
+                </button>
+                <button class="btn btn-secondary btn-icon-split" data-dismiss="modal">
+                    <span class="icon text-white-50">
+                        <i class="fas fa-times"></i>
+                    </span>
+                    <span class="text">취소</span>
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="actgroup-modal" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document" style="max-width: 1200px !important;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">동작그룹선택</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="table-responsive">
+                    <table class="table table-bordered datatable-tbl no-context" id="logic-actgroup-table">
+                        <thead>
+                            <tr>
+                                <th class="text-center">
+                                    <div class="form-check">
+                                        <input type="checkbox" class="form-check-input check-all">
+                                        <label class="form-check-label"></label>
+                                    </div>
+                                </th>
+                                <th>번호</th>
+                                <th>이름</th>
+                                <th>동작모드</th>
+                                <th>실행횟수</th>
+                                <th>할당</th>
+                            </tr>
+                        </thead>
+                    </table>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-info btn-icon-split" onclick="actGroupSelect();">
+                    <span class="icon text-white-50">
+                        <i class="fas fa-check"></i>
+                    </span>
+                    <span class="text">선택</span>
+                </button>
+                <button class="btn btn-secondary btn-icon-split" data-dismiss="modal">
+                    <span class="icon text-white-50">
+                        <i class="fas fa-times"></i>
+                    </span>
+                    <span class="text">취소</span>
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="custom-channel-modal" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document" style="max-width: 1200px !important;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">통신채널선택</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group row">
+                    <div class="col-6">
+                        <div class="table-responsive">
+                            <table class="table table-bordered datatable-tbl" id="custom-channel-table" edit="1">
+                                <thead>
+                                    <tr>
+                                        <th class="text-center">
+                                            <div class="form-check">
+                                                <input type="checkbox" class="form-check-input check-all">
+                                                <label class="form-check-label"></label>
+                                            </div>
+                                        </th>
+                                        <th>번호</th>
+                                        <th>이름</th>
+                                        <th>타입</th>
+                                        <th>상태</th>
+                                    </tr>
+                                </thead>
+                            </table>
+                            <div class="btn-panel">
+                                <button class="btn btn-primary btn-icon-split" onclick="addChannel();">
+                                    <span class="icon text-white-50">
+                                        <i class="fas fa-plus"></i>
+                                    </span>
+                                    <span class="text">추가</span>
+                                </button>
+                                <button class="btn btn-danger btn-icon-split" onclick="removeChannel();">
+                                    <span class="icon text-white-50">
+                                        <i class="fas fa-trash"></i>
+                                    </span>
+                                    <span class="text">삭제</span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-6" id="channel">
+                        <div id="serial-input" class="custom-communicate">
+                            <div class="form-group row">
+                                <div class="col-3">
+                                    <label class="input-label" for="serial-port">포트</label>
+                                </div>
+                                <div class="col-7">
+                                    <input type="number" class="form-control" min="0" id="serial-port">
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <div class="col-3">
+                                    <label class="input-label" for="serial-baud">Baud rate (bps)</label>
+                                </div>
+                                <div class="col-7">
+                                    <select class="form-control" id="serial-baud">
+                                        <option>1200</option>
+                                        <option>2400</option>
+                                        <option>4800</option>
+                                        <option>9600</option>
+                                        <option>19200</option>
+                                        <option>38400</option>
+                                        <option>57600</option>
+                                        <option>115200</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <div class="col-3">
+                                    <label class="input-label" for="serial-parity">Parity bit</label>
+                                </div>
+                                <div class="col-7">
+                                    <select class="form-control" id="serial-parity">
+                                        <option value="NONE">None</option>
+                                        <option value="ODD">Odd</option>
+                                        <option value="EVEN">Even</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <div class="col-3">
+                                    <label class="input-label" for="serial-stop">Stop bit</label>
+                                </div>
+                                <div class="col-7">
+                                    <select class="form-control" id="serial-stop">
+                                        <option value="0">0</option>
+                                        <option value="1">1</option>
+                                        <option value="2">2</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <div class="col-3">
+                                    <label class="input-label" for="serial-data">Data bit</label>
+                                </div>
+                                <div class="col-7">
+                                    <select class="form-control" id="serial-data">
+                                        <option value="7">7</option>
+                                        <option value="8">8</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <div class="col-3">
+                                    <label class="input-label" for="serial-timeout">수신타임아웃(ms)</label>
+                                </div>
+                                <div class="col-7">
+                                    <input type="number" class="form-control" id="serial-timeout" value="100" min="0">
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <div class="col-3">
+                                    <label class="input-label" for="serial-delay">송신딜레이(ms)</label>
+                                </div>
+                                <div class="col-7">
+                                    <input type="number" class="form-control" id="serial-delay" value="0" min="0">
+                                </div>
+                            </div>
+                        </div>
+                        <div id="tcp-input" class="custom-communicate">
+                            <div class="form-group row">
+                                <div class="col-3">
+                                    <label class="input-label" for="custom-ip">IP주소</label>
+                                </div>
+                                <div class="col-7">
+                                    <input type="text" class="form-control mask-ip" id="custom-ip">
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <div class="col-3">
+                                    <label class="input-label" for="custom-port">포트</label>
+                                </div>
+                                <div class="col-7">
+                                    <input type="number" class="form-control" id="custom-port" min="0">
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <div class="col-3">
+                                    <label class="input-label" for="custom-timeout">수신타임아웃(ms)</label>
+                                </div>
+                                <div class="col-7">
+                                    <input type="number" class="form-control" id="custom-timeout" min="0" value="100">
+                                </div>
+                            </div>
+                        </div>
+                        <div id="tcp_client-input" class="custom-communicate">
+                            <div class="form-group row">
+                                <div class="col-3">
+                                    <label class="input-label" for="tcpclient-ip">IP주소</label>
+                                </div>
+                                <div class="col-7">
+                                    <input type="text" class="form-control mask-ip" id="tcpclient-ip">
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <div class="col-3">
+                                    <label class="input-label" for="tcpclient-port">포트</label>
+                                </div>
+                                <div class="col-7">
+                                    <input type="number" class="form-control" id="tcpclient-port" min="0">
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <div class="col-3">
+                                    <label class="input-label" for="tcpclient-connect">연결타임아웃</label>
+                                </div>
+                                <div class="col-7">
+                                    <input type="text" class="form-control" id="tcpclient-connect">
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <div class="col-3">
+                                    <label class="input-label" for="tcpclient-timeout">수신타임아웃(ms)</label>
+                                </div>
+                                <div class="col-7">
+                                    <input type="number" class="form-control" id="tcpclient-timeout" min="0" value="100">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group custom-communicate" id="save-panel">
+                            <div class="col-7">
+                                <div class="btn-panel">
+                                    <button class="btn btn-primary btn-icon-split" onclick="saveDetail();">
+                                        <span class="icon text-white-50">
+                                            <i class="fas fa-check"></i>
+                                        </span>
+                                        <span class="text">저장</span>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-info btn-icon-split" onclick="channelSelect();">
+                    <span class="icon text-white-50">
+                        <i class="fas fa-check"></i>
+                    </span>
+                    <span class="text">선택</span>
+                </button>
+                <button class="btn btn-secondary btn-icon-split" data-dismiss="modal">
+                    <span class="icon text-white-50">
+                        <i class="fas fa-times"></i>
+                    </span>
+                    <span class="text">취소</span>
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="custom-frame-modal" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document" style="max-width: 1200px !important;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">프레임선택</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group row">
+                    <div class="col-5">
+                        <div class="table-responsive">
+                            <table class="table table-bordered datatable-tbl" id="custom-frame-table" edit="1">
+                                <thead>
+                                    <tr>
+                                        <th style="width: 20%" class="text-center">
+                                            <div class="form-check">
+                                                <input type="checkbox" class="form-check-input check-all">
+                                                <label class="form-check-label"></label>
+                                            </div>
+                                        </th>
+                                        <th style="width: 30%">번호</th>
+                                        <th style="width: 50%">이름</th>
+                                    </tr>
+                                </thead>
+                            </table>
+                            <div class="btn-panel">
+                                <button class="btn btn-primary btn-icon-split" onclick="addFrame();">
+                                    <span class="icon text-white-50">
+                                        <i class="fas fa-plus"></i>
+                                    </span>
+                                    <span class="text">추가</span>
+                                </button>
+                                <button class="btn btn-danger btn-icon-split" onclick="removeFrame();">
+                                    <span class="icon text-white-50">
+                                        <i class="fas fa-trash"></i>
+                                    </span>
+                                    <span class="text">삭제</span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-7" id="frame">
+                        <div class="custom-communicate" id="segment-panel">
+                            <div class="table-responsive">
+                                <label class="form-check-label mb-3">프레임 세그먼트</label>
+                                <table class="table table-bordered datatable-tbl" id="custom-segment-table">
+                                    <thead>
+                                        <tr>
+                                            <th class="text-center">
+                                                <div class="form-check">
+                                                    <input type="checkbox" class="form-check-input check-all-2">
+                                                    <label class="form-check-label"></label>
+                                                </div>
+                                            </th>
+                                            <th style="width: 15%;">번호</th>
+                                            <th style="width: 35%;">타입</th>
+                                            <th style="width: 50%;">내용</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="segment-tbody"></tbody>
+                                </table>
+                                <div class="btn-panel">
+                                    <button class="btn btn-primary btn-icon-split" onclick="addSegment();">
+                                        <span class="icon text-white-50">
+                                            <i class="fas fa-plus"></i>
+                                        </span>
+                                        <span class="text">추가</span>
+                                    </button>
+                                    <button class="btn btn-warning btn-icon-split" onclick="editSegment();">
+                                        <span class="icon text-white-50">
+                                            <i class="fas fa-edit"></i>
+                                        </span>
+                                        <span class="text">편집</span>
+                                    </button>
+                                    <button class="btn btn-danger btn-icon-split" onclick="removeSegment();">
+                                        <span class="icon text-white-50">
+                                            <i class="fas fa-trash"></i>
+                                        </span>
+                                        <span class="text">삭제</span>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-info btn-icon-split" onclick="frameSelect();">
+                    <span class="icon text-white-50">
+                        <i class="fas fa-check"></i>
+                    </span>
+                    <span class="text">선택</span>
+                </button>
+                <button class="btn btn-secondary btn-icon-split" data-dismiss="modal">
+                    <span class="icon text-white-50">
+                        <i class="fas fa-times"></i>
+                    </span>
+                    <span class="text">취소</span>
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="channel-modal" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">채널 추가</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group row">
+                    <div class="col-3">
+                        <label class="input-label" for="channel-name">이름</label>
+                    </div>
+                    <div class="col-9">
+                        <input type="text" class="form-control" id="channel-name" />
+                    </div>
+                </div>
+                <div class="form-group row">
+                    <div class="col-3">
+                        <label class="input-label" for="channel-type">타입</label>
+                    </div>
+                    <div class="col-9">
+                        <select class="form-control" id="channel-type">
+                            <option value="SERIAL">SERIAL</option>
+                            <option value="TCP_CLIENT">TCP CLIENT</option>
+                            <option value="TCP_SERVER">TCP SERVER</option>
+                            <option value="UDP_CLIENT">UDP CLIENT</option>
+                            <option value="UDP_SERVER">UDP SERVER</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary btn-icon-split" data-dismiss="modal">
+                    <span class="icon text-white-50">
+                        <i class="fas fa-times"></i>
+                    </span>
+                    <span class="text">취소</span>
+                </button>
+                <button class="btn btn-primary btn-icon-split" onclick="doChannelAdd();">
+                    <span class="icon text-white-50">
+                        <i class="fas fa-check"></i>
+                    </span>
+                    <span class="text">확인</span>
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="frame-modal" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">채널 추가</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group row">
+                    <div class="col-3">
+                        <label class="input-label" for="frame-name">이름</label>
+                    </div>
+                    <div class="col-9">
+                        <input type="text" class="form-control" id="frame-name" />
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary btn-icon-split" data-dismiss="modal">
+                    <span class="icon text-white-50">
+                        <i class="fas fa-times"></i>
+                    </span>
+                    <span class="text">취소</span>
+                </button>
+                <button class="btn btn-primary btn-icon-split" onclick="doFrameAdd();">
+                    <span class="icon text-white-50">
+                        <i class="fas fa-check"></i>
+                    </span>
+                    <span class="text">확인</span>
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="segment-modal" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">세그먼트편집</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <input type="hidden" id="segment-id" value="" />
+                <div class="form-group row">
+                    <div class="col-3">
+                        <label class="input-label" for="segment-type">세그먼트타입</label>
+                    </div>
+                    <div class="col-9">
+                        <select class="form-control" id="segment-type">
+                            <option value="<H>">상수(HEX)</option>
+                            <option value="<S>">문자열</option>
+                            <option value="<V>">변수 입력</option>
+                            <option value="<B>">BCC 입력</option>
+                        </select>
+                    </div>
+                </div>
+                <div id="H-panel" class="segment-panel">
+                    <div class="alert alert-info" role="alert">
+                        0~FF까지 1바이트크기의 HEX 상수값을 입력합니다
+                        대소문자는 구별하지 않으며, 1바이트를 초과하는 값을
+                        입력하면 1바이트까지 인식합니다.
+                    </div>
+                    <div class="form-group row">
+                        <div class="col-3">
+                            <label class="input-label" for="segment-hex">상수(HEX)</label>
+                        </div>
+                        <div class="col-9">
+                            <input type="text" class="form-control" id="segment-hex" />
+                        </div>
+                    </div>
+                </div>
+                <div class="segment-panel" id="S-panel">
+                    <div class="alert alert-info" role="alert">
+                        최대 xx자까지 문자열을 입력합니다.
+                    </div>
+                    <div class="form-group row">
+                        <div class="col-3">
+                            <label class="input-label" for="segment-string">문자열</label>
+                        </div>
+                        <div class="col-9">
+                            <input type="text" class="form-control" id="segment-string" />
+                        </div>
+                    </div>
+                </div>
+                <div class="segment-panel" id="V-panel">
+                    <div class="alert alert-info" role="alert">
+                        변수 및 바이트크기를 입력합니다.
+                        바이트크기는 숫자를 직접 입력하거나 변수를 지정할 수 있습니다.
+                    </div>
+                    <div class="form-group row">
+                        <div class="col-3">
+                            <label class="input-label" for="segment-variable">변수</label>
+                        </div>
+                        <div class="col-9">
+                            <div class="input-group">
+                                <input type="text" class="form-control" id="segment-variable" readonly />
+                                <span class="input-group-append dropdown">
+                                    <button class="btn btn-primary dropdown-toggle" data-toggle="dropdown"></button>
+                                    <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                                        <a class="dropdown-item" href="#" onclick="showFixed('segment-variable');">고정변수</a>
+                                        <a class="dropdown-item" href="#" onclick="showFluid('segment-variable');">가변변수</a>
+                                    </div>
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <div class="col-3">
+                            <label class="input-label" for="segment-byte">바이트크기</label>
+                        </div>
+                        <div class="col-9">
+                            <div class="input-group">
+                                <input class="form-control" type="number" id="segment-byte"/>
+                                <span class="input-group-append dropdown">
+                                    <button class="btn btn-primary dropdown-toggle" data-toggle="dropdown"></button>
+                                    <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                                        <a class="dropdown-item" href="#" onclick="showFixed('segment-byte', 'analog');">고정변수</a>
+                                        <a class="dropdown-item" href="#" onclick="showFluid('segment-byte', 'analog');">가변변수</a>
+                                    </div>
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="segment-panel" id="B-panel">
+                    <div class="alert alert-info" role="alert">
+                        BCC 를 계산하기 위해 타입과 범위를 설정합니다.
+                    </div>
+                    <div class="form-group row">
+                        <div class="col-3">
+                            <label class="input-label" for="segment-btype">타입</label>
+                        </div>
+                        <div class="col-9">
+                            <select class="form-control" id="segment-btype">
+                                <option value="BYTE_SUM">BYTE SUM</option>
+                                <option value="WORD_SUM">WORD SUM</option>
+                                <option value="7BIT_SUM">7BIT SUM</option>
+                                <option value="7BIT_SUM_1s_Comp">7BIT SUM 1s Comp</option>
+                                <option value="7BIT_XOR">7BIT XOR</option>
+                                <option value="BYTE_SUM_1s_Comp">BYTE SUM 1s Comp</option>
+                                <option value="BYTE_SUM_2s_Comp">BYTE SUM 2s Comp</option>
+                                <option value="BYTE_XOR">BYTE XOR</option>
+                                <option value="CRC16_STANDARD">CRC16 STANDARD</option>
+                                <option value="CRC16_CCITT">CRC16 CCITT</option>
+                                <option value="CRC16_MODBUS">CRC16 MODBUS</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <div class="col-3">
+                            <label class="input-label" for="segment-start">시작세그먼트</label>
+                        </div>
+                        <div class="col-9">
+                            <input type="number" class="form-control" id="segment-start" />
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <div class="col-3">
+                            <label class="input-label" for="segment-end">종료세그먼트</label>
+                        </div>
+                        <div class="col-9">
+                            <input type="number" class="form-control" id="segment-end" />
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <div class="col-12">
+                            <div class="form-check">
+                                <input type="checkbox" class="form-check-input" id="segment-ascii">
+                                <label class="form-check-label" for="segment-ascii">ASCII로 변환</label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary btn-icon-split" data-dismiss="modal">
+                    <span class="icon text-white-50">
+                        <i class="fas fa-times"></i>
+                    </span>
+                    <span class="text">취소</span>
+                </button>
+                <button class="btn btn-primary btn-icon-split" onclick="doSegmentAdd();">
+                    <span class="icon text-white-50">
+                        <i class="fas fa-check"></i>
+                    </span>
+                    <span class="text">확인</span>
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="recipe-select-modal" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document" style="max-width: 1200px !important;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">레시피선택</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group row">
+                    <div class="col-4">
+                        <div class="table-responsive pt-3">
+                            <table class="table table-bordered datatable-tbl {%if selmode == 'run' or not edit_auth%}no-context{%endif%}" id="recipe-table">
+                                <thead>
+                                    <tr>
+                                        <th class="text-center">
+                                            <div class="form-check">
+                                                <input type="checkbox" class="form-check-input check-all">
+                                                <label class="form-check-label"></label>
+                                            </div>
+                                        </th>
+                                        <th style="width: 20%">번호</th>
+                                        <th style="width: 80%">레시피정의</th>
+                                    </tr>
+                                </thead>
+                            </table>
+                            {% if selmode == "stop" and edit_auth %}
+                                <div class="btn-panel">
+                                    <button class="btn btn-primary btn-icon-split" onclick="addDef();">
+                                        <span class="icon text-white-50">
+                                            <i class="fas fa-plus"></i>
+                                        </span>
+                                        <span class="text">추가</span>
+                                    </button>
+                                    <button class="btn btn-success btn-icon-split" onclick="editDef();">
+                                        <span class="icon text-white-50">
+                                            <i class="fas fa-edit"></i>
+                                        </span>
+                                        <span class="text">편집</span>
+                                    </button>
+                                    <button class="btn btn-danger btn-icon-split" onclick="removeDef();">
+                                        <span class="icon text-white-50">
+                                            <i class="fas fa-trash"></i>
+                                        </span>
+                                        <span class="text">삭제</span>
+                                    </button>
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div class="col-8" id="detail-panel">
+                        <div class="table-responsive pt-3">
+                            <table class="table table-bordered no-context" id="recipe-val-table">
+                                <thead>
+                                    <tr id="variable-tr"></tr>
+                                </thead>
+                                <tbody id="variable-tbody"></tbody>
+                            </table>
+                            {% if selmode == "stop" and edit_auth %}
+                                <div class="btn-panel">
+                                    <button class="btn btn-info btn-icon-split" onclick="addVariable();">
+                                        <span class="icon text-white-50">
+                                            <i class="fas fa-plus"></i>
+                                        </span>
+                                        <span class="text">변수추가</span>
+                                    </button>
+                                    <button class="btn btn-warning btn-icon-split" onclick="removeVariable();">
+                                        <span class="icon text-white-50">
+                                            <i class="fas fa-trash"></i>
+                                        </span>
+                                        <span class="text">변수삭제</span>
+                                    </button>
+                                    <button class="btn btn-success btn-icon-split" onclick="addRecipe();">
+                                        <span class="icon text-white-50">
+                                            <i class="fas fa-plus"></i>
+                                        </span>
+                                        <span class="text">레시피추가</span>
+                                    </button>
+                                    <button class="btn btn-danger btn-icon-split" onclick="removeRecipe();">
+                                        <span class="icon text-white-50">
+                                            <i class="fas fa-trash"></i>
+                                        </span>
+                                        <span class="text">레시피삭제</span>
+                                    </button>
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary btn-icon-split" data-dismiss="modal">
+                    <span class="icon text-white-50">
+                        <i class="fas fa-times"></i>
+                    </span>
+                    <span class="text">취소</span>
+                </button>
+                <button class="btn btn-primary btn-icon-split" onclick="selectRecipe();">
+                    <span class="icon text-white-50">
+                        <i class="fas fa-check"></i>
+                    </span>
+                    <span class="text">확인</span>
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="def-modal" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">레시피정의추가</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group row">
+                    <div class="col-3">
+                        <label class="input-label" for="recipe-name">레시피정의명</label>
+                    </div>
+                    <div class="col-9">
+                        <input type="text" class="form-control" id="recipe-name"/>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary btn-icon-split" data-dismiss="modal">
+                    <span class="icon text-white-50">
+                        <i class="fas fa-times"></i>
+                    </span>
+                    <span class="text">취소</span>
+                </button>
+                <button class="btn btn-primary btn-icon-split" onclick="doDefSave();">
+                    <span class="icon text-white-50">
+                        <i class="fas fa-check"></i>
+                    </span>
+                    <span class="text">확인</span>
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="var-modal" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">변수추가</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group row">
+                    <div class="col-3">
+                        <label class="input-label" for="variable-name">변수선택</label>
+                    </div>
+                    <div class="col-7">
+                        <div class="input-group">
+                            <input type="text" class="form-control" id="variable-name" readonly />
+                            <span class="input-group-append dropdown">
+                                <button class="btn btn-primary dropdown-toggle" data-toggle="dropdown"></button>
+                                <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                                    <a class="dropdown-item" href="#" onclick="showFixed('variable-name');">고정변수</a>
+                                    <a class="dropdown-item" href="#" onclick="showFluid('variable-name');">가변변수</a>
+                                </div>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary btn-icon-split" data-dismiss="modal">
+                    <span class="icon text-white-50">
+                        <i class="fas fa-times"></i>
+                    </span>
+                    <span class="text">취소</span>
+                </button>
+                <button class="btn btn-primary btn-icon-split" onclick="doVarSave();">
+                    <span class="icon text-white-50">
+                        <i class="fas fa-check"></i>
+                    </span>
+                    <span class="text">확인</span>
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="recipe-modal" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">레시피추가</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group row">
+                    <div class="col-3">
+                        <label class="input-label" for="recipe-title">레시피제목</label>
+                    </div>
+                    <div class="col-7">
+                        <input type="text" class="form-control" id="recipe-title"  />
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary btn-icon-split" data-dismiss="modal">
+                    <span class="icon text-white-50">
+                        <i class="fas fa-times"></i>
+                    </span>
+                    <span class="text">취소</span>
+                </button>
+                <button class="btn btn-primary btn-icon-split" onclick="doRecipeSave();">
+                    <span class="icon text-white-50">
+                        <i class="fas fa-check"></i>
+                    </span>
+                    <span class="text">확인</span>
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="recipe-context" class="contextmenu">
+    <ul>
+        <li onclick="addVariable();"><i class="fas fa-plus-circle"></i>변수추가</li>
+        <li onclick="removeVariable();"><i class="fas fa-trash"></i>변수삭제</li>
+        <li onclick="addRecipe();"><i class="fas fa-plus-circle"></i>레시피추가</li>
+        <li onclick="removeRecipe();"><i class="fas fa-trash"></i>레시피삭제</li>
+    </ul>
+</div>
+
+<script>
+    const funcTbl = $("#func-table");
+    const varTemp = `
+        <div class="input-group">
+            <input type="input.text" class="form-control" id="input.id" readonly>
+            <span class="input-group-append dropdown">
+                <button class="btn btn-primary dropdown-toggle" data-toggle="dropdown"></button>
+                <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                    <a class="dropdown-item" href="#" onclick="showFixed('input.id', 'var.type');">고정변수</a>
+                    <a class="dropdown-item" href="#" onclick="showFluid('input.id', 'var.type');">가변변수</a>
+                </div>
+            </span>
+        </div>
+    `;
+    function selectFormula() {
+        $("#formula-modal").modal('show');
+    }
+
+    function drawInOut(inList = [], outList = []) {
+        let html = "";
+        for(let ii = 0; ii < inList.length; ii++) {
+            const inItem = inList[ii];
+            html += "<tr><td>" + inItem.name + "</td>";
+            const inputID = 'func-in-val-' + inItem.id;
+            if(inItem.control === "CHECK_BOX") {
+                html += '<td class="text-center"><div class="form-check"><input type="checkbox" class="form-check-input" id="' + inputID + '" ';
+                if(inItem.default === "TRUE") html += 'checked';
+                html += '><label class="form-check-label" for="' + inputID + '"></label></div></td>\';'
+            } else if(inItem.control === "COMBO_BOX") {
+                const itemList = inItem.combo && inItem.combo.length > 0 ? inItem.combo.split(',') : [];
+                html += '<td><select class="form-control" id="' + inputID + '">';
+                for(let jj = 0; jj < itemList.length; jj++) {
+                    const itemVal = itemList[ii].trim();
+                    html += '<option value="' + itemVal + '">' + itemVal + '</option>';
+                }
+
+                html += "</select></td>";
+            } else {
+                html += '<td>';
+                const varType = ["DIGITAL", "TIME", "DATE", "STRING"].indexOf(inItem.type) >= 0 ? inItem.type.toLowerCase() : 'analog';
+                const inputType = varType === "analog" ? 'number' : "text";
+                html += varTemp.replaceAll('input.id', inputID).replaceAll('var.type', varType).replaceAll('readonly', '').replaceAll('input.type', inputType);
+                html += '</td>';
+            }
+
+            html += "<td>" + inItem.type + "</td></tr>";
+        }
+        $("#func-input-tbody").html(html);
+
+        html = "";
+        for(let ii = 0; ii < outList.length; ii++) {
+            const outItem = outList[ii];
+            const inputID = 'func-out-val-' + outItem.id;
+            const varType = outItem.type.toLowerCase();
+            html += "<tr><td>" + outItem.name + "</td><td>";
+            html += varTemp.replaceAll('input.id', inputID).replaceAll('var.type', varType);
+            html += '</td><td>' + outItem.type + '</td></tr>';
+        }
+        $("#func-output-tbody").html(html);
+
+        $("#in-out-panel").show();
+    }
+
+    function selectFunc() {
+        const selChk = $("#func-table .check-row").filter(':checked');
+        if(selChk.length === 1) {
+            const selElement = $(selChk[0]);
+            const inputID = funcTbl.attr('inputid');
+            const selName = selElement.attr('data-name');
+            const selid = selElement.attr('id').replace('check-row-func-', '');
+
+            $.ajax({
+                url: "{{url_for('logic_setting.func_inout')}}",
+                data: {selid},
+                dataType: 'json',
+                type: 'POST',
+                headers: { "X-CSRFToken": csrf_token },
+                success: function(resp) {
+                    if(resp.status) {
+                        $(inputID).val(selName);
+                        $(inputID).attr('selid', selid);
+
+                        drawInOut(resp.in_list, resp.out_list);
+                        $("#function-modal").modal('hide');
+                    } else {
+                        alert(resp.message);
+                    }
+                },
+                error: function () {
+                    alert(refreshMsg);
+                }
+            });
+        } else {
+            alert('함수를 선택하세요');
+        }
+    }
+
+    function funcSelect(inputid) {
+        $("#func-table tbody input.check-row").prop('checked', false);
+        funcTbl.attr('inputid', inputid);
+        $("#function-modal").modal('show');
+    }
+
+    function doFuncSave() {
+        $("#action-modal .insert-alert").hide();
+        let postData = {};
+        postData['use_flag'] = $("#ckbx-style-1-1").prop('checked') ? '1' : '0';
+
+        $("#action-modal input").removeClass('border-danger');
+
+        const action_name = input_val("action-name");
+        if(!action_name) {
+            showErr("action-name");
+            return false;
+        }
+        postData['action_name'] = action_name;
+
+        const action_order = input_val("action-order");
+        if(!action_order) {
+            showErr("action-order");
+            return false;
+        }
+        postData['action_order'] = action_order;
+
+        postData['action_type'] = input_val("type-select");
+        let inputArr = $("#" + postData['action_type'] + "-input input");
+        let inputValid = true;
+        if(inputArr.length > 0) {
+            for(let ii = 0; ii < inputArr.length; ii++) {
+                const inputItem = $(inputArr[ii]);
+                const inputID = inputItem.attr('id');
+                const inputID1 = $("#" + inputID);
+                const inputVal = inputItem.val().trim();
+
+                if(inputItem.attr('type') === "checkbox" || !inputItem.attr('id')) continue;
+
+                const filterParents = inputID1.parents("div")
+                    .filter(function() {
+                        return $(this).css('display') === "none";
+                    }).length;
+
+                if(filterParents === 0 && inputVal.length === 0) {
+                    showErr(inputID);
+                    inputValid = false;
+                    return false;
+                } else if(filterParents === 0) {
+                    const inputKey = inputID.replaceAll('-', '_');
+                    postData[inputKey] = inputKey === "shell_exec" ? ($(inputArr[ii]).prop('checked') ? '1' : '0') : inputVal;
+                    if(inputID1.attr("seltype")) {
+                        postData[inputKey + "_selid"] = inputID1.attr("selid");
+                        postData[inputKey + "_seltype"] = inputID1.attr("seltype");
+                        postData[inputKey + "_sellocstr"] = inputID1.attr("sellocstr");
+                    }
+                }
+            }
+        }
+
+        switch (postData['action_type']) {
+            case 'function':
+                postData['func_select_selid'] = $("#func-select").attr('selid');
+                break;
+            case 'control':
+                postData['control_id'] = $("#control-select").attr('selid');
+                break;
+            case 'act_group':
+                postData['actgroup_id'] = $("#act-group-select").attr('selid');
+                break;
+            case 'shell_exec':
+                postData['shell_exec'] = $("#shell-exec").prop('checked') ? '1' : '0';
+                break;
+            case 'user_def_comm':
+                postData['channel_id'] = $("#comm-channel").attr('selid');
+                postData['frame_id'] = $("#comm-frame").attr('selid');
+                break;
+            case 'recipe':
+                const recipeInput = $("#recipe-value");
+                postData['def_id'] = recipeInput.attr('defid');
+                postData['recipe_id'] = recipeInput.attr('selid');
+                break;
+        }
+
+        if(inputValid) {
+            let inputArr = $("#" + postData['action_type'] + "-input select");
+            for(let ii = 0; ii < inputArr.length; ii++) {
+                postData[$(inputArr[ii]).attr('name').trim()] = $(inputArr[ii]).val();
+            }
+        }
+
+        postData['selid'] = $("#selid").val();
+        postData['action_type'] = postData['action_type'].toUpperCase();
+        sendAjax("{{url_for('logic_setting.update_action')}}", postData, false);
+        updateVariable(typeof logicActTbl === 'undefined' ? dataTables : logicActTbl);
+        $("#action-modal").modal('hide');
+    }
+
+    function doActCreate() {
+        $("#selid").val('0');
+        $(".type-div").hide();
+        $("#action-modal .insert-alert").hide();
+
+        $("#action-name").val('');
+        $("#action-order").val('1');
+
+        const selType = "#" + $("#type-select").val() + "-input";
+        const selInputs = $(selType + " input");
+        for(let ii = 0; ii <selInputs.length; ii++) {
+            $(selInputs[ii]).removeAttr("seltype").removeAttr("selid").removeAttr("sellocstr").val('');
+        }
+        $(selType).show();
+
+        $("#in-out-panel").hide();
+        $("#func-input-tbody").html('');
+        $("#func-output-tbody").html('');
+        $("#action-modal").modal('show');
+    }
+
+    function doActEdit(selID = "#action-table") {
+        const checkedRows = $(selID + " input.check-row").filter(':checked');
+        const totalCnt = checkedRows.length;
+        if(totalCnt === 1) {
+            const selid = $(checkedRows[0]).attr('id').replace('check-row-', '');
+            editAction(selid);
+        } else {
+            alert("편집할 동작을 선택하세요");
+        }
+    }
+
+    function doActDelete(selID = "#action-table") {
+        removeAction(selID, '{{url_for("logic_setting.remove_action")}}', '', false);
+        updateVariable(typeof logicActTbl === "undefined" ? dataTables : logicActTbl);
+    }
+
+    function actionAct(flag) {
+        const selRow = $("#contextmenu").attr("selrow");
+        if(flag === "plus") {
+            doActCreate();
+        } else if(flag === "edit" && selRow) {
+            editAction(selRow);
+        } else {
+            if(selRow && confirm('삭제하시겠습니까?')) {
+                sendAjax("{{url_for('logic_setting.remove_action')}}", {selRow}, false);
+                updateVariable(typeof logicActTbl === "undefined" ? dataTables : logicActTbl);
+            }
+        }
+    }
+
+    function editAction(selid) {
+        if(selid && selid.length > 0) {
+            $.ajax({
+                url: "{{url_for('logic_setting.edit_action')}}",
+                dataType: 'json',
+                type: 'post',
+                data: {selid},
+                headers: { "X-CSRFToken": csrf_token },
+                success: function(resp) {
+                    if(resp.status) {
+                        $("#selid").val(selid);
+                        $(".type-div").hide();
+                        $("#action-modal .insert-alert").hide();
+
+                        const selData = resp.data;
+                        const dataType = selData.type.toLowerCase();
+                        const selType = "#" + dataType + "-input";
+                        $(selType).show();
+
+                        $("#type-select").val(dataType);
+                        $("#action-name").val(selData.name);
+                        $("#action-order").val(selData.order);
+                        $("#ckbx-style-1-1").prop('checked', selData.use_flag === 1);
+
+                        let optionArr = {};
+                        if(selData.options.length > 0) {
+                            optionArr = JSON.parse(selData.options);
+                        }
+
+                        initInputs(selType, optionArr);
+
+                        const inputSelects = $(selType + " select");
+                        for(let ii = 0; ii < inputSelects.length; ii++) {
+                            const selSelect = "#" + $(inputSelects[ii]).attr('name');
+                            const selOption = $(inputSelects[ii]).find(':checked').attr('condition');
+                            if(selOption === "1") {
+                                $(selSelect).show();
+                            } else {
+                                $(selSelect).hide();
+                            }
+                        }
+
+                        if(dataType === "function") {
+                            $("#func-select").attr('selid', optionArr['func_select_selid']);
+                            const inList = selData.in_list, outList = selData.out_list;
+                            drawInOut(inList, outList);
+                            for(let ii = 0; ii < inList.length; ii++) {
+                                const inItem = inList[ii];
+                                let idStr = "func-in-val-" + inItem.id
+                                const idSplit = idStr.replaceAll('-', '_');
+                                idStr = "#" + idStr;
+                                $(idStr).val(optionArr[idSplit]);
+                                if(optionArr.hasOwnProperty(idSplit + "_selid")) {
+                                    $(idStr).attr('selid', optionArr[idSplit + "_selid"])
+                                        .attr('seltype', optionArr[idSplit + "_seltype"])
+                                        .attr('sellocstr', optionArr[idSplit + "_sellocstr"]);
+                                }
+                            }
+
+                            for(let ii = 0; ii < outList.length; ii++) {
+                                const outItem = outList[ii];
+                                let idStr = "func-out-val-" + outItem.id
+                                const idSplit = idStr.replaceAll('-', '_');
+                                idStr = "#" + idStr;
+                                $(idStr).val(optionArr[idSplit]);
+                                $(idStr).attr('selid', optionArr[idSplit + "_selid"])
+                                    .attr('seltype', optionArr[idSplit + "_seltype"])
+                                    .attr('sellocstr', optionArr[idSplit + "_sellocstr"]);
+                            }
+                        } else if(dataType === "control") {
+                            $("#control-select").attr('selid', optionArr['control_id']);
+                        } else if(dataType === "act_group") {
+                            $("#act-group-select").attr('selid', optionArr['actgroup_id']);
+                        } else if(dataType === "shell_exec") {
+                            $("#shell-exec").prop('checked', optionArr['shell_exec'] === "1");
+                        } else if(dataType === "user_def_comm") {
+                            $("#comm-channel").attr('selid', optionArr['channel_id']);
+                            $("#comm-frame").attr('selid', optionArr['frame_id']);
+                        } else if(dataType === "recipe") {
+                            $("#recipe-value").attr('defid', optionArr['def_id']).attr('selid', optionArr['recipe_id']);
+                        }
+
+                        $("#action-modal").modal('show');
+                    } else {
+                        alert(resp.message);
+                    }
+                },
+                error: function() {
+                    alert(refreshMsg);
+                }
+            });
+        }
+    }
+
+    function controlSelect() {
+        const selIDs = getTblChk("#logic-control-table");
+        if(selIDs.length > 0 && selIDs.split(',').length === 1) {
+            const selName = $("#logic-control-table tbody input.check-row").filter(':checked').attr('data-name');
+            const controlInput = $("#control-select");
+            controlInput.val(selName);
+            controlInput.attr('selid', selIDs);
+            $("#control-select-modal").modal('hide');
+        } else {
+            alert('조건그룹을 1개선택하세요');
+        }
+    }
+
+    function actGroupSelect() {
+        const selIDs = getTblChk("#logic-actgroup-table", "actgroup-");
+        if(selIDs.length > 0 && selIDs.split(',').length === 1) {
+            const selName = $("#logic-actgroup-table tbody input.check-row").filter(':checked').attr('data-name');
+            const controlInput = $("#act-group-select");
+            controlInput.val(selName);
+            controlInput.attr('selid', selIDs);
+            $("#actgroup-modal").modal('hide');
+        } else {
+            alert('동작그룹을 1개 선택하세요');
+        }
+    }
+
+    function channelSelect() {
+        const selIDs = getTblChk("#custom-channel-table");
+        if(selIDs.length > 0 && selIDs.split(',').length === 1) {
+            const selName = $("#custom-channel-table tbody input.check-row").filter(':checked').attr('data-name');
+            const controlInput = $("#comm-channel");
+            controlInput.val(selName);
+            controlInput.attr('selid', selIDs);
+            $("#custom-channel-modal").modal('hide');
+        } else {
+            alert('통신채널을 1개 선택하세요');
+        }
+    }
+
+    function frameSelect() {
+        const selIDs = getTblChk("#custom-frame-table", 'frame-');
+        if(selIDs.length > 0 && selIDs.split(',').length === 1) {
+            const selName = $("#custom-frame-table tbody input.check-row").filter(':checked').attr('data-name');
+            const controlInput = $("#comm-frame");
+            controlInput.val(selName);
+            controlInput.attr('selid', selIDs);
+            $("#custom-frame-modal").modal('hide');
+        } else {
+            alert('프레임을 1개 선택하세요');
+        }
+    }
+
+    function selectRecipe() {
+        const rowArr = $("#variable-tr input[type='checkbox']").filter(':checked');
+        if(rowArr.length === 1) {
+            const chkDef = $("#recipe-table tbody input.check-row").filter(':checked');
+            const defName = chkDef.attr('data-name');
+            const defID = chkDef.attr('id').replace('check-row-', '');
+
+            const selName = rowArr.closest('th').find('input[type="text"]').val();
+            const selID = rowArr.attr('id').replace('recipe-name-', '');
+
+            const controlInput = $("#recipe-value");
+            controlInput.val(defName + "." + selName);
+            controlInput.attr('defid', defID);
+            controlInput.attr('selid', selID);
+            $("#recipe-select-modal").modal('hide');
+        } else {
+            alert('레시피를 1개 선택하세요');
+        }
+    }
+
+    function calcSelect() {
+        const formulaInput = $("#formula-area").val().trim();
+        if(formulaInput.length > 0) {
+            $("#formula-value").val(formulaInput);
+            $("#formula-modal").modal('hide');
+        } else {
+            alert('수식을 입력하세요');
+        }
+    }
+
+    function updateArea(selText = '', hasFunc = false) {
+        selText = hasFunc ? selText + "()" : selText;
+        const formulaInput = $("#formula-area");
+        const curPosition = formulaInput[0].selectionStart;
+        const curText = formulaInput.val().trim();
+        const textLen = selText.length;
+        formulaInput.val(curText.substr(0, curPosition) + selText + curText.substr(curPosition)).focus();
+        formulaInput[0].selectionStart = formulaInput[0].selectionEnd = curPosition + (hasFunc ? textLen - 1 : textLen);
+    }
+
+    $(document).ready(function () {
+        $("#type-select").change(function() {
+            const selType = $(this).val();
+            $(".type-div").hide();
+            $("#" + selType + "-input").show();
+        });
+
+        funcTbl.DataTable({
+            ...dataTableLang,
+            ...dataTableObj,
+            "columnDefs": columnDef,
+            'ajax': {
+                'url': "{{url_for('logic_setting.func_list')}}",
+                'headers': { "X-CSRFToken": csrf_token },
+            },
+            "drawCallback": function(oSettings) {
+                setDataTblPage(funcTbl, oSettings._iDisplayLength);
+            },
+            "columns": [
+                {
+                    render: function (data, type, row) {
+                        return '<div class="form-check"><input type="checkbox" class="form-check-input check-row" id="check-row-func-' + row.id + '" data-name="' + row.name + '"><label class="form-check-label" for="check-row-func-' + row.id + '"></label></div>';
+                    }
+                },
+                { "data": "group" },
+                { "data": "name" },
+                { "data": "desc" }
+            ],
+            "createdRow": function(row, data) {
+                $(row).attr('data-row', "func-" + data.id);
+                $(row).find('td:first').addClass('text-center');
+            }
+        });
+
+        $("#logic-control-table").DataTable({
+            ...dataTableLang,
+            ...dataTableObj,
+            "columnDefs": columnDef,
+            "order": [[ 1, "asc" ]],
+            "drawCallback": function(oSettings) {
+                setDataTblPage($("#logic-control-table"), oSettings._iDisplayLength);
+            },
+            'ajax': {
+                'url': "{{url_for('logic_setting.control_list')}}",
+                'headers': { "X-CSRFToken": csrf_token },
+                'data': function(data) {
+                    return {
+                        ...data,
+                        beforeID: 0
+                    };
+                }
+            },
+            "columns": [
+                {
+                    render: function (data, type, row) {
+                        const nameStr = " data-name='" + row.name + "'";
+                        const attrStr = $("#control-select-modal").attr('before') === row.id.toString() ? 'checked' + nameStr : nameStr;
+                        return checkForm.replaceAll('data.id', row.id).replaceAll('data.attr', attrStr);
+                    }
+                },
+                {"data": "ind"},
+                {"data": "useflag"},
+                {"data": "name"},
+                {"data": "priority"},
+                {"data": "mode1"},
+                {"data": "logic_name"}
+            ],
+            "createdRow": function(row, data) {
+                $(row).attr('data-row', data.id);
+            }
+        });
+
+        $("#logic-actgroup-table").DataTable({
+            ...dataTableLang,
+            ...dataTableObj,
+            "columnDefs": columnDef,
+            "order": [[ 1, "asc" ]],
+            "drawCallback": function(oSettings) {
+                setDataTblPage($("#logic-actgroup-table"), oSettings._iDisplayLength);
+            },
+            'ajax': {
+                'url': "{{url_for('logic_setting.actgroup_list')}}",
+                'headers': { "X-CSRFToken": csrf_token },
+                'data': function(data) {
+                    return {
+                        ...data,
+                        beforeID: 0
+                    };
+                }
+            },
+            "columns": [
+                {
+                    render: function (data, type, row) {
+                        let attrStr = "data-name='" + row.name + "' mode='" + row.mode1 + "' cnt='" + row.cnt + "'";
+                        return checkForm.replaceAll('data.id', "actgroup-" + row.id).replaceAll('data.attr', attrStr);
+                    }
+                },
+                {"data": "ind"},
+                {"data": "name"},
+                {"data": "mode"},
+                {"data": "cnt"},
+                {"data": "control_name"}
+            ],
+            "createdRow": function(row, data) {
+                $(row).attr('data-row', "actgroup-" + data.id);
+            }
+        });
+
+        $(".func-btns .btn-secondary").on('click', function () {
+            updateArea($(this).text().trim(), $(this).hasClass('func'));
+        });
+
+        $("#formula-var").on('change', function() {
+            updateArea($(this).attr('sellocstr'));
+        });
+
+        $(".mask-time").inputmask(timeFormat);
+
+        $('.date-picker').datetimepicker({
+            format: 'YYYY-MM-DD',
+        });
+    });
+</script>

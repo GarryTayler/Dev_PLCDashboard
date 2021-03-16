@@ -1,0 +1,136 @@
+<style>
+    .dataTables_wrapper .dataTables_paginate .paginate_button.current,
+    .dataTables_wrapper .dataTables_paginate .paginate_button.current:hover,
+    .dataTables_wrapper .dataTables_paginate .paginate_button:hover {
+        border-radius: 5px;
+        background: #4e73df;
+        border: none;
+        color: white !important;
+    }
+    .dataTables_wrapper .dataTables_paginate .paginate_button:hover {
+        background: #2caae1 !important;
+    }
+</style>
+
+<div id="contextmenu" class="contextmenu">
+    <ul>
+        <li onclick="contextAct('build');" id="contextmenu-build"><i class="fas fa-layer-group"></i>구성</li>
+        <li onclick="contextAct('plus');"><i class="fas fa-plus-circle"></i>추가</li>
+        <li onclick="contextAct('edit');" id="contextmenu-edit"><i class="fas fa-edit"></i>편집</li>
+        <li onclick="contextAct('del');"><i class="fas fa-trash"></i>삭제</li>
+    </ul>
+</div>
+
+<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.22/css/jquery.dataTables.min.css">
+<script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/1.10.22/js/jquery.dataTables.min.js"></script>
+<script>
+    function toggleItem(itemRow, currentClicked) {
+        const selTbl = itemRow.closest('table');
+        const currentProp = itemRow.find('input[type="checkbox"]').prop('checked');
+        selTbl.attr('before_clicked', currentProp ? '' : currentClicked)
+        updateCheck(itemRow);
+    }
+
+    function updateCheck(itemRow, flag = 0) {
+        const itemChk = itemRow.find('input[type="checkbox"]');
+        if(flag === 0) {
+            itemChk.prop('checked', !itemChk.prop('checked'));
+        } else {
+            itemChk.prop('checked', flag);
+        }
+    }
+
+    function contextAct(flag) {
+        const selTbl = $("#contextmenu").attr("seltbl");
+        if(["logic-cond-modal", "condition-table"].indexOf(selTbl) >= 0) {
+            conditionAct(flag);
+        } else if(["logic-condgroup-table", "condgroup-table"].indexOf(selTbl) >= 0) {
+            condGroupAct(flag);
+        } else if(["logic-act-modal", "action-table"].indexOf(selTbl) >= 0) {
+            actionAct(flag);
+        } else if(["logic-actgroup-table", "actiongroup-table"].indexOf(selTbl) >= 0) {
+            actionGroupAct(flag);
+        } else if(['logic-control-table', "control-table"].indexOf(selTbl) >= 0) {
+            controlAct(flag);
+        } else if(selTbl === "control-panel-table") {
+            logicAct(flag);
+        } else if(selTbl === "data-collect-table") {
+            collectAct(flag);
+        } else if(selTbl === "modbus-table") {
+            modbusAct(flag);
+        } else if(selTbl === "modbus-channel-tbl") {
+            modbusChannelAct(flag);
+        } else if(selTbl === "rtu-channel-tbl") {
+            modbusChannelAct(flag, 'rtu');
+        } else if(selTbl === "custom-channel-table") {
+            customAct(flag);
+        } else if(selTbl === "custom-frame-table") {
+            frameAct(flag);
+        } else if(selTbl === "custom-segment-table") {
+            segmentAct(flag);
+        } else if(selTbl === "remote-client-table") {
+            remoteAct(flag);
+        } else if(selTbl === "alarm-table") {
+            alarmAct(flag);
+        } else if(selTbl === "recipe-table") {
+            recipeAct(flag);
+        } else if(selTbl === "user-table") {
+            userAct(flag);
+        }
+    }
+
+    $(document).ready(function () {
+        $('.dataTable').DataTable({
+            ...dataTableLang,
+            "columnDefs": typeof columnDef1 == 'undefined' ? columnDef : columnDef1,
+            'ordering': false,
+            'bAutoWidth': false
+        });
+
+        $(".dataTable, .datatable-tbl").on("click", "tbody tr", function (e) {
+            const isTable = $(e.target).is(".dataTable td");
+            const isTbl = $(e.target).is(".datatable-tbl td");
+            const selClass = "#" + $(e.target).closest('table').attr('id');
+            let beforeClicked = $(selClass).attr('before_clicked');
+
+            if(isTable || isTbl) {
+                const currentClicked = $(this).data("row");
+                if(e.shiftKey) {
+                    $(selClass + " .check-row").prop('checked', false);
+                    if(beforeClicked) {
+                        if(currentClicked === beforeClicked) {
+                            updateCheck($(this), '1');
+                        } else {
+                            let isSelected = false;
+                            let rows = $(selClass + " tbody tr");
+                            for(let ii = 0; ii < rows.length; ii++) {
+                                const rowItem = $(rows[ii]);
+                                const itemRow = rowItem.data("row");
+                                if(!isSelected && (itemRow == beforeClicked || itemRow == currentClicked)) {
+                                    isSelected = true;
+                                } else if(isSelected && (itemRow == beforeClicked || itemRow == currentClicked)) {
+                                    updateCheck(rowItem, 1);
+                                    return;
+                                }
+
+                                if(isSelected) updateCheck(rowItem, 1);
+                            }
+                        }
+                    } else {
+                        toggleItem($(this), currentClicked);
+                    }
+                } else if(e.ctrlKey) {
+                    toggleItem($(this), currentClicked);
+                } else {
+                    const chkRow = $(selClass + " input.check-row");
+                    if(beforeClicked == currentClicked && chkRow.filter(":checked").length === 1) {
+                        updateCheck($(this));
+                    } else {
+                        chkRow.prop('checked', false);
+                        toggleItem($(this), currentClicked);
+                    }
+                }
+            }
+        });
+    });
+</script>

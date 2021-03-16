@@ -1,0 +1,1359 @@
+{% extends "layout.html" %}
+
+{% block style %}
+    <style>
+        .tab-pane {
+            padding-top: 2rem;
+        }
+        #right-panel,
+        .tab-part {
+            display: none;
+            width: 100%;
+        }
+    </style>
+{% endblock %}
+
+{% block content %}
+    <div class="card shadow mb-4">
+        <div class="card-header py-3">
+            <h6 class="m-0 font-weight-bold text-primary">통신설정 > 모드버스</h6>
+        </div>
+        <div class="card-body">
+            <div class="form-group row">
+                <div class="col-9">
+                    <div class="table-responsive">
+                        <table class="table table-bordered datatable-tbl{%if selmode=='run' or not edit_auth%} no-context{%endif%}" id="modbus-table">
+                            <thead>
+                                <tr>
+                                    <th style="width: 10%" class="text-center">
+                                        <div class="form-check">
+                                            <input type="checkbox" class="form-check-input check-all">
+                                            <label class="form-check-label"></label>
+                                        </div>
+                                    </th>
+                                    <th>번호</th>
+                                    <th>사용</th>
+                                    <th>타입</th>
+                                    <th>프로토콜</th>
+                                    {% if selmode == "run" %}
+                                        <th style="width: 30%">상태</th>
+                                    {% endif %}
+                                </tr>
+                            </thead>
+                        </table>
+                        {% if selmode == "stop" and edit_auth %}
+                            <div class="btn-panel">
+                                <button class="btn btn-primary btn-icon-split" onclick="addModbus();">
+                                    <span class="icon text-white-50">
+                                        <i class="fas fa-plus"></i>
+                                    </span>
+                                    <span class="text">추가</span>
+                                </button>
+                                <button class="btn btn-warning btn-icon-split" onclick="editModbus();">
+                                    <span class="icon text-white-50">
+                                        <i class="fas fa-edit"></i>
+                                    </span>
+                                    <span class="text">편집</span>
+                                </button>
+                                <button class="btn btn-danger btn-icon-split" onclick="removeModbus();">
+                                    <span class="icon text-white-50">
+                                        <i class="fas fa-trash"></i>
+                                    </span>
+                                    <span class="text">삭제</span>
+                                </button>
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            <div class="form-group row">
+                <div class="col-12" id="right-panel">
+                    <ul class="nav nav-tabs" role="tablist">
+                        <li class="nav-item">
+                            <a class="nav-link active" data-toggle="tab" href="#common" id="common-tab">
+                                <i class="fa fa-info"></i> 일반
+                            </a>
+                        </li>
+                        <li class="nav-item rtu-panel">
+                            <a class="nav-link" data-toggle="tab" href="#channel">
+                                <i class="fa fa-route"></i> 채널
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" data-toggle="tab" href="#variable">
+                                <i class="fa fa-wrench"></i> 변수할당
+                            </a>
+                        </li>
+                    </ul>
+                    <div class="tab-content">
+                        <div id="common" class="tab-pane active">
+                            <div id="tcp-master-common" class="tab-part">
+                                <div class="form-group row">
+                                    <div class="col-2">
+                                        <label class="form-check-label" for="tcp-master-ip">IP주소</label>
+                                    </div>
+                                    <div class="col-5">
+                                        <input type="text" class="form-control mask-ip" placeholder="내용을 입력해주세요" id="tcp-master-ip">
+                                    </div>
+                                </div>
+                                <div class="form-group row">
+                                    <div class="col-2">
+                                        <label class="form-check-label" for="tcp-master-port">포트</label>
+                                    </div>
+                                    <div class="col-5">
+                                        <input type="number" class="form-control" value="502" id="tcp-master-port" min="1">
+                                    </div>
+                                </div>
+                                <div class="form-group row">
+                                    <div class="col-2">
+                                        <label class="form-check-label" for="tcp-master-timeout">타임아웃 (ms)</label>
+                                    </div>
+                                    <div class="col-5">
+                                        <input type="number" class="form-control" value="1000" id="tcp-master-timeout" min="1">
+                                    </div>
+                                </div>
+                                <div class="form-group row">
+                                    <div class="col-2">
+                                        <label class="form-check-label" for="tcp-master-unit">UNIT ID</label>
+                                    </div>
+                                    <div class="col-5">
+                                        <input type="number" class="form-control" id="tcp-master-unit" value="0" min="0" max="247">
+                                    </div>
+                                </div>
+                                <div class="form-group row">
+                                    <div class="col-2">
+                                        <label class="form-check-label" for="tcp-master-delay">지연시간 (ms)</label>
+                                    </div>
+                                    <div class="col-5">
+                                        <input type="number" class="form-control" id="tcp-master-delay" value="0" min="0">
+                                    </div>
+                                </div>
+                            </div>
+                            <div id="rtu-master-common" class="tab-part">
+                                <div class="form-group row">
+                                    <div class="col-2">
+                                        <label class="form-check-label" for="rtu-master-transmission">Transmission</label>
+                                    </div>
+                                    <div class="col-5">
+                                        <select class="form-control" id="rtu-master-transmission">
+                                            <option value="RTU">RTU</option>
+                                            <option value="ASCII">ASCII</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="form-group row">
+                                    <div class="col-2">
+                                        <label class="form-check-label" for="rtu-master-port">Port</label>
+                                    </div>
+                                    <div class="col-5">
+                                        <input type="number" class="form-control" id="rtu-master-port" min="1" />
+                                    </div>
+                                </div>
+                                <div class="form-group row">
+                                    <div class="col-2">
+                                        <label class="form-check-label" for="rtu-master-bps">Baud rate(bps)</label>
+                                    </div>
+                                    <div class="col-5">
+                                        <select class="form-control" id="rtu-master-bps">
+                                            <option value="1200">1200</option>
+                                            <option value="2400">2400</option>
+                                            <option value="4800">4800</option>
+                                            <option value="9600">9600</option>
+                                            <option value="19200">19200</option>
+                                            <option value="38400">38400</option>
+                                            <option value="57600">57600</option>
+                                            <option value="115200">115200</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="form-group row">
+                                    <div class="col-2">
+                                        <label class="form-check-label" for="rtu-master-parity">Parity bit</label>
+                                    </div>
+                                    <div class="col-5">
+                                        <select class="form-control" id="rtu-master-parity">
+                                            <option value="None">None</option>
+                                            <option value="Odd">Odd</option>
+                                            <option value="Even">Even</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="form-group row">
+                                    <div class="col-2">
+                                        <label class="form-check-label" for="rtu-master-stop">Stop bit</label>
+                                    </div>
+                                    <div class="col-5">
+                                        <select class="form-control" id="rtu-master-stop">
+                                            <option value="0">0</option>
+                                            <option value="1">1</option>
+                                            <option value="2">2</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="form-group row">
+                                    <div class="col-2">
+                                        <label class="form-check-label" for="rtu-master-data">Data bit</label>
+                                    </div>
+                                    <div class="col-5">
+                                        <select class="form-control" id="rtu-master-data">
+                                            <option value="7">7</option>
+                                            <option value="8">8</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                            <div id="tcp-slave-common" class="tab-part">
+                                <div class="form-group row">
+                                    <div class="col-2">
+                                        <label class="form-check-label" for="tcp-slave-port">Port</label>
+                                    </div>
+                                    <div class="col-5">
+                                        <input type="number" class="form-control" id="tcp-slave-port" min="1" placeholder="502">
+                                    </div>
+                                </div>
+                            </div>
+                            <div id="rtu-slave-common" class="tab-part">
+                                <div class="form-group row">
+                                    <div class="col-2">
+                                        <label class="form-check-label" for="rtu-slave-unit">UNIT ID</label>
+                                    </div>
+                                    <div class="col-5">
+                                        <input type="number" class="form-control" id="rtu-slave-unit" min="1" max="247" placeholder="1">
+                                    </div>
+                                </div>
+                                <div class="form-group row">
+                                    <div class="col-2">
+                                        <label class="form-check-label" for="rtu-slave-port">Port</label>
+                                    </div>
+                                    <div class="col-5">
+                                        <input type="number" class="form-control" id="rtu-slave-port" min="1" placeholder="1">
+                                    </div>
+                                </div>
+                                <div class="form-group row">
+                                    <div class="col-2">
+                                        <label class="form-check-label" for="rtu-slave-bps">Baud rate(bps)</label>
+                                    </div>
+                                    <div class="col-5">
+                                        <select class="form-control" id="rtu-slave-bps">
+                                            <option value="1200">1200</option>
+                                            <option value="2400">2400</option>
+                                            <option value="4800">4800</option>
+                                            <option value="9600">9600</option>
+                                            <option value="19200">19200</option>
+                                            <option value="38400">38400</option>
+                                            <option value="57600">57600</option>
+                                            <option value="115200">115200</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="form-group row">
+                                    <div class="col-2">
+                                        <label class="form-check-label" for="rtu-slave-parity">Parity bit</label>
+                                    </div>
+                                    <div class="col-5">
+                                        <select class="form-control" id="rtu-slave-parity">
+                                            <option value="None">None</option>
+                                            <option value="Odd">Odd</option>
+                                            <option value="Even">Even</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="form-group row">
+                                    <div class="col-2">
+                                        <label class="form-check-label" for="rtu-slave-stop">Stop bit</label>
+                                    </div>
+                                    <div class="col-5">
+                                        <select class="form-control" id="rtu-slave-stop">
+                                            <option value="0">0</option>
+                                            <option value="1">1</option>
+                                            <option value="2">2</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                            {% if selmode == "stop" and edit_auth %}
+                                <div class="form-group row">
+                                    <div class="col-7">
+                                        <div class="btn-panel">
+                                            <button class="btn btn-primary btn-icon-split" onclick="saveCommon();">
+                                                <span class="icon text-white-50">
+                                                    <i class="fas fa-check"></i>
+                                                </span>
+                                                <span class="text">저장</span>
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            {% endif %}
+                        </div>
+                        <div id="channel" class="tab-pane">
+                            <div class="form-group row">
+                                <div id="tcp-master-channel" class="tab-part">
+                                    <div class="col-12">
+                                        <div class="table-responsive">
+                                            <table class="table table-bordered datatable-tbl{%if selmode=='run' or not edit_auth%} no-context{%endif%}" id="modbus-channel-tbl">
+                                                <thead>
+                                                    <tr>
+                                                        <th class="text-center">
+                                                            <div class="form-check">
+                                                                <input type="checkbox" class="form-check-input check-all">
+                                                                <label class="form-check-label"></label>
+                                                            </div>
+                                                        </th>
+                                                        <th>트리거</th>
+                                                        <th>사이클시간(ms)</th>
+                                                        <th>트리거변수</th>
+                                                        <th>Function Code</th>
+                                                        <th>Read Offset</th>
+                                                        <th>Read Length</th>
+                                                        <th>Write Offset</th>
+                                                        <th>Write Length</th>
+                                                        {% if selmode == "run"%}
+                                                            <th>상태</th>
+                                                        {% endif %}
+                                                    </tr>
+                                                </thead>
+                                            </table>
+                                            {% if selmode == "stop" and edit_auth %}
+                                                <div class="btn-panel">
+                                                    <button class="btn btn-primary btn-icon-split" onclick="addChannel();">
+                                                        <span class="icon text-white-50">
+                                                            <i class="fas fa-plus"></i>
+                                                        </span>
+                                                        <span class="text">추가</span>
+                                                    </button>
+                                                    <button class="btn btn-success btn-icon-split" onclick="editChannel();">
+                                                        <span class="icon text-white-50">
+                                                            <i class="fas fa-edit"></i>
+                                                        </span>
+                                                        <span class="text">편집</span>
+                                                    </button>
+                                                    <button class="btn btn-danger btn-icon-split" onclick="removeChannel();">
+                                                        <span class="icon text-white-50">
+                                                            <i class="fas fa-trash"></i>
+                                                        </span>
+                                                        <span class="text">삭제</span>
+                                                    </button>
+                                                </div>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                </div>
+                                <div id="rtu-master-channel" class="tab-part">
+                                    <div class="table-responsive">
+                                        <table class="table table-bordered datatable-tbl{%if selmode=='run' or not edit_auth%} no-context{%endif%}" id="rtu-channel-tbl">
+                                            <thead>
+                                                <tr>
+                                                    <th class="text-center">
+                                                        <div class="form-check">
+                                                            <input type="checkbox" class="form-check-input check-all">
+                                                            <label class="form-check-label"></label>
+                                                        </div>
+                                                    </th>
+                                                    <th>Unit ID</th>
+                                                    <th>TimeOut(ms)</th>
+                                                    <th>트리거</th>
+                                                    <th>사이클시간(ms)</th>
+                                                    <th>트리거변수</th>
+                                                    <th>Function Code</th>
+                                                    <th>Read Offset</th>
+                                                    <th>Read Length</th>
+                                                    <th>Write Offset</th>
+                                                    <th>Write Length</th>
+                                                    {% if selmode == "run"%}
+                                                        <th>상태</th>
+                                                    {% endif %}
+                                                </tr>
+                                            </thead>
+                                        </table>
+                                        {% if selmode == "stop" and edit_auth %}
+                                            <div class="btn-panel">
+                                                <button class="btn btn-primary btn-icon-split" onclick="addChannel('rtu');">
+                                                    <span class="icon text-white-50">
+                                                        <i class="fas fa-plus"></i>
+                                                    </span>
+                                                    <span class="text">추가</span>
+                                                </button>
+                                                <button class="btn btn-success btn-icon-split" onclick="editChannel('rtu');">
+                                                    <span class="icon text-white-50">
+                                                        <i class="fas fa-edit"></i>
+                                                    </span>
+                                                    <span class="text">편집</span>
+                                                </button>
+                                                <button class="btn btn-danger btn-icon-split" onclick="removeChannel('rtu');">
+                                                    <span class="icon text-white-50">
+                                                        <i class="fas fa-trash"></i>
+                                                    </span>
+                                                    <span class="text">삭제</span>
+                                                </button>
+                                            </div>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div id="variable" class="tab-pane">
+                            <div id="master-variable" class="tab-part">
+                                <div class="form-group row">
+                                    <div class="col-2">
+                                        <label for="master-channel">채널</label>
+                                        <select class="form-control" id="master-channel" onchange="chlChange();">
+                                        </select>
+                                    </div>
+                                    <div class="col-2 len-panel" id="read-length">
+                                        <label for="read-length-sel">Read Length</label>
+                                        <select class="form-control" id="read-length-sel" onchange="chlChange();">
+                                        </select>
+                                    </div>
+                                    <div class="col-2 len-panel" id="write-length">
+                                        <label for="write-length-sel">Write Length</label>
+                                        <select class="form-control" id="write-length-sel" onchange="chlChange();">
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="form-group row">
+                                    <div class="col-7">
+                                        <div class="table-responsive">
+                                            <table class="table table-bordered no-context">
+                                                <thead>
+                                                    <tr>
+                                                        <th style="width: 30%">채널</th>
+                                                        <th style="width: 50%">변수</th>
+                                                        <th style="width: 20%">타입</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody id="master-variable-tbl">
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div id="slave-variable" class="tab-part">
+                                <div class="form-group row">
+                                    <div class="col-2">
+                                        <label for="slave-word-index">Word Index</label>
+                                        <select class="form-control" id="slave-word-index" onchange="chlChange('slave');">
+                                            {% for i in range(1024) %}
+                                                <option value="{{i}}">{{i}}</option>
+                                            {% endfor %}
+                                        </select>
+                                    </div>
+                                    <div class="col-3"></div>
+                                </div>
+                                <div class="form-group row">
+                                    <div class="col-12">
+                                        <div class="table-responsive">
+                                            <table class="table table-bordered">
+                                                <thead>
+                                                    <tr>
+                                                        <th>Word Index</th>
+                                                        <th>Bit Index</th>
+                                                        <th>변수</th>
+                                                        <th>타입</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    <tr>
+
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            {% if selmode == "stop" and edit_auth %}
+                                <div class="btn-panel">
+                                    <button class="btn btn-primary btn-icon-split" onclick="doSaveVariable();">
+                                        <span class="icon text-white-50">
+                                            <i class="fas fa-check"></i>
+                                        </span>
+                                        <span class="text">저장</span>
+                                    </button>
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="modbus-modal" tabindex="-1" role="dialog">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">모드버스 추가</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="form-group row">
+                        <div class="col-3">
+                            <label class="input-label">사용</label>
+                        </div>
+                        <div class="col-5">
+                            <div class="ckbx-style-1">
+                                <input type="checkbox" checked id="ckbx-style-1-1">
+                                <label for="ckbx-style-1-1"></label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <div class="col-3">
+                            <label class="input-label" for="modbus-type">타입</label>
+                        </div>
+                        <div class="col-5">
+                            <select class="form-control" id="modbus-type">
+                                <option value="MASTER">Master</option>
+                                <option value="SLAVE">Slave</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <div class="col-3">
+                            <label class="input-label" for="modbus-protocol">프로토콜</label>
+                        </div>
+                        <div class="col-5">
+                            <select class="form-control" id="modbus-protocol">
+                                <option value="TCP">Modbus TCP</option>
+                                <option value="RTU">Modbus RTU</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-secondary btn-icon-split" data-dismiss="modal">
+                        <span class="icon text-white-50">
+                            <i class="fas fa-times"></i>
+                        </span>
+                        <span class="text">취소</span>
+                    </button>
+                    <button class="btn btn-primary btn-icon-split" onclick="doModbusAdd();">
+                        <span class="icon text-white-50">
+                            <i class="fas fa-check"></i>
+                        </span>
+                        <span class="text">확인</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="channel-modal" tabindex="-1" role="dialog">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">채널 추가</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="alert alert-danger" role="alert" id="insert-alert">
+                        값을 입력하세요
+                    </div>
+                    <div id="rtu-channel" class="tab-part">
+                        <div class="form-group row">
+                            <div class="col-3">
+                                <label class="input-label" for="channel-unit">UNIT ID</label>
+                            </div>
+                            <div class="col-9">
+                                <input type="number" class="form-control" min="1" max="247" id="channel-unit" />
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <div class="col-3">
+                                <label class="input-label" for="channel-timeout">Timeout(ms)</label>
+                            </div>
+                            <div class="col-9">
+                                <input type="number" class="form-control" min="1" value="1000" id="channel-timeout" />
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <div class="col-3">
+                            <label class="input-label" for="channel-trigger">트리거</label>
+                        </div>
+                        <div class="col-9">
+                            <select class="form-control condition-select" id="channel-trigger">
+                                <option value="CYCLE_TIME">사이클시간</option>
+                                <option value="TRIGGER_VARIABLE">트리거변수</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div id="cycle-panel">
+                        <div class="form-group row">
+                            <div class="col-3">
+                                <label class="input-label" for="channel-cycle">사이클시간(ms)</label>
+                            </div>
+                            <div class="col-9">
+                                <input type="number" class="form-control" min="20" value="100" id="channel-cycle" />
+                            </div>
+                        </div>
+                    </div>
+                    <div class="tab-part" id="trigger-panel">
+                        <div class="form-group row">
+                            <div class="col-3">
+                                <label class="input-label" for="channel-trigger-variable">트리거변수</label>
+                            </div>
+                            <div class="col-9">
+                                <div class="input-group">
+                                    <input type="text" class="form-control" id="channel-trigger-variable" readonly>
+                                    <span class="input-group-append dropdown">
+                                        <button class="btn btn-primary dropdown-toggle" data-toggle="dropdown"></button>
+                                        <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                                            <a class="dropdown-item" href="#" onclick="showFixed('channel-trigger-variable');">고정변수</a>
+                                            <a class="dropdown-item" href="#" onclick="showFluid('channel-trigger-variable');">가변변수</a>
+                                        </div>
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <div class="col-3">
+                            <label class="input-label" for="channel-code">Function Code</label>
+                        </div>
+                        <div class="col-9">
+                            <select class="form-control condition-select" id="channel-code">
+                                <option value="1">1: Read Coils</option>
+                                <option value="2">2: Read Inputs</option>
+                                <option value="3">3: Read Holding Registers</option>
+                                <option value="4">4: Read Input Registers</option>
+                                <option value="5">5: Force Single Coil</option>
+                                <option value="6">6: Preset Single Register</option>
+                                <option value="15">15: Force Multiple Coils</option>
+                                <option value="16">16: Preset Multiple Registers</option>
+                                <option value="23">23: Read/Write Registers</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div id="read-offset-panel">
+                        <div class="form-group row">
+                            <div class="col-3">
+                                <label class="input-label" for="channel-readoffset">Read Offset</label>
+                            </div>
+                            <div class="col-9">
+                                <input type="number" class="form-control" id="channel-readoffset" onkeypress="return event.charCode >= 48 && event.charCode <= 57"/>
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <div class="col-3">
+                                <label class="input-label" for="channel-readlen">Read Length</label>
+                            </div>
+                            <div class="col-9">
+                                <input type="number" class="form-control" id="channel-readlen" onkeypress="return event.charCode >= 48 && event.charCode <= 57"/>
+                            </div>
+                        </div>
+                    </div>
+                    <div id="write-offset-panel" class="tab-part">
+                        <div class="form-group row">
+                            <div class="col-3">
+                                <label class="input-label" for="channel-writeoffset">Write Offset</label>
+                            </div>
+                            <div class="col-9">
+                                <input type="number" class="form-control" id="channel-writeoffset" onkeypress="return event.charCode >= 48 && event.charCode <= 57"/>
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <div class="col-3">
+                                <label class="input-label" for="channel-writelen">Write Length</label>
+                            </div>
+                            <div class="col-9">
+                                <input type="number" class="form-control" id="channel-writelen" onkeypress="return event.charCode >= 48 && event.charCode <= 57"/>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-secondary btn-icon-split" data-dismiss="modal">
+                        <span class="icon text-white-50">
+                            <i class="fas fa-times"></i>
+                        </span>
+                        <span class="text">취소</span>
+                    </button>
+                    <button class="btn btn-primary btn-icon-split" onclick="doChannelAdd();">
+                        <span class="icon text-white-50">
+                            <i class="fas fa-check"></i>
+                        </span>
+                        <span class="text">확인</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block script %}
+    {% include 'common/datatable.html' %}
+    {% include 'common/variable_modal.html' %}
+    <script src="{{ url_for('static', filename='js/jquery.inputmask.min.js') }}"></script>
+    <script>
+        const chlLimit = parseInt("{{channel_limit}}"), modbusLimit = "{{modbus_limit}}", modbusModal = $("#modbus-modal");
+        let commonPanel = '', channelPanel = '', variablePanel = '', selModbus = 0, chlCnt = 0;
+        let chlCode = 0, modbusTbl, modbusLen = 0;
+        const FuncCodes = {
+            '1': '1: Read Coils',
+            '2': '2: Read Inputs',
+            '3': '3: Read Holding Registers',
+            '4': '4: Read Input Registers',
+            '5': '5:Force Single Coil',
+            '6': '6: Preset Single Register',
+            '15': '15: Force Multiple Coils',
+            '16': '16: Preset Multiple Registers',
+            '23': '23: Read/Write Registers'
+        };
+        const modbusTable = $("#modbus-table");
+        let modbusChlTbl, rtuChlTbl;
+
+        function addModbus() {
+            if(modbusLen < modbusLimit) {
+                modbusModal.attr('selid', '0').modal('show');
+            } else {
+                alert(limitMsg);
+            }
+        }
+
+        function editModbus() {
+            const selIDs = getTblChk("#modbus-table", 'modbus-');
+            if(selIDs.length > 0) {
+                showModbusModal("modbus-" + selIDs.split(',')[0]);
+            } else {
+                alert('편집할 행을 선택하세요');
+            }
+        }
+
+        function doModbusAdd() {
+            const postData = {
+                type: $("#modbus-type").val(),
+                selid: modbusModal.attr('selid'),
+                protocol: $("#modbus-protocol").val(),
+                use_flag: $("#ckbx-style-1-1").prop('checked') ? '1' : '0'
+            };
+
+            sendAjax("{{url_for('communicate.add_modbus')}}", postData, false);
+            updateVariable(modbusTbl);
+            modbusModal.modal('hide');
+        }
+
+        function removeModbus() {
+            removeAction("#modbus-table", '{{url_for("communicate.remove_modbus")}}', 'modbus-', false);
+            updateVariable(modbusTbl);
+        }
+
+        function modbusAct(flag) {
+            if(flag === "plus") {
+                modbusModal.modal('show');
+            } else if(flag === "del") {
+                const selRow = $("#contextmenu").attr("selrow").replace('modbus-', '');
+                if(selRow && confirm('삭제하시겠습니까?')) {
+                    sendAjax("{{url_for('communicate.remove_modbus')}}", {selRow}, false);
+                    updateVariable(modbusTbl);
+                }
+            } else if(flag === "edit") {
+                showModbusModal($("#contextmenu").attr("selrow"));
+            }
+        }
+
+        function showModbusModal(selRow) {
+            const selInput = $("#modbus-table input[id='check-row-" + selRow + "']");
+            $("#modbus-type").val(selInput.attr('mtype'));
+            $("#modbus-protocol").val(selInput.attr('protocol'));
+            $("#ckbx-style-1-1").prop('checked', selInput.attr('flag') === "1");
+            modbusModal.attr('selid', selRow.replace('modbus-', '')).modal('show');
+        }
+
+        function removeChannel(type = 'modbus') {
+            const isDefault = type === "modbus";
+            const tableID = isDefault ? "#modbus-channel-tbl" : "#rtu-channel-tbl";
+            removeCustom(tableID, '{{url_for("communicate.remove_modbus")}}', "channel-", {selType: 'channel'}, false);
+            updateVariable(isDefault ? modbusChlTbl : rtuChlTbl);
+        }
+
+        function doChannelAdd() {
+            let postData = {};
+            let inputValid = true;
+            $("#insert-alert").hide();
+            $("#channel-modal input").removeClass('border-danger');
+            const inputArr = $("#channel-modal input, #channel-modal select");
+            for(let ii = 0; ii < inputArr.length; ii++) {
+                const inputItem = $(inputArr[ii]);
+                const inputID = inputItem.attr('id');
+                const inputID1 = $("#" + inputID);
+                const inputVal = inputItem.val().trim();
+
+                const filterParents = inputID1.parents("div")
+                    .filter(function() {
+                        return $(this).css('display') === "none";
+                    }).length;
+
+                if(filterParents === 0 && !inputID1.attr("disabled") && inputVal.length === 0) {
+                    showErr(inputID);
+                    inputValid = false;
+                    return false;
+                } else if(filterParents === 0) {
+                    const inputKey = inputID.replaceAll('-', '_');
+                    postData[inputKey] = inputVal;
+                    if(inputID1.attr("seltype")) {
+                        postData[inputKey + "_selid"] = inputID1.attr("selid");
+                        postData[inputKey + "_seltype"] = inputID1.attr("seltype");
+                        postData[inputKey + "_sellocstr"] = inputID1.attr("sellocstr");
+                    }
+                }
+            }
+
+            if(inputValid && chkCodes()) {
+                const chlModal = $("#channel-modal");
+                postData['modbusid'] = selModbus;
+                postData['selid'] = chlModal.attr('selid');
+                sendAjax("{{url_for('communicate.add_channel')}}", postData, false);
+                const modalType = $("#rtu-channel").css('display') === 'none';
+                updateVariable(modalType ? modbusChlTbl : rtuChlTbl);
+                chlModal.modal('hide');
+            }
+        }
+
+        function chkCodes() {
+            const selCode = parseInt($("#channel-code").val());
+            let len = 0, errMsg = "";
+            if(selCode < 4) {
+                len = parseInt($("#channel-readlen").val().trim());
+                if (selCode < 3 && (len < 1 || len > 2000)) {
+                    errMsg = "Read길이는 1 ~ 2000의 정수여야 합니다";
+                } else if (selCode > 2 && (len < 1 || len > 125)) {
+                    errMsg = "Read길이는 1 ~ 125의 정수여야 합니다";
+                }
+            } else if(selCode > 4 && selCode < 17) {
+                len = parseInt($("#channel-writelen").val().trim());
+                if(selCode === 15 && (len < 1 || len > 1968)) {
+                    errMsg = "Write길이는 1 ~ 1968의 정수여야 합니다";
+                } else if(selCode === 16 && (len < 1 || len > 123)) {
+                    errMsg = "Write길이는 1 ~ 123의 정수여야 합니다";
+                }
+            } else if(selCode === 23) {
+                len = parseInt($("#channel-readlen").val().trim());
+                if(len < 1 || len > 125) {
+                    errMsg = "Read길이는 1 ~ 125의 정수여야 합니다";
+                }
+
+                if(errMsg.length === 0) {
+                    len = parseInt($("#channel-writelen").val().trim());
+                    if(len < 1 || len > 121) {
+                        errMsg = "Write길이는 1 ~ 121의 정수여야 합니다";
+                    }
+                }
+            }
+
+            if(errMsg.length > 0) {
+                alert(errMsg);
+                return false;
+            } else {
+                return true;
+            }
+        }
+
+        function addChannel(type='') {
+            if(chlCnt < chlLimit) {
+                const rtuChl = $("#rtu-channel");
+                if(type.length > 0) {
+                    rtuChl.show();
+                } else {
+                    rtuChl.hide();
+                }
+
+                $("#insert-alert").hide();
+                const modalInput = $("#channel-modal input");
+                modalInput.removeClass('border-danger');
+                modalInput.val('');
+                $("#channel-code").val('1');
+                $("#channel-trigger").val('CYCLE_TIME');
+                $('#channel-modal').attr('selid', '0').modal('show');
+            } else {
+                alert(limitMsg);
+            }
+        }
+
+        function modbusChannelAct(flag, str = '') {
+            if(flag === "plus") {
+                addChannel(str);
+            } else if(flag === "del") {
+                const selRow = $("#contextmenu").attr("selrow").replace('channel-', '');
+                if(selRow && confirm('삭제하시겠습니까?')) {
+                    sendAjax("{{url_for('communicate.remove_modbus')}}", {selRow, selType: 'channel'}, false);
+                    updateVariable(str.length === 0 ? modbusChlTbl : rtuChlTbl);
+                }
+            } else if(flag === "edit") {
+                editChannel1($("#contextmenu").attr("selrow"), str);
+            }
+        }
+
+        function editChannel(type = '') {
+            const selIDs = getTblChk(type.length === 0 ? "#modbus-channel-tbl" : "#rtu-channel-tbl");
+            if(selIDs.length > 0) {
+                editChannel1(selIDs.split(',')[0], type);
+            } else {
+                alert('편집할 행을 선택하세요');
+            }
+        }
+
+        function editChannel1(selRow, str) {
+            const tableID = str.length === 0 ? "#modbus-channel-tbl" : "#rtu-channel-tbl";
+            const selInput = $(tableID + " input[id='check-row-" + selRow + "']");
+            initInputs("#channel-modal .modal-body", JSON.parse(selInput.attr('options')));
+            $("#channel-code").trigger('change');
+            $("#insert-alert").hide();
+            $("#channel-modal").attr('selid', selRow.replace('channel-', '')).modal('show');
+        }
+
+        function saveCommon() {
+            let postData = getPostData(commonPanel);
+            $("#check-row-modbus-" + selModbus).attr('options', JSON.stringify(postData));
+
+            postData['modbusid'] = selModbus;
+            sendAjax("{{url_for('communicate.add_common')}}", postData, false);
+            alert(saveMsg);
+        }
+
+        function getObjVal(obj, key) {
+            return key in obj ? obj[key] : '';
+        }
+
+        function doSaveVariable() {
+
+        }
+
+        function chkFuncCode(code) {
+            let returnStr = '';
+            if([1, 2, 5, 15].indexOf(code) >= 0) {
+                returnStr = 'CoilInput';
+            } else if([3, 4, 6, 16].indexOf(code) >= 0) {
+                returnStr = 'Register';
+            }
+
+            return returnStr;
+        }
+
+        function drawMasterTbl(data) {
+            let rowType = chkFuncCode(parseInt(data.channel_code));
+            let rowCnt = 16;
+            // if(rowType === "CoilInput") {}
+
+            let html = "";
+            if(rowCnt > 0) {
+                for(let ii = 1; ii <= rowCnt; ii++) {
+                    const startID = "modbus-variable-" + ii;
+                    const varType = ii === 1 ? 'analog' : 'digital';
+                    html += "<tr>";
+                    html += ii === 1 ? "<td>" + data.channel_code + ": " + FuncCodes[data.channel_code] + "</td>" : "<td></td>";
+                    html += "<td><div class='input-group'><input class='form-control time-picker' type='text' id='" + startID + "' readonly/><span class='input-group-append dropdown'><button class='btn btn-primary dropdown-toggle' data-toggle='dropdown'></button><div class='dropdown-menu' aria-labelledby='dropdownMenuButton'><a class='dropdown-item' href='#' onclick=\"showFixed(\'" + startID + "\', \'" + varType + "\')\">고정변수</a><a class='dropdown-item' href='#' onclick=\"showFluid(\'" + startID + "\', \'" + varType + "\')\">가변변수</a></div></span></div></td>";
+                    html += ii === 1 ? "<td>WORD</td></tr>" : "<td>BOOL</td>";
+                }
+            }
+
+            $("#master-variable-tbl").html(html);
+        }
+
+        function drawSlaveTbl(data) {
+
+        }
+
+        function chlChange(type = 'master') {
+            const channel_id = type === 'master' ? $("#master-channel").val() : $("#slave-word-index").val();
+            $.ajax({
+                url: "{{url_for('communicate.get_variable')}}",
+                dataType: 'json',
+                type: 'post',
+                data: {channel_id, type},
+                headers: { "X-CSRFToken": csrf_token },
+                success: function(resp) {
+                    if(resp.status) {
+                        delete resp.status;
+                        chlCode = resp.channel_code;
+                        getVarLen(resp);
+                        if(type === 'master') {
+                            drawMasterTbl(resp);
+                        } else {
+                            drawSlaveTbl(resp);
+                        }
+                    } else {
+                        alert(resp.message);
+                    }
+                },
+                error: function() {
+                    alert(refreshMsg);
+                }
+            })
+        }
+
+        function getVarLen(selObj) {
+            let html = "", lenLimit = 0;
+            const selCode = parseInt(selObj['channel_code']);
+            if(selCode === 23) {
+                $(".len-panel").show();
+                lenLimit = parseInt(selObj['channel_readlen']);
+                for(let ii = 1; ii <= lenLimit; ii++) {
+                    html += "<option value='" + ii + "'>" + ii + "</option>";
+                }
+
+                $("#read-length-sel").html(html);
+
+                lenLimit = parseInt(selObj['channel_writelen']);
+                for(let ii = 1; ii <= lenLimit; ii++) {
+                    html += "<option value='" + ii + "'>" + ii + "</option>";
+                }
+
+                $("#write-length-sel").html(html);
+            } else {
+                let letType = "";
+                if(selCode === 1 || selCode === 2) {
+                    lenLimit = Math.ceil(parseInt(selObj['channel_readlen']) / 16);
+                    letType = "#read-length";
+                } else if(selCode === 3 || selCode === 4) {
+                    lenLimit = parseInt(selObj['channel_readlen']);
+                    letType = "#read-length";
+                } else if(selCode === 5 || selCode === 6) {
+                    lenLimit = 1;
+                    letType = "#write-length";
+                } else if(selCode === 15) {
+                    lenLimit = Math.ceil(parseInt(selObj['channel_writelen']) / 16);
+                    letType = "#write-length       } else if(selCode === 16) {";
+
+                    lenLimit = parseInt(selObj['channel_writelen']);
+                    letType = "#write-length";
+                }
+
+                $(".len-panel").hide();
+                $(letType).show();
+                if(letType.length > 0) {
+                    for(let ii = 1; ii <= lenLimit; ii++) {
+                        html += "<option value='" + ii + "'>" + ii + "</option>";
+                    }
+
+                    $(letType + "-sel").html(html);
+                }
+            }
+        }
+
+        $(document).ready(function () {
+            $('.mask-ip').inputmask({
+                alias: "ip",
+                greedy: false
+            });
+
+            modbusTable.on('click', 'tbody tr', function() {
+                const rowArr = $("#modbus-table input.check-row").filter(':checked');
+                const totalCnt = rowArr.length;
+                if(totalCnt > 0) {
+                    const itemRow = $(rowArr[0]);
+                    const newModbus = itemRow.attr('id').replace('check-row-modbus-', '');
+                    if(newModbus !== selModbus) {
+                        const itemOptions = itemRow.attr('options');
+                        const itemType = itemRow.attr('mtype');
+                        const itemProtocol = itemRow.attr('protocol');
+                        commonPanel = "#" + (itemProtocol + "-" + itemType + "-common").toLowerCase();
+                        variablePanel = "#" + itemType.toLowerCase() + "-variable";
+                        selModbus = newModbus;
+
+                        const optionArr = itemOptions.length > 0 ? JSON.parse(itemOptions) : {};
+                        initInputs(commonPanel, optionArr);
+
+                        if(itemType === "SLAVE") {
+                            const activePane = $(".tab-pane.active");
+                            if(activePane.attr('id') === "channel") {
+                                activePane.removeClass('active');
+                                $(".rtu-panel .nav-link").removeClass('active');
+                                $("#common").addClass('active');
+                                $("#common-tab").addClass('active');
+                            }
+
+                            $(".rtu-panel").hide();
+                            channelPanel = "";
+                        } else {
+                            $(".rtu-panel").show();
+                            channelPanel = "#" + (itemProtocol + "-" + itemType + "-channel").toLowerCase();
+                        }
+
+                        if(itemProtocol === "TCP" && itemType === "MASTER") {
+                            updateVariable(modbusChlTbl);
+                        } else if(itemProtocol === "RTU" && itemType === "MASTER") {
+                            updateVariable(rtuChlTbl);
+                        }
+
+                        $(".tab-part").hide();
+                        $(commonPanel).show();
+                        $(variablePanel).show();
+                        if(channelPanel.length > 0) {
+                            $(channelPanel).show();
+                        }
+                        $("#right-panel").show();
+                    }
+                } else {
+                    $("#right-panel").hide();
+                    selModbus = 0;
+                }
+            });
+
+            $("#channel-code").on('change', function() {
+                const selVal = parseInt($(this).val());
+                if(selVal <= 4) {
+                    $("#read-offset-panel").show();
+                    $("#write-offset-panel").hide();
+                } else if(selVal < 23) {
+                    $("#read-offset-panel").hide();
+                    $("#write-offset-panel").show();
+                } else {
+                    $("#read-offset-panel").show();
+                    $("#write-offset-panel").show();
+                }
+
+                const chlWriteLen = $("#channel-writelen");
+                if(selVal === 5 || selVal === 6) {
+                    chlWriteLen.attr('readonly', true).val('1');
+                } else {
+                    chlWriteLen.removeAttr('readonly');
+                }
+            });
+
+            $("#tcp-master-trigger").on('change', function() {
+                const selVal = $(this).val();
+                if(selVal === "CYCLE_TIME") {
+                    $("#cycle-panel").show();
+                    $("#trigger-panel").hide();
+                } else {
+                    $("#cycle-panel").hide();
+                    $("#trigger-panel").show();
+                }
+            });
+
+            let fieldArr = [
+                {
+                    render: function (data, type, row) {
+                        return checkForm.replaceAll('data.id', 'modbus-' + row.id).replaceAll('data.attr', "options='" + row.options + "' mtype='" + row.mtype + "' protocol='" + row.protocol1 + "' flag='" + row.flag + "'");
+                    }
+                },
+                {"data": "ind"},
+                {"data": "use_flag"},
+                {"data": "type"},
+                {"data": "protocol"}
+            ];
+            if(curMode === "run") {
+                fieldArr.push({
+                    render: function (data, type, row) {
+                        return row.modbus.status;
+                    }
+                });
+
+                columnDef.push({
+                    'targets': 5,
+                    'defaultContent': '',
+                    'createdCell': function(td, cellData, rowData) {
+                        if(rowData.modbus.ok) {
+                            $(td).addClass('bg-success');
+                        } else if(rowData.modbus.err) {
+                            $(td).addClass('bg-warning');
+                        }
+                    }
+                });
+            }
+            modbusTbl = modbusTable.DataTable({
+                ...dataTableLang,
+                ...dataTableObj,
+                "columnDefs": columnDef,
+                "drawCallback": function(oSettings) {
+                    modbusLen = oSettings._iRecordsTotal;
+                    setDataTblPage(modbusTable, oSettings._iDisplayLength);
+                },
+                'ajax': {
+                    'url': "{{url_for('communicate.modbus_list')}}",
+                    'headers': { "X-CSRFToken": csrf_token }
+                },
+                "initComplete": function(setting, resp) {
+                    $("#modbus-table tbody input[type='checkbox']:first").trigger('click');
+                },
+                "columns": fieldArr,
+                "createdRow": function(row, data) {
+                    $(row).attr('data-row', 'modbus-' + data.id);
+                }
+            });
+
+            fieldArr =  [
+                {
+                    render: function (data, type, row) {
+                        return checkForm.replaceAll('data.id', 'channel-' + row.id).replaceAll('data.attr', "options='" + row.options + "'");
+                    }
+                },
+                {
+                    render: function(data, type, row) {
+                        return row.channel_trigger === "CYCLE_TIME" ? '사이클시간' : '트리거변수';
+                    }
+                },
+                {"data": "channel_cycle"},
+                {
+                    render: function(data, type, row) {
+                        return getObjVal(row, 'channel_trigger_variable');
+                    }
+                },
+                {
+                    render: function(data, type, row) {
+                        return FuncCodes[row.channel_code];
+                    }
+                },
+                {
+                    render: function(data, type, row) {
+                        return getObjVal(row, 'channel_readoffset');
+                    }
+                },
+                {
+                    render: function(data, type, row) {
+                        return getObjVal(row, 'channel_readlen');
+                    }
+                },
+                {
+                    render: function(data, type, row) {
+                        return getObjVal(row, 'channel_writeoffset');
+                    }
+                },
+                {
+                    render: function(data, type, row) {
+                        return getObjVal(row, 'channel_writelen');
+                    }
+                }
+            ];
+            if(curMode === "run") {
+                fieldArr.push({
+                    render: function (data, type, row) {
+                        return row.chl.status;
+                    }
+                });
+
+                columnDef.splice(-1, 1);
+                columnDef.push({
+                    'targets': 8,
+                    'defaultContent': '',
+                    'createdCell': function(td, cellData, rowData) {
+                        if(rowData.modbus.ok) {
+                            $(td).addClass('bg-success');
+                        } else if(rowData.modbus.err) {
+                            $(td).addClass('bg-warning');
+                        }
+                    }
+                });
+            }
+            modbusChlTbl = $("#modbus-channel-tbl").DataTable({
+                ...dataTableLang,
+                ...dataTableObj,
+                "columnDefs": columnDef,
+                "drawCallback": function(oSettings) {
+                    chlCnt = oSettings._iRecordsTotal;
+                    setDataTblPage($("#modbus-channel-tbl"), oSettings._iDisplayLength);
+                },
+                'ajax': {
+                    'url': "{{url_for('communicate.get_channel')}}",
+                    'headers': { "X-CSRFToken": csrf_token },
+                    'data': function(data) {
+                        return {
+                            ...data,
+                            selModbus
+                        };
+                    }
+                },
+                "columns": fieldArr,
+                "createdRow": function(row, data) {
+                    $(row).attr('data-row', 'channel-' + data.id);
+                }
+            });
+
+            fieldArr = [
+                {
+                    render: function (data, type, row) {
+                        return checkForm.replaceAll('data.id', 'channel-' + row.id).replaceAll('data.attr', "options='" + row.options + "'");
+                    }
+                },
+                {"data": "channel_unit"},
+                {"data": "channel_timeout"},
+                {
+                    render: function(data, type, row) {
+                        return row.channel_trigger === "CYCLE_TIME" ? '사이클시간' : '트리거변수';
+                    }
+                },
+                {"data": "channel_cycle"},
+                {
+                    render: function(data, type, row) {
+                        return getObjVal(row, 'channel_trigger_variable');
+                    }
+                },
+                {
+                    render: function(data, type, row) {
+                        return FuncCodes[row.channel_code];
+                    }
+                },
+                {
+                    render: function(data, type, row) {
+                        return getObjVal(row, 'channel_readoffset');
+                    }
+                },
+                {
+                    render: function(data, type, row) {
+                        return getObjVal(row, 'channel_readlen');
+                    }
+                },
+                {
+                    render: function(data, type, row) {
+                        return getObjVal(row, 'channel_writeoffset');
+                    }
+                },
+                {
+                    render: function(data, type, row) {
+                        return getObjVal(row, 'channel_writelen');
+                    }
+                }
+            ];
+            if(curMode === "run") {
+                fieldArr.push({
+                    render: function (data, type, row) {
+                        return row.chl.status;
+                    }
+                });
+
+                columnDef.splice(-1, 1);
+                columnDef.push({
+                    'targets': 10,
+                    'defaultContent': '',
+                    'createdCell': function(td, cellData, rowData) {
+                        if(rowData.modbus.ok) {
+                            $(td).addClass('bg-success');
+                        } else if(rowData.modbus.err) {
+                            $(td).addClass('bg-warning');
+                        }
+                    }
+                });
+            }
+            rtuChlTbl = $("#rtu-channel-tbl").DataTable({
+                ...dataTableLang,
+                ...dataTableObj,
+                "columnDefs": columnDef,
+                "drawCallback": function(oSettings) {
+                    chlCnt = oSettings._iRecordsTotal;
+                    setDataTblPage($("#rtu-channel-tbl"), oSettings._iDisplayLength);
+                },
+                'ajax': {
+                    'url': "{{url_for('communicate.get_channel')}}",
+                    'headers': { "X-CSRFToken": csrf_token },
+                    'data': function(data) {
+                        return {
+                            ...data,
+                            selModbus
+                        };
+                    }
+                },
+                "columns": fieldArr,
+                "createdRow": function(row, data) {
+                    $(row).attr('data-row', 'channel-' + data.id);
+                }
+            });
+        });
+    </script>
+{% endblock %}

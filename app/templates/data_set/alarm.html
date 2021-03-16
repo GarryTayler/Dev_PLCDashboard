@@ -1,0 +1,1005 @@
+{% extends "layout.html" %}
+
+{% block style %}
+    <style>
+        .alarm-input {
+            display: none;
+        }
+        .limit-input {
+            margin-bottom: 1rem;
+            display: flex;
+        }
+        .limit-input input[type=number] {
+            max-width: 190px;
+            margin-left: auto;
+            margin-top: -7px;
+        }
+        .alarm-input label.input-label {
+            padding-left: 1.5rem;
+        }
+    </style>
+{% endblock %}
+
+{% block content %}
+    <div class="card shadow mb-4">
+        <div class="card-header py-3">
+            <h6 class="m-0 font-weight-bold text-primary">데이터설정 > 알람</h6>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive pt-3">
+                <div class="form-group row">
+                    <div class="col-7">
+                        <div class="mb-4">
+                            {% if selmode == "stop" and edit_auth %}
+                                <button class="btn btn-primary btn-icon-split" onclick="dbSetModal();">
+                                    <span class="icon text-white-50">
+                                        <i class="fas fa-server"></i>
+                                    </span>
+                                    <span class="text">DB설정</span>
+                                </button>
+                                <a href="{{url_for('data_set.csv_export', csvType='alarm')}}" target="_blank">
+                                    <button class="btn btn-primary btn-icon-split" style="float: right;">
+                                        <span class="icon text-white-50">
+                                            <i class="fas fa-file-export"></i>
+                                        </span>
+                                        <span class="text">CSV내보내기</span>
+                                    </button>
+                                </a>
+                            {% endif %}
+                        </div>
+                        <table class="table table-bordered datatable-tbl" id="alarm-table">
+                            <thead>
+                                <tr>
+                                    <th class="text-center" style="width: 10%">
+                                        <div class="form-check">
+                                            <input type="checkbox" class="form-check-input check-all">
+                                            <label class="form-check-label"></label>
+                                        </div>
+                                    </th>
+                                    <th>번호</th>
+                                    <th>분류</th>
+                                    <th>이름</th>
+                                    <th>해제</th>
+                                    <th>타입</th>
+                                </tr>
+                            </thead>
+                        </table>
+                        {% if selmode == "stop" and edit_auth %}
+                            <div class="btn-panel mt-3">
+                                <button class="btn btn-primary btn-icon-split" onclick="addAlarm();">
+                                    <span class="icon text-white-50">
+                                        <i class="fas fa-plus"></i>
+                                    </span>
+                                    <span class="text">추가</span>
+                                </button>
+                                <button class="btn btn-warning btn-icon-split" onclick="editAlarm();">
+                                    <span class="icon text-white-50">
+                                        <i class="fas fa-edit"></i>
+                                    </span>
+                                    <span class="text">편집</span>
+                                </button>
+                                <button class="btn btn-danger btn-icon-split" onclick="delAlarm();">
+                                    <span class="icon text-white-50">
+                                        <i class="fas fa-trash"></i>
+                                    </span>
+                                    <span class="text">삭제</span>
+                                </button>
+                            </div>
+                        {% endif %}
+                    </div>
+                    <div class="col-5 pt-5 mt-3">
+                        <div id="digital-input" class="alarm-input">
+                            <div class="form-group row">
+                                <div class="col-3">
+                                    <label class="input-label" for="digital-variable">변수</label>
+                                </div>
+                                <div class="col-9">
+                                    <div class="input-group">
+                                        <input type="text" class="form-control" id="digital-variable" readonly />
+                                        <span class="input-group-append dropdown">
+                                            <button class="btn btn-primary dropdown-toggle" data-toggle="dropdown"></button>
+                                            <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                                                <a class="dropdown-item" href="#" onclick="showFixed('digital-variable', 'digital');">고정변수</a>
+                                                <a class="dropdown-item" href="#" onclick="showFluid('digital-variable', 'digital');">가변변수</a>
+                                            </div>
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <div class="col-3">
+                                    <label class="input-label" for="digital-cond">조건</label>
+                                </div>
+                                <div class="col-9">
+                                    <select class="form-control" id="digital-cond">
+                                        <option value="=">=(같다)</option>
+                                        <option value="!=">!=(같지 않다)</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <div class="col-3">
+                                    <label class="input-label" for="digital-value">값</label>
+                                </div>
+                                <div class="col-9">
+                                    <select class="form-control" id="digital-value">
+                                        <option value="TRUE">TRUE</option>
+                                        <option value="FALSE">FALSE</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <div class="col-3">
+                                    <label class="input-label" for="digital-time">최소유지시간</label>
+                                </div>
+                                <div class="col-9">
+                                    <div class="value-radio">
+                                        <div class="form-check mb-2">
+                                            <input type="checkbox" class="form-check-input" id="digital-time-radio" checked>
+                                            <label class="form-check-label" for="digital-time-radio">변수</label>
+                                        </div>
+                                        <input type="text" class="form-control alt-input mask-time">
+                                        <div class="input-group">
+                                            <input type="text" class="form-control" id="digital-time" readonly />
+                                            <span class="input-group-append dropdown">
+                                                <button class="btn btn-primary dropdown-toggle" data-toggle="dropdown"></button>
+                                                <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                                                    <a class="dropdown-item" href="#" onclick="showFixed('lbound-time', 'time');">고정변수</a>
+                                                    <a class="dropdown-item" href="#" onclick="showFluid('lbound-time', 'time');">가변변수</a>
+                                                </div>
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <div class="col-3">
+                                    <label class="input-label" for="digital-message">메시지</label>
+                                </div>
+                                <div class="col-9">
+                                    <textarea class="form-control" rows="3" id="digital-message">알림1이 ON되였습니다.</textarea>
+                                </div>
+                            </div>
+                        </div>
+                        <div id="lower_limit-input" class="alarm-input">
+                            <div class="form-group row">
+                                <div class="col-3">
+                                    <label class="input-label" for="lbound-variable">변수</label>
+                                </div>
+                                <div class="col-9">
+                                    <div class="input-group">
+                                        <input type="text" class="form-control" id="lbound-variable" readonly />
+                                        <span class="input-group-append dropdown">
+                                            <button class="btn btn-primary dropdown-toggle" data-toggle="dropdown"></button>
+                                            <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                                                <a class="dropdown-item" href="#" onclick="showFixed('lbound-variable', 'analog');">고정변수</a>
+                                                <a class="dropdown-item" href="#" onclick="showFluid('lbound-variable', 'analog');">가변변수</a>
+                                            </div>
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <div class="col-3">
+                                    <label class="input-label" for="lbound-cond">조건</label>
+                                </div>
+                                <div class="col-9">
+                                    <select class="form-control" id="lbound-cond">
+                                        <option value="<="><=(작거나 같다)</option>
+                                        <option value="<"><(작다)</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <div class="col-3">
+                                    <label class="input-label" for="lbound-value">값</label>
+                                </div>
+                                <div class="col-9">
+                                    <div class="value-radio">
+                                        <div class="form-check mb-2">
+                                            <input type="checkbox" class="form-check-input" id="lbound-value-radio" checked>
+                                            <label class="form-check-label" for="lbound-value-radio">변수</label>
+                                        </div>
+                                        <input type="number" class="form-control alt-input">
+                                        <div class="input-group">
+                                            <input type="text" class="form-control" id="lbound-value" readonly />
+                                            <span class="input-group-append dropdown">
+                                                <button class="btn btn-primary dropdown-toggle" data-toggle="dropdown"></button>
+                                                <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                                                    <a class="dropdown-item" href="#" onclick="showFixed('lbound-value', 'analog');">고정변수</a>
+                                                    <a class="dropdown-item" href="#" onclick="showFluid('lbound-value', 'analog');">가변변수</a>
+                                                </div>
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <div class="col-3">
+                                    <label class="input-label" for="lbound-hysteris">Hysterisis</label>
+                                </div>
+                                <div class="col-9">
+                                    <div class="value-radio">
+                                        <div class="form-check mb-2">
+                                            <input type="checkbox" class="form-check-input" id="lbound-hysteris-radio" checked>
+                                            <label class="form-check-label" for="lbound-hysteris-radio">변수</label>
+                                        </div>
+                                        <input type="number" class="form-control alt-input">
+                                        <div class="input-group">
+                                            <input type="text" class="form-control" id="lbound-hysteris" readonly />
+                                            <span class="input-group-append dropdown">
+                                                <button class="btn btn-primary dropdown-toggle" data-toggle="dropdown"></button>
+                                                <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                                                    <a class="dropdown-item" href="#" onclick="showFixed('lbound-hysteris', 'analog');">고정변수</a>
+                                                    <a class="dropdown-item" href="#" onclick="showFluid('lbound-hysteris', 'analog');">가변변수</a>
+                                                </div>
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <div class="col-3">
+                                    <label class="input-label" for="lbound-time">최소유지시간</label>
+                                </div>
+                                <div class="col-9">
+                                    <div class="value-radio">
+                                        <div class="form-check mb-2">
+                                            <input type="checkbox" class="form-check-input" id="lbound-time-radio" checked>
+                                            <label class="form-check-label" for="lbound-time-radio">변수</label>
+                                        </div>
+                                        <input type="text" class="form-control alt-input mask-time">
+                                        <div class="input-group">
+                                            <input type="text" class="form-control" id="lbound-time" />
+                                            <span class="input-group-append dropdown">
+                                                <button class="btn btn-primary dropdown-toggle" data-toggle="dropdown"></button>
+                                                <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                                                    <a class="dropdown-item" href="#" onclick="showFixed('lbound-time', 'time');">고정변수</a>
+                                                    <a class="dropdown-item" href="#" onclick="showFluid('lbound-time', 'time');">가변변수</a>
+                                                </div>
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <div class="col-3">
+                                    <label class="input-label" for="digital-message">메시지</label>
+                                </div>
+                                <div class="col-9">
+                                    <textarea class="form-control" rows="3" id="lbound-message">알림1이 ON되였습니다.</textarea>
+                                </div>
+                            </div>
+                        </div>
+                        <div id="upper_limit-input" class="alarm-input">
+                            <div class="form-group row">
+                                <div class="col-3">
+                                    <label class="input-label" for="ubound-variable">변수</label>
+                                </div>
+                                <div class="col-9">
+                                    <div class="input-group">
+                                        <input type="text" class="form-control" id="ubound-variable" readonly />
+                                        <span class="input-group-append dropdown">
+                                            <button class="btn btn-primary dropdown-toggle" data-toggle="dropdown"></button>
+                                            <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                                                <a class="dropdown-item" href="#" onclick="showFixed('ubound-variable', 'analog');">고정변수</a>
+                                                <a class="dropdown-item" href="#" onclick="showFluid('ubound-variable', 'analog');">가변변수</a>
+                                            </div>
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <div class="col-3">
+                                    <label class="input-label" for="ubound-cond">조건</label>
+                                </div>
+                                <div class="col-9">
+                                    <select class="form-control" id="ubound-cond">
+                                        <option value=">=">>=(크거나 같다)</option>
+                                        <option value=">">>(크다)</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <div class="col-3">
+                                    <label class="input-label" for="ubound-value">값</label>
+                                </div>
+                                <div class="col-9">
+                                    <div class="value-radio">
+                                        <div class="form-check mb-2">
+                                            <input type="checkbox" class="form-check-input" id="ubound-value-radio" checked>
+                                            <label class="form-check-label" for="ubound-value-radio">변수</label>
+                                        </div>
+                                        <input type="number" class="form-control alt-input">
+                                        <div class="input-group">
+                                            <input type="text" class="form-control" id="ubound-value" readonly />
+                                            <span class="input-group-append dropdown">
+                                                <button class="btn btn-primary dropdown-toggle" data-toggle="dropdown"></button>
+                                                <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                                                    <a class="dropdown-item" href="#" onclick="showFixed('ubound-value', 'analog');">고정변수</a>
+                                                    <a class="dropdown-item" href="#" onclick="showFluid('ubound-value', 'analog');">가변변수</a>
+                                                </div>
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <div class="col-3">
+                                    <label class="input-label" for="ubound-hysteris">Hysterisis</label>
+                                </div>
+                                <div class="col-9">
+                                    <div class="value-radio">
+                                        <div class="form-check mb-2">
+                                            <input type="checkbox" class="form-check-input" id="ubound-hysteris-radio" checked>
+                                            <label class="form-check-label" for="ubound-hysteris-radio">변수</label>
+                                        </div>
+                                        <input type="number" class="form-control alt-input">
+                                        <div class="input-group">
+                                            <input type="text" class="form-control" id="ubound-hysteris" readonly />
+                                            <span class="input-group-append dropdown">
+                                                <button class="btn btn-primary dropdown-toggle" data-toggle="dropdown"></button>
+                                                <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                                                    <a class="dropdown-item" href="#" onclick="showFixed('ubound-hysteris', 'analog');">고정변수</a>
+                                                    <a class="dropdown-item" href="#" onclick="showFluid('ubound-hysteris', 'analog');">가변변수</a>
+                                                </div>
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <div class="col-3">
+                                    <label class="input-label" for="ubound-time">최소유지시간</label>
+                                </div>
+                                <div class="col-9">
+                                    <div class="value-radio">
+                                        <div class="form-check mb-2">
+                                            <input type="checkbox" class="form-check-input" id="ubound-time-radio" checked>
+                                            <label class="form-check-label" for="ubound-time-radio">변수</label>
+                                        </div>
+                                        <input type="text" class="form-control alt-input mask-time">
+                                        <div class="input-group">
+                                            <input type="text" class="form-control" id="ubound-time" readonly />
+                                            <span class="input-group-append dropdown">
+                                                <button class="btn btn-primary dropdown-toggle" data-toggle="dropdown"></button>
+                                                <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                                                    <a class="dropdown-item" href="#" onclick="showFixed('ubound-time', 'time');">고정변수</a>
+                                                    <a class="dropdown-item" href="#" onclick="showFluid('ubound-time', 'time');">가변변수</a>
+                                                </div>
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <div class="col-3">
+                                    <label class="input-label" for="ubound-message">메시지</label>
+                                </div>
+                                <div class="col-9">
+                                    <textarea class="form-control" rows="3" id="ubound-message">알림1이 ON되였습니다.</textarea>
+                                </div>
+                            </div>
+                        </div>
+                        <div id="in_range-input" class="alarm-input">
+                            <div class="form-group row">
+                                <div class="col-3">
+                                    <label class="input-label" for="range-variable">변수</label>
+                                </div>
+                                <div class="col-9">
+                                    <div class="input-group">
+                                        <input type="text" class="form-control" id="range-variable" readonly />
+                                        <span class="input-group-append dropdown">
+                                            <button class="btn btn-primary dropdown-toggle" data-toggle="dropdown"></button>
+                                            <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                                                <a class="dropdown-item" href="#" onclick="showFixed('range-variable', 'analog');">고정변수</a>
+                                                <a class="dropdown-item" href="#" onclick="showFluid('range-variable', 'analog');">가변변수</a>
+                                            </div>
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <div class="col-3">
+                                    <label class="input-label" for="range-lbound">하한조건</label>
+                                </div>
+                                <div class="col-9">
+                                    <select class="form-control" id="range-lbound">
+                                        <option value=">">>(크다)</option>
+                                        <option value=">=">>=(크거나 같다)</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <div class="col-3">
+                                    <label class="input-label" for="range-lbound-value">하한값</label>
+                                </div>
+                                <div class="col-9">
+                                    <div class="value-radio">
+                                        <div class="form-check mb-2">
+                                            <input type="checkbox" class="form-check-input" id="range-lbound-value-radio" checked>
+                                            <label class="form-check-label" for="range-lbound-value-radio">변수</label>
+                                        </div>
+                                        <input type="number" class="form-control alt-input">
+                                        <div class="input-group">
+                                            <input type="text" class="form-control" id="range-lbound-value" readonly />
+                                            <span class="input-group-append dropdown">
+                                                <button class="btn btn-primary dropdown-toggle" data-toggle="dropdown"></button>
+                                                <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                                                    <a class="dropdown-item" href="#" onclick="showFixed('range-lbound-value', 'analog');">고정변수</a>
+                                                    <a class="dropdown-item" href="#" onclick="showFluid('range-lbound-value', 'analog');">가변변수</a>
+                                                </div>
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <div class="col-3">
+                                    <label class="input-label" for="range-ubound">상한조건</label>
+                                </div>
+                                <div class="col-9">
+                                    <select class="form-control" id="range-ubound">
+                                        <option value="<"><(작다)</option>
+                                        <option value="<="><=(작거나 같다)</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <div class="col-3">
+                                    <label class="input-label" for="range-ubound-value">상한값</label>
+                                </div>
+                                <div class="col-9">
+                                    <div class="value-radio">
+                                        <div class="form-check mb-2">
+                                            <input type="checkbox" class="form-check-input" id="range-ubound-value-radio" checked>
+                                            <label class="form-check-label" for="range-ubound-value-radio">변수</label>
+                                        </div>
+                                        <input type="number" class="form-control alt-input">
+                                        <div class="input-group">
+                                            <input type="text" class="form-control" id="range-ubound-value" readonly />
+                                            <span class="input-group-append dropdown">
+                                                <button class="btn btn-primary dropdown-toggle" data-toggle="dropdown"></button>
+                                                <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                                                    <a class="dropdown-item" href="#" onclick="showFixed('range-ubound-value', 'analog');">고정변수</a>
+                                                    <a class="dropdown-item" href="#" onclick="showFluid('range-ubound-value', 'analog');">가변변수</a>
+                                                </div>
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <div class="col-3">
+                                    <label class="input-label" for="range-hysteris">Hysterisis</label>
+                                </div>
+                                <div class="col-9">
+                                    <div class="value-radio">
+                                        <div class="form-check mb-2">
+                                            <input type="checkbox" class="form-check-input" id="range-hysteris-radio" checked>
+                                            <label class="form-check-label" for="range-hysteris-radio">변수</label>
+                                        </div>
+                                        <input type="number" class="form-control alt-input">
+                                        <div class="input-group">
+                                            <input type="text" class="form-control" id="range-hysteris" readonly />
+                                            <span class="input-group-append dropdown">
+                                                <button class="btn btn-primary dropdown-toggle" data-toggle="dropdown"></button>
+                                                <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                                                    <a class="dropdown-item" href="#" onclick="showFixed('range-hysteris', 'analog');">고정변수</a>
+                                                    <a class="dropdown-item" href="#" onclick="showFluid('range-hysteris', 'analog');">가변변수</a>
+                                                </div>
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <div class="col-3">
+                                    <label class="input-label" for="range-time">최소유지시간</label>
+                                </div>
+                                <div class="col-9">
+                                    <div class="value-radio">
+                                        <div class="form-check mb-2">
+                                            <input type="checkbox" class="form-check-input" id="range-time-radio" checked>
+                                            <label class="form-check-label" for="range-time-radio">변수</label>
+                                        </div>
+                                        <input type="text" class="form-control alt-input mask-time">
+                                        <div class="input-group">
+                                            <input type="text" class="form-control" id="range-time" readonly />
+                                            <span class="input-group-append dropdown">
+                                                <button class="btn btn-primary dropdown-toggle" data-toggle="dropdown"></button>
+                                                <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                                                    <a class="dropdown-item" href="#" onclick="showFixed('range-time', 'time');">고정변수</a>
+                                                    <a class="dropdown-item" href="#" onclick="showFluid('range-time', 'time');">가변변수</a>
+                                                </div>
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <div class="col-3">
+                                    <label class="input-label" for="range-message">메시지</label>
+                                </div>
+                                <div class="col-9">
+                                    <textarea class="form-control" rows="3" id="range-message">알림1이 ON되였습니다.</textarea>
+                                </div>
+                            </div>
+                        </div>
+                        <div id="out_range-input" class="alarm-input">
+                            <div class="form-group row">
+                                <div class="col-3">
+                                    <label class="input-label" for="outer-variable">변수</label>
+                                </div>
+                                <div class="col-9">
+                                    <div class="input-group">
+                                        <input type="text" class="form-control" id="outer-variable" readonly />
+                                        <span class="input-group-append dropdown">
+                                            <button class="btn btn-primary dropdown-toggle" data-toggle="dropdown"></button>
+                                            <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                                                <a class="dropdown-item" href="#" onclick="showFixed('outer-variable', 'analog');">고정변수</a>
+                                                <a class="dropdown-item" href="#" onclick="showFluid('outer-variable', 'analog');">가변변수</a>
+                                            </div>
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <div class="col-3">
+                                    <label class="input-label" for="outer-lbound">하한조건</label>
+                                </div>
+                                <div class="col-9">
+                                    <select class="form-control" id="outer-lbound">
+                                        <option value="<"><(작다)</option>
+                                        <option value="<="><=(작거나 같다)</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <div class="col-3">
+                                    <label class="input-label" for="outer-lbound-value">하한값</label>
+                                </div>
+                                <div class="col-9">
+                                    <div class="value-radio">
+                                        <div class="form-check mb-2">
+                                            <input type="checkbox" class="form-check-input" id="outer-lbound-value-radio" checked>
+                                            <label class="form-check-label" for="outer-lbound-value-radio">변수</label>
+                                        </div>
+                                        <input type="number" class="form-control alt-input">
+                                        <div class="input-group">
+                                            <input type="text" class="form-control" id="outer-lbound-value" readonly />
+                                            <span class="input-group-append dropdown">
+                                                <button class="btn btn-primary dropdown-toggle" data-toggle="dropdown"></button>
+                                                <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                                                    <a class="dropdown-item" href="#" onclick="showFixed('outer-lbound-value', 'analog');">고정변수</a>
+                                                    <a class="dropdown-item" href="#" onclick="showFluid('outer-lbound-value', 'analog');">가변변수</a>
+                                                </div>
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <div class="col-3">
+                                    <label class="input-label" for="outer-ubound">상한조건</label>
+                                </div>
+                                <div class="col-9">
+                                    <select class="form-control" id="outer-ubound">
+                                        <option value=">">>(크다)</option>
+                                        <option value=">=">>=(크거나 같다)</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <div class="col-3">
+                                    <label class="input-label" for="outer-ubound-value">상한값</label>
+                                </div>
+                                <div class="col-9">
+                                    <div class="value-radio">
+                                        <div class="form-check mb-2">
+                                            <input type="checkbox" class="form-check-input" id="outer-ubound-value-radio" checked>
+                                            <label class="form-check-label" for="outer-ubound-value-radio">변수</label>
+                                        </div>
+                                        <input type="number" class="form-control alt-input">
+                                        <div class="input-group">
+                                            <input type="text" class="form-control" id="outer-ubound-value" readonly />
+                                            <span class="input-group-append dropdown">
+                                                <button class="btn btn-primary dropdown-toggle" data-toggle="dropdown"></button>
+                                                <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                                                    <a class="dropdown-item" href="#" onclick="showFixed('outer-ubound-value', 'analog');">고정변수</a>
+                                                    <a class="dropdown-item" href="#" onclick="showFluid('outer-ubound-value', 'analog');">가변변수</a>
+                                                </div>
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <div class="col-3">
+                                    <label class="input-label" for="outer-hysteris">Hysterisis</label>
+                                </div>
+                                <div class="col-9">
+                                    <div class="value-radio">
+                                        <div class="form-check mb-2">
+                                            <input type="checkbox" class="form-check-input" id="outer-hysteris-radio" checked>
+                                            <label class="form-check-label" for="outer-hysteris-radio">변수</label>
+                                        </div>
+                                        <input type="number" class="form-control alt-input">
+                                        <div class="input-group">
+                                            <input type="text" class="form-control" id="outer-hysteris" />
+                                            <span class="input-group-append dropdown">
+                                                <button class="btn btn-primary dropdown-toggle" data-toggle="dropdown"></button>
+                                                <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                                                    <a class="dropdown-item" href="#" onclick="showFixed('outer-hysteris', 'analog');">고정변수</a>
+                                                    <a class="dropdown-item" href="#" onclick="showFluid('outer-hysteris', 'analog');">가변변수</a>
+                                                </div>
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <div class="col-3">
+                                    <label class="input-label" for="range-time">최소유지시간</label>
+                                </div>
+                                <div class="col-9">
+                                    <div class="value-radio">
+                                        <div class="form-check mb-2">
+                                            <input type="checkbox" class="form-check-input" id="outer-time-radio" checked>
+                                            <label class="form-check-label" for="outer-time-radio">변수</label>
+                                        </div>
+                                        <input type="text" class="form-control alt-input mask-time">
+                                        <div class="input-group">
+                                            <input type="text" class="form-control" id="outer-time" readonly />
+                                            <span class="input-group-append dropdown">
+                                                <button class="btn btn-primary dropdown-toggle" data-toggle="dropdown"></button>
+                                                <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                                                    <a class="dropdown-item" href="#" onclick="showFixed('outer-time', 'time');">고정변수</a>
+                                                    <a class="dropdown-item" href="#" onclick="showFluid('outer-time', 'time');">가변변수</a>
+                                                </div>
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <div class="col-3">
+                                    <label class="input-label" for="outer-message">메시지</label>
+                                </div>
+                                <div class="col-9">
+                                    <textarea class="form-control" rows="3" id="outer-message">알림1이 ON되였습니다.</textarea>
+                                </div>
+                            </div>
+                        </div>
+                        <div id="change-input" class="alarm-input">
+                            <div class="form-group row">
+                                <div class="col-3">
+                                    <label class="input-label" for="detect-variable">최소유지시간</label>
+                                </div>
+                                <div class="col-9">
+                                    <div class="value-radio">
+                                        <div class="form-check mb-2">
+                                            <input type="checkbox" class="form-check-input" id="detect-variable-radio" checked>
+                                            <label class="form-check-label" for="detect-variable-radio">변수</label>
+                                        </div>
+                                        <input type="text" class="form-control alt-input mask-time">
+                                        <div class="input-group">
+                                            <input type="text" class="form-control" id="detect-variable" readonly />
+                                            <span class="input-group-append dropdown">
+                                                <button class="btn btn-primary dropdown-toggle" data-toggle="dropdown"></button>
+                                                <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                                                    <a class="dropdown-item" href="#" onclick="showFixed('detect-variable', 'time');">고정변수</a>
+                                                    <a class="dropdown-item" href="#" onclick="showFluid('detect-variable', 'time');">가변변수</a>
+                                                </div>
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="btn-panel alarm-input">
+                            {% if selmode == "stop" and edit_auth %}
+                                <button class="btn btn-primary btn-icon-split" onclick="saveDetail();">
+                                    <span class="icon text-white-50">
+                                        <i class="fas fa-check"></i>
+                                    </span>
+                                    <span class="text">저장</span>
+                                </button>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="new-alarm" tabindex="-1" role="dialog">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">알람추가</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="form-group row">
+                        <div class="col-3">
+                            <label class="input-label" for="alarm-name">이름</label>
+                        </div>
+                        <div class="col-5">
+                            <input type="text" class="form-control" id="alarm-name" />
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <div class="col-3">
+                            <label class="input-label" for="alarm-category">분류</label>
+                        </div>
+                        <div class="col-5">
+                            <select class="form-control" id="alarm-category">
+                                <option value="info">로그</option>
+                                <option value="warn">경고</option>
+                                <option value="error">에러</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <div class="col-3">
+                            <label class="input-label" for="alarm-confirm">해제</label>
+                        </div>
+                        <div class="col-5">
+                            <select class="form-control" id="alarm-confirm">
+                                <option value="0">조건불만족</option>
+                                <option value="1">사용자확인시</option>
+                                <option value="2">조건불만족+사용자확인시</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <div class="col-3">
+                            <label class="input-label" for="alarm-type">타입</label>
+                        </div>
+                        <div class="col-5">
+                            <select class="form-control" id="alarm-type">
+                                <option value="DIGITAL">디지털</option>
+                                <option value="LOWER_LIMIT">하한</option>
+                                <option value="UPPER_LIMIT">상한</option>
+                                <option value="IN_RANGE">범위안</option>
+                                <option value="OUT_RANGE">범위밖</option>
+                                <option value="CHANGE">변경감지</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-secondary btn-icon-split" data-dismiss="modal">
+                        <span class="icon text-white-50">
+                            <i class="fas fa-times"></i>
+                        </span>
+                        <span class="text">취소</span>
+                    </button>
+                    <button class="btn btn-primary btn-icon-split" onclick="doSave();">
+                        <span class="icon text-white-50">
+                            <i class="fas fa-check"></i>
+                        </span>
+                        <span class="text">확인</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="alarm-set" tabindex="-1" role="dialog">
+        <div class="modal-dialog" role="document" style="max-width: 700px !important;">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">DB설정</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="table-responsive pt-3">
+                        <p>주의 : DB파일은 가급적 외부 저장장치에 저장하십시오. 내부장치에 저장할 경우,</p>
+                        <p class="mb-3">잦은 쓰기로 인해 용량부족 및 저장장치의 수명단축 가능성이 있습니다.</p>
+                        <div class="form-group row">
+                            <div class="col-2">
+                                <label class="input-label" for="save-path">저장경로</label>
+                            </div>
+                            <div class="col-7">
+                                <div class="input-group">
+                                    <input type="text" class="form-control" id="save-path" value="{{setting.path}}" />
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <div class="col-2">
+                                <label class="input-label">제한</label>
+                            </div>
+                            <div class="col-7">
+                                <div class="form-radio limit-input">
+                                    <div class="form-check">
+                                        <input type="radio" class="form-check-input" name="alarm-limit" value="NONE" id="no-limit" {%if setting==None or setting.limit=="" or setting.limit=="NONE"%}checked{%endif%}>
+                                        <label class="form-check-label" for="no-limit">제한없음</label>
+                                    </div>
+                                </div>
+                                <div class="form-radio limit-input">
+                                    <div class="form-check">
+                                        <input type="radio" class="form-check-input" name="alarm-limit" value="RECORD" id="max-record" {%if setting.limit=="RECORD"%}checked{%endif%}>
+                                        <label class="form-check-label" for="max-record">최대 레코드 수</label>
+                                    </div>
+                                    <input type="number" class="form-control" id="max-record-cnt" onkeypress="return event.charCode >= 48 && event.charCode <= 57" {%if setting.limit=="RECORD"%}value="{{setting.limit_val}}"{%endif%}>
+                                </div>
+                                <div class="form-radio limit-input">
+                                    <div class="form-check">
+                                        <input type="radio" class="form-check-input" name="alarm-limit" value="CAPACITY" id="save-capacity" {%if setting.limit=="CAPACITY"%}checked{%endif%}>
+                                        <label class="form-check-label" for="save-capacity">저장용량</label>
+                                    </div>
+                                    <input type="number" class="form-control" id="capacity-value" {%if setting.limit=="CAPACITY"%}value="{{setting.limit_val}}"{%endif%}>
+                                </div>
+                            </div>
+                            <div class="col-3 grid-margin" style="margin-top: auto; margin-bottom: 15px;">
+                                <select class="form-control" id="capacity-unit">
+                                    <option value="KB" {%if setting.limit_unit=="KB"%}selected{%endif%}>KB</option>
+                                    <option value="MB" {%if setting.limit_unit=="MB"%}selected{%endif%}>MB</option>
+                                    <option value="GB" {%if setting.limit_unit=="GB"%}selected{%endif%}>GB</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button class="btn btn-secondary btn-icon-split" data-dismiss="modal">
+                            <span class="icon text-white-50">
+                                <i class="fas fa-times"></i>
+                            </span>
+                            <span class="text">취소</span>
+                        </button>
+                        <button class="btn btn-primary btn-icon-split" onclick="saveAlarm();">
+                            <span class="icon text-white-50">
+                                <i class="fas fa-save"></i>
+                            </span>
+                            <span class="text">저장</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade"></div>
+{% endblock %}
+
+{% block script %}
+    <script src="{{ url_for('static', filename='js/datetimepicker.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/jquery.inputmask.min.js') }}"></script>
+    {% include 'common/datatable.html' %}
+    {% include 'common/variable_modal.html' %}
+    {% include 'common/alarm_js.html' %}
+    <script>
+        const alarmLimit = parseInt("{{alarm_limit}}");
+
+        function addAlarm() {
+            if(alarmCnt < alarmLimit) {
+                $("#alarm-name").val('');
+                $("#new-alarm").attr('selid', '0').modal('show');
+            } else {
+                alert(limitMsg);
+            }
+        }
+
+        function showAlarmModal(selRow) {
+            const selInput = $("#alarm-table input[id='check-row-" + selRow + "']");
+            $("#alarm-type").val(selInput.attr('mtype'));
+            $("#alarm-name").val(selInput.attr('data-name'));
+            $("#alarm-confirm").val(selInput.attr('confirm'));
+            $("#alarm-category").val(selInput.attr('category'));
+            $("#new-alarm").attr('selid', selRow).modal('show');
+        }
+
+        function editAlarm() {
+            const selIDs = getTblChk("#alarm-table");
+            if(selIDs.length > 0) {
+                showAlarmModal(selIDs.split(',')[0]);
+            } else {
+                alert('편집할 행을 선택하세요');
+            }
+        }
+
+        function doSave() {
+            const alarmName = $("#alarm-name");
+            alarmName.removeClass('border-danger');
+            if(alarmName.val().trim().length > 0) {
+                let postData = {};
+                const modalInputs = $("#new-alarm input, #new-alarm select");
+                for(let ii = 0; ii < modalInputs.length; ii++) {
+                    const itemInput = $(modalInputs[ii]);
+                    postData[itemInput.attr('id').replace('-', '_')] = itemInput.val().trim();
+                }
+
+                const alarmModal = $("#new-alarm");
+                postData['selid'] = alarmModal.attr('selid');
+                sendAjax("{{url_for('data_set.create_alarm')}}", postData, false);
+                updateVariable(alarmTbl);
+                alarmModal.modal('hide');
+            } else {
+                alarmName.addClass('border-danger');
+                alert('이름을 입력하세요');
+            }
+        }
+
+        function delAlarm() {
+            removeAction("#alarm-table", "{{url_for('data_set.remove_alarm')}}", '', false);
+            updateVariable(alarmTbl);
+        }
+
+        function alarmAct(flag) {
+            if(flag === "plus") {
+                addAlarm();
+            } else if(flag === "del") {
+                const selRow = $("#contextmenu").attr("selrow");
+                if(selRow && confirm('삭제하시겠습니까?')) {
+                    sendAjax("{{url_for('data_set.remove_alarm')}}", {selRow}, false);
+                    updateVariable(alarmTbl);
+                }
+            } else if(flag === "edit") {
+                showAlarmModal($("#contextmenu").attr("selrow"));
+            }
+        }
+
+        function dbSetModal() {
+            $("#alarm-set").modal('show');
+        }
+
+        function saveAlarm() {
+            $("#alarm-set input").removeClass('border-danger');
+
+            let postData = {}, inputValid = true;
+            let inputItem = $("#save-path");
+            let inputVal = inputItem.val().trim();
+            if(inputVal.length > 0) {
+                if(inputVal.substr(-7) === ".sqlite") {
+                    postData['save_path'] = inputVal;
+                } else {
+                    alert('파일 확장자가 정확하지 않습니다');
+                    return false;
+                }
+            } else {
+                inputValid = false;
+                inputItem.addClass('border-danger');
+            }
+
+            if(inputValid) {
+                inputVal = $("input[name='alarm-limit']:checked").val();
+                postData['alarm_limit'] = inputVal;
+                if(inputVal === "CAPACITY") {
+                    inputItem = $("#capacity-value");
+                    inputVal = inputItem.val().trim();
+                    if(inputVal.length > 0) {
+                        postData['record_cnt'] = inputVal
+                        postData['record_unit'] = $("#capacity-unit").val();
+                    } else {
+                        inputValid = false;
+                        inputItem.addClass('border-danger');
+                    }
+                } else if(inputVal === "RECORD") {
+                    inputItem = $("#max-record-cnt");
+                    inputVal = inputItem.val().trim();
+                    if(inputVal.length > 0) {
+                        postData['record_cnt'] = inputVal
+                    } else {
+                        inputValid = false;
+                        inputItem.addClass('border-danger');
+                    }
+                }
+            }
+
+            if(inputValid) {
+                postData['set_name'] = 'alarm_set';
+                sendAjax("{{url_for('data_set.set_save')}}", postData, false);
+                $("#alarm-set").modal('hide');
+            } else {
+                alert('값을 입력하세요');
+            }
+        }
+    </script>
+{% endblock %}

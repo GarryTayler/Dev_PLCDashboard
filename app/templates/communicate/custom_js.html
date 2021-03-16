@@ -1,0 +1,360 @@
+<script src="{{ url_for('static', filename='js/jquery.inputmask.min.js') }}"></script>
+<script>
+    const chlLimit = parseInt("{{channel_limit}}"), channelTable = $("#custom-channel-table");
+    const frmLimit = parseInt("{{frame_limit}}"), frameTable = $("#custom-frame-table");
+    let curLen = 0, frmLen = 0, selType = '', selChannel = 0, selFrame = 0, channelTbl, frameTbl;
+    function doChannelAdd() {
+        const channelName = $("#channel-name").val().trim();
+        if(channelName.length > 0) {
+            const chlModal = $("#channel-modal");
+            const postData = {channelName, channelType: $("#channel-type").val(), selid: chlModal.attr('selid')};
+            sendAjax("{{url_for('communicate.add_custom_channel')}}", postData, false);
+            updateVariable(channelTbl);
+            chlModal.modal('hide');
+        } else {
+            alert('이름을 입력하세요');
+        }
+    }
+
+    function saveDetail() {
+        let postData = getPostData(selType);
+        $("#check-row-" + selChannel).attr('options', JSON.stringify(postData));
+
+        postData['channel_id'] = selChannel;
+        sendAjax("{{url_for('communicate.update_custom')}}", postData, false);
+        alert(saveMsg);
+    }
+
+    function addChannel() {
+        if(curLen < chlLimit) {
+            $("#channel-name").val('');
+            $("#channel-modal").attr('selid', '0').modal('show');
+        } else {
+            alert(limitMsg);
+        }
+    }
+
+    function customAct(flag) {
+        if(flag === "plus") {
+            addChannel();
+        } else if(flag === "del") {
+            const selRow = $("#contextmenu").attr("selrow");
+            if(selRow && confirm('삭제하시겠습니까?')) {
+                sendAjax("{{url_for('communicate.remove_modbus')}}", {selRow, selType: 'custom'}, false);
+                updateVariable(channelTbl);
+            }
+        } else if(flag === "edit") {
+            showChlEdit($("#contextmenu").attr("selrow"));
+        }
+    }
+
+    function removeChannel() {
+        removeCustom("#custom-channel-table", '{{url_for("communicate.remove_modbus")}}', "", {selType: 'custom'}, false);
+        updateVariable(channelTbl);
+    }
+
+    function addFrame() {
+        if(frmLen < frmLimit) {
+            $("#frame-name").val('');
+            $("#frame-modal").modal('show');
+        } else {
+            alert(limitMsg);
+        }
+    }
+
+    function removeFrame() {
+        removeCustom("#custom-frame-table", '{{url_for("communicate.remove_modbus")}}', "frame-", {selType: 'frame'}, false);
+        updateVariable(frameTbl);
+    }
+
+    function doFrameAdd() {
+        const frameName = $("#frame-name").val().trim();
+        if(frameName.length > 0) {
+            sendAjax("{{url_for('communicate.add_frame')}}", {frameName}, false);
+            updateVariable(frameTbl);
+        } else {
+            alert('이름을 입력하세요');
+        }
+    }
+
+    function frameAct(flag) {
+        if(flag === "plus") {
+            addFrame();
+        } else {
+            const selRow = $("#contextmenu").attr("selrow").replace('frame-', '');
+            if(selRow && confirm('삭제하시겠습니까?')) {
+                sendAjax("{{url_for('communicate.remove_modbus')}}", {selRow, selType: 'frame'}, false);
+                updateVariable(frameTbl);
+            }
+        }
+    }
+
+    function segmentAct(flag) {
+        if(flag === "plus") {
+            addSegment();
+        } else if(flag === "del") {
+            const selRow = $("#contextmenu").attr("selrow").replace('seg-', '');
+            if(selRow && confirm('삭제하시겠습니까?')) {
+                sendAjax("{{url_for('communicate.remove_modbus')}}", {selRow, selType: 'segment'}, false);
+                showFrameData();
+            }
+        } else if(flag === 'edit') {
+            const selRow = "#check-row-" + $("#contextmenu").attr("selrow");
+            showEdit($(selRow));
+        }
+    }
+
+    function removeBracket(str) {
+        return str.replace('<', '').replace('>', '');
+    }
+
+    function addSegment() {
+        $("#segment-modal input").val('').removeAttr('selid').removeAttr('seltype').removeAttr('sellocstr');
+
+        $("#segment-modal .segment-panel").hide();
+        const segType = "#" + removeBracket($("#segment-type").val()) + "-panel";
+        $(segType).show();
+
+        $("#segment-id").val('0');
+        $("#segment-modal").modal('show');
+    }
+
+    function showEdit(selItem) {
+        const optionKey = removeBracket(selItem.attr('stype'));
+        const optionType = "#" + optionKey + "-panel";
+        const optionStr = selItem.attr('options');
+        const optionObj = optionStr.length > 0 ? JSON.parse(optionStr) : {};
+        initInputs(optionType, optionObj);
+
+        $("#segment-modal .segment-panel").hide();
+        $(optionType).show();
+
+        $("#segment-type").val("<" + optionKey + ">");
+        if(optionKey === "B") {
+            $("#segment-ascii").prop('checked', optionObj['segment_ascii'] === '1');
+        } else if(optionKey === "V") {
+            const segVar = $("#segment-variable");
+            segVar.attr('selid', optionObj['segment_variable_selid'])
+                .attr('seltype', optionObj['segment_variable_seltype'])
+                .attr('sellocstr', optionObj['segment_variable_sellocstr']);
+
+            const segByte = $("#segment-byte");
+            if(optionObj.hasOwnProperty('segment_byte_selid')) {
+                segByte.attr('selid', optionObj['segment_byte_selid'])
+                    .attr('seltype', optionObj['segment_byte_seltype'])
+                    .attr('sellocstr', optionObj['segment_byte_sellocstr']);
+            } else {
+                segByte.removeAttr('selid')
+                    .removeAttr('seltype')
+                    .removeAttr('sellocstr');
+            }
+        }
+
+        const selID = selItem.attr('id').replace('check-row-seg-', '');
+        $("#segment-id").val(selID);
+        $("#segment-modal").modal('show');
+    }
+
+    function editSegment() {
+        const rowArr = $("#custom-segment-table tbody input.check-row").filter(':checked');
+        if(rowArr.length === 1) {
+            showEdit($(rowArr[0]));
+        } else {
+            alert('편집할 세스먼트를 선택하세요');
+        }
+    }
+
+    function doSegmentAdd() {
+        const seType = removeBracket($("#segment-type").val());
+        const segType = "#" + seType + "-panel";
+        let postData = getPostData(segType);
+        if(postData) {
+            if(seType === "B") {
+                postData['segment_ascii'] = $("#segment-ascii").prop('checked') ? '1' : '0';
+            }
+
+            postData['frame_id'] = selFrame;
+            postData['type'] = $("#segment-type").val();
+            postData['selid'] = $("#segment-id").val();
+            sendAjax("{{url_for('communicate.add_segment')}}", postData, false);
+            $("#segment-modal").modal("hide");
+            showFrameData();
+        }
+    }
+
+    function removeSegment() {
+        const tableID = "#custom-segment-table";
+        const url = '{{url_for("communicate.remove_modbus")}}';
+        const customData = {selType: 'segment'};
+        const replaceStr = "seg-";
+        removeCustom(tableID, url, replaceStr, customData, false);
+        showFrameData();
+    }
+
+    function showFrameData() {
+        const rowArr = $("#custom-frame-table tbody input.check-row").filter(':checked');
+        $("#segment-panel").hide();
+        if(rowArr.length > 0) {
+            selFrame = parseInt($(rowArr[0]).attr('id').replace('check-row-frame-', ''));
+            $.ajax({
+                url: "{{url_for('communicate.get_frame')}}",
+                dataType: 'json',
+                data: {selFrame},
+                type: 'post',
+                headers: { "X-CSRFToken": csrf_token },
+                success: function(resp) {
+                    if(resp.status) {
+                        let html = '';
+                        const segment_list = resp.data;
+                        if(segment_list && segment_list.length > 0) {
+                            for(let ii = 0; ii < segment_list.length; ii++) {
+                                const segItem = segment_list[ii];
+                                let jj = ii + 1;
+                                html += "<tr data-row='seg-" + segItem.id + "'><td class='text-center'><div class='form-check'><input type='checkbox' class='form-check-input check-row' id='check-row-seg-" + segItem.id + "' options='" + segItem.options + "' stype='" + segItem.type + "'><label class='form-check-label'></label></div></td>";
+                                html += "<td>" + jj + "</td><td>" + segItem.type_str + "</td><td>" + segItem.desc + "</td></tr>";
+                            }
+                        }
+
+                        $("#segment-tbody").html(html);
+                        $("#segment-panel").show();
+
+                        const chk2 = $(".check-all-2");
+                        chk2.unbind('click');
+                        chk2.on('click', function() {
+                            const selChk = $(this).prop('checked');
+                            $("#custom-segment-table .check-row").prop('checked', selChk);
+                        });
+                    } else {
+                        alert(resp.message);
+                    }
+                }
+            });
+        }
+    }
+
+    function editChannel() {
+        const selIDs = getTblChk("#custom-channel-table");
+        if(selIDs.length > 0) {
+            const selID = selIDs.split(',')[0];
+            $("#channel-modal").attr('selid', selID).modal('show');
+        } else {
+            alert('채널을 선택하세요');
+        }
+    }
+
+    function showChlEdit(selRow) {
+        const selChk = $("#custom-channel-table tbody input[id='check-row-" + selRow + "']");
+        $("#channel-name").val(selChk.attr('data-name'));
+        $("#channel-type").val(selChk.attr('data-type'));
+        $("#channel-modal").attr('selid', selRow).modal('show');
+    }
+
+    $(document).ready(function () {
+        $('.mask-ip').inputmask({
+            alias: "ip",
+            greedy: false
+        });
+
+        $(".mask-time").inputmask(timeFormat);
+
+        $("#segment-type").on('change', function() {
+            $("#segment-modal .segment-panel").hide();
+            const segType = "#" + removeBracket($(this).val()) + "-panel";
+            $(segType).show();
+        });
+
+        channelTable.on('click', 'tbody tr', function () {
+            const rowArr = $("#custom-channel-table tbody input.check-row").filter(':checked');
+            $("#channel .custom-communicate").hide();
+            if(rowArr.length > 0) {
+                const firstItem = $(rowArr[0]);
+                const selChl = parseInt(firstItem.attr('id').replace('check-row-', ''));
+                if(selChl !== selChannel) {
+                    const optionStr = firstItem.attr('options');
+                    const optionObj = optionStr.length > 0 ? JSON.parse(optionStr) : {};
+
+                    const trType = firstItem.closest('tr').data('type');
+                    if(['udp_client', 'udp_server', 'tcp_server'].indexOf(trType) >= 0) {
+                        selType = "#tcp-input";
+                    } else {
+                        selType = "#" + trType + "-input";
+                    }
+
+                    initInputs(selType, optionObj);
+
+                    $(selType).show();
+                    $("#save-panel").show();
+
+                    selChannel = selChl;
+                }
+            } else {
+                selChannel = 0;
+            }
+        });
+
+        frameTable.on('click', 'tbody tr', function() {
+            showFrameData();
+        });
+
+        channelTbl = channelTable.DataTable({
+            ...dataTableLang,
+            ...dataTableObj,
+            "columnDefs": columnDef,
+            "order": [[ 1, "asc" ]],
+            "drawCallback": function(oSettings) {
+                curLen = oSettings._iRecordsTotal;
+                setDataTblPage(channelTable, oSettings._iDisplayLength);
+            },
+            'ajax': {
+                'url': "{{url_for('communicate.channel_list')}}",
+                'headers': { "X-CSRFToken": csrf_token }
+            },
+            "columns": [
+                {
+                    render: function (data, type, row) {
+                        return checkForm.replaceAll('data.id', row.id).replaceAll('data.attr', "data-name='" + row.name + "' data-type='" + row.type + "' options='" + row.options + "'");
+                    }
+                },
+                {"data": "ind"},
+                {"data": "name"},
+                {"data": "type"}
+            ],
+            "initComplete": function(setting, resp) {
+                $("#custom-channel-table tbody input[type='checkbox']:first").trigger('click');
+            },
+            "createdRow": function(row, data) {
+                $(row).attr('data-row', data.id).attr('data-type', data.type.toLowerCase());
+            }
+        });
+
+        frameTbl = frameTable.DataTable({
+            ...dataTableLang,
+            ...dataTableObj,
+            "columnDefs": columnDef,
+            "order": [[ 1, "asc" ]],
+            "drawCallback": function(oSettings) {
+                frmLen = oSettings._iRecordsTotal;
+                setDataTblPage(frameTable, oSettings._iDisplayLength);
+            },
+            'ajax': {
+                'url': "{{url_for('communicate.frame_list')}}",
+                'headers': { "X-CSRFToken": csrf_token }
+            },
+            "columns": [
+                {
+                    render: function (data, type, row) {
+                        return checkForm.replaceAll('data.id', 'frame-' + row.id).replaceAll('data.attr', "data-name='" + row.name + "'");
+                    }
+                },
+                {"data": "ind"},
+                {"data": "name"}
+            ],
+            "initComplete": function(setting, resp) {
+                $("#custom-frame-table tbody input[type='checkbox']:first").trigger('click');
+            },
+            "createdRow": function(row, data) {
+                $(row).attr('data-row', 'frame-' + data.id);
+            }
+        });
+    });
+</script>

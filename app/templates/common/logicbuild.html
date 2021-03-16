@@ -1,0 +1,431 @@
+<link rel="stylesheet" href="{{ url_for('static', filename='css/spectrum.min.css') }}">
+
+<div class="modal fade" id="palette-modal" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">글꼴, 색상편집</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <div class="alert alert-info" role="alert">
+                        헤더설정
+                    </div>
+                    <div class="row">
+                        <div class="col-6">
+                            <label for="header-back-color">배경색</label>
+                            <input id="header-back-color" class="form-control" />
+                        </div>
+                        <div class="col-6" id="header-family-div">
+                            <label for="font-family">글꼴</label>
+                            <input id="font-family" type="text" class="form-control family-select">
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-6">
+                            <label for="font-color">색상</label>
+                            <input id="font-color" class="form-control" value='#276cb8' />
+                        </div>
+                        <div class="col-6">
+                            <label for="font-size-input">글꼴 크기</label>
+                            <input type="number" class="form-control" placeholder="" value="14" id="font-size-input">
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div class="alert alert-info" role="alert">
+                        바디설정
+                    </div>
+                    <div class="row">
+                        <div class="col-6">
+                            <label for="body-back-color">배경색</label>
+                            <input id="body-back-color" class="form-control" />
+                        </div>
+                        <div class="col-6" id="body-family-div">
+                            <label for="body-family">글꼴</label>
+                            <input id="body-family" type="text" class="form-control family-select">
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-6">
+                            <label for="body-color">색상</label>
+                            <input id="body-color" class="form-control" value='#276cb8' />
+                        </div>
+                        <div class="col-6">
+                            <label for="body-size-input">글꼴크기</label>
+                            <input type="number" class="form-control" placeholder="" value="14" id="body-size-input">
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group" id="back-img">
+                    <div class="alert alert-info" role="alert">
+                        배경그림
+                    </div>
+                    <div class="row">
+                        <div class="col-12">
+                            <div id="backimg-div">
+                                <img src="" id="monitor-back" alt="monitor-back" />
+                                <div class="btn-panel">
+                                    <button class="btn btn-danger btn-icon-split mb-2" onclick="removeImg();">
+                                        <span class="icon text-white-50">
+                                            <i class="fas fa-times"></i>
+                                        </span>
+                                        <span class="text">삭제</span>
+                                    </button>
+                                </div>
+                            </div>
+                            <div id="back-img-select">
+                                <input id="file-demo1" type="file" accept="image/*" onchange="fileChange();">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary btn-icon-split" data-dismiss="modal">
+                    <span class="icon text-white-50">
+                        <i class="fas fa-times"></i>
+                    </span>
+                    <span class="text">취소</span>
+                </button>
+                <button class="btn btn-primary btn-icon-split" onclick="updatePalette();">
+                    <span class="icon text-white-50">
+                        <i class="fas fa-check"></i>
+                    </span>
+                    <span class="text">확인</span>
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/sortablejs@latest/Sortable.min.js"></script>
+<script src="{{ url_for('static', filename='js/jquery.fontselect.min.js') }}"></script>
+<script>
+    let selFont = {}, fileUpdate = false;
+    const hexDigits = ["0","1","2","3","4","5","6","7","8","9","a","b","c","d","e","f"];
+    function removeChild(url, selID, flag = true) {
+        if(confirm('삭제하시겠습니까?')) {
+            sendAjax(url, selID, flag);
+        }
+    }
+
+    function slideFunc(selID, flag) {
+        if($(selID).attr('flag') !== flag) {
+            $(selID).attr('flag', flag);
+            $(selID).slideToggle("slow");
+        }
+    }
+
+    function hex(x) {
+        return isNaN(x) ? "00" : hexDigits[(x - x % 16) / 16] + hexDigits[x % 16];
+    }
+
+    function rgb2hex(rgb) {
+        if(rgb.indexOf('a') >= 0) {
+            // rgb = rgb.replace('a', '');
+            return '#fff';
+        } else {
+            rgb = rgb.replace(')', ', 0)');
+        }
+
+        rgb = rgb.match(/^rgb\((\d+),\s*(\d+),\s*(\d+),\s*(\d+)\)$/);
+        return "#" + hex(rgb[1]) + hex(rgb[2]) + hex(rgb[3]);
+    }
+
+    function setFamily(elem, prefixStr) {
+        const fontName = $(elem).css('font-family').trim().split(',')[0].trim();
+        const fontSelect = $(prefixStr + 'div.font-select');
+        fontSelect.find('.fs-results li').removeClass('active');
+        const dropEle = fontSelect.find('.fs-drop');
+        const fontToSelect = fontSelect.find('.fs-results li:contains(' + fontName + ')');
+        dropEle.addClass('fs-drop-op');
+        const posFont = fontToSelect.offset().top
+        const posFontOffset = fontSelect.find('.fs-results li:first').offset().top
+        fontSelect.find('.fs-results').scrollTop(posFont - posFontOffset);
+        fontToSelect.addClass('active').trigger('click');
+    }
+
+    function showPalette(cardID, backImg = false) {
+        fileUpdate = false;
+        const bckImg = $("#back-img");
+        if(backImg) {
+            bckImg.show();
+            const backImgOpt = $(cardID).attr('back_img');
+            const imgDiv = $("#backimg-div"), selDiv = $("#back-img-select");
+            if(backImgOpt && backImgOpt.length > 0) {
+                imgDiv.show();
+                selDiv.hide();
+                $("#monitor-back").attr('src', assetPath + backImgOpt);
+            } else {
+                imgDiv.hide();
+                selDiv.show();
+            }
+        } else {
+            bckImg.hide();
+        }
+
+        const cardDiv = $(cardID);
+        const headerDiv = $(cardDiv).find('div.card-header:first');
+        const bodyDiv = $(cardDiv).find('div.card-body:first');
+
+        $("#header-back-color").spectrum({
+            ...spectrumObj,
+            color: rgb2hex($(headerDiv).css('background-color'))
+        });
+
+        $("#body-back-color").spectrum({
+            ...spectrumObj,
+            color: rgb2hex($(bodyDiv).css('background-color'))
+        });
+
+        $("#font-color").spectrum({
+            ...spectrumObj,
+            color: rgb2hex($(headerDiv).css('color'))
+        });
+
+        $("#body-color").spectrum({
+            ...spectrumObj,
+            color: rgb2hex($(bodyDiv).css('color'))
+        });
+
+        $("#font-size-input").val($(headerDiv).css('font-size').replace('px', ''));
+        $("#body-size-input").val($(bodyDiv).css('font-size').replace('px', ''));
+
+        setFamily(headerDiv, "#header-family-div ");
+        setFamily(bodyDiv, "#body-family-div ");
+
+        $("#palette-modal").attr('cardID', cardID).modal("show");
+    }
+
+    function getStyleStr(opt) {
+        let headerStyle = "", bodyStyle = "", cardStyle= "";
+        if(opt.hasOwnProperty('header_back')) {
+            headerStyle = "background-color: " + opt.header_back;
+            bodyStyle = "background-color: " + opt.body_back;
+            cardStyle = "color: " + opt.font_color + "; font-size: " + opt.font_size + "; font: " + opt.font_family;
+        }
+
+        return {headerStyle, bodyStyle, cardStyle};
+    }
+
+    function drawLogicCond(pageList) {
+        let html = "";
+        for(let ii = 0; ii < pageList.length; ii++) {
+            const pageItem = pageList[ii];
+            const pageOpt = pageItem.options.length > 0 ? JSON.parse(pageItem.options) : {};
+            const {headerStyle, bodyStyle, cardStyle} = getStyleStr(pageOpt);
+            html += logicCondPanel.replaceAll('data.id', pageItem.id).replaceAll('data.name', pageItem.name)
+                .replaceAll('data.type', pageItem.type).replaceAll('data.useflag', pageItem.use_flag)
+                .replaceAll('data.desc', pageItem.desc).replaceAll('card-style', cardStyle)
+                .replaceAll('header-style', headerStyle).replaceAll('body-style', bodyStyle);
+        }
+
+        $("#cond-group-palette .card-body").html(html);
+    }
+
+    function drawLogicAction(pageList) {
+        let html = "";
+        for(let ii = 0; ii < pageList.length; ii++) {
+            const pageItem = pageList[ii];
+            const pageOpt = pageItem.options.length > 0 ? JSON.parse(pageItem.options) : {};
+            const {headerStyle, bodyStyle, cardStyle} = getStyleStr(pageOpt);
+            html += logicActionPanel.replaceAll('data.id', pageItem.id).replaceAll('data.name', pageItem.name)
+                .replaceAll('data.type', pageItem.type).replaceAll('data.useflag', pageItem.use_flag)
+                .replaceAll('data.desc', pageItem.desc).replaceAll('card-style', cardStyle)
+                .replaceAll('header-style', headerStyle).replaceAll('body-style', bodyStyle);;
+        }
+
+        $("#act-group-palette .card-body").html(html);
+    }
+
+    function initLogicIcons() {
+        const circleUp = $("i.fa-chevron-circle-up");
+        const circleDown = $("i.fa-chevron-circle-down");
+        const trashArr = $("div.header-badge i.fa-trash");
+        if(curMode === "stop" && curAuth) {
+            circleUp.unbind('click');
+            circleDown.unbind('click');
+            trashArr.unbind('click');
+            circleUp.on('click', function() {
+                const selType = $(this).attr('type');
+                const selID = selType + $(this).closest('div').data('id');
+                slideFunc(selID, '1');
+                $(this).hide();
+                $(this).closest('div.header-badge').find('i.fa-chevron-circle-down:first').show();
+            });
+
+            circleDown.on('click', function() {
+                const selType = $(this).attr('type');
+                const selID = selType + $(this).closest('div').data('id');
+                slideFunc(selID, '0');
+                $(this).hide();
+                $(this).closest('div.header-badge').find('i.fa-chevron-circle-up:first').show();
+            });
+
+            trashArr.on('click', function() {
+                const selUrl = $(this).attr('url');
+                const isLogic = typeof logicID === 'undefined';
+                removeChild(selUrl, {actID: $(this).closest('div').data('id')}, !isLogic);
+                if(isLogic) {
+                    if(selUrl.indexOf('remove_action') >= 0) {
+                        updateBuildPanel1();
+                    } else if(selUrl.indexOf('remove_cond') >= 0) {
+                        updateBuildPanel();
+                    }
+                }
+            });
+        } else {
+            $(".header-badge i").remove();
+        }
+    }
+
+    function initCardStyle(opt, cardID, childItem = false) {
+        if(opt.hasOwnProperty('header_back')) {
+            const cardDiv = $(cardID);
+            const headerDiv = $(cardDiv).find('div.card-header:first');
+            const bodyDiv = $(cardDiv).find('div.card-body:first');
+
+            bodyDiv.css('color', opt.body_color).css('font-size', opt.body_size).css('font-family', opt.body_family).css('background-color', opt.body_back);
+            headerDiv.css('color', opt.font_color).css('font-size', opt.font_size).css('font-family', opt.font_family).css('background-color', opt.header_back);
+
+            if(childItem) {
+                let inputList = bodyDiv.find('select');
+                for(let ii = 0; ii < inputList.length; ii++) {
+                    $(inputList[ii]).css('color', opt.body_color).css('font-size', opt.body_size).css('font-family', opt.body_family);
+                }
+
+                inputList = bodyDiv.find('input');
+                for(let ii = 0; ii < inputList.length; ii++) {
+                    $(inputList[ii]).css('color', opt.body_color).css('font-size', opt.body_size).css('font-family', opt.body_family);
+                }
+            }
+        }
+    }
+
+    function updatePalette() {
+        const paletteModal = $("#palette-modal");
+        const cardID = paletteModal.attr('cardID');
+
+        const postData = {
+            header_back: $("#header-back-color").val(),
+            font_color: $("#font-color").val(),
+            font_size: $("#font-size-input").val() + "px",
+            font_family: selFont['font-family'],
+            body_back: $("#body-back-color").val(),
+            body_size: $("#body-size-input").val() + "px",
+            body_color: $("#body-color").val(),
+            body_family: selFont['body-family']
+        };
+
+        let selType = "", selID = '';
+        if(cardID === "#cond-group-palette") {
+            selType = "cond_group";
+            selID = actGroupID;
+        } else if(cardID === "#act-group-palette") {
+            selType = "act_group";
+            selID = condGroupID;
+        } else if(cardID.indexOf("cond-palette-") >= 0) {
+            selType = "condition";
+            selID = cardID.replace('#cond-palette-', '');
+        } else if(cardID.indexOf("act-palette-") >= 0) {
+            selType = "action";
+            selID = cardID.replace('#act-palette-');
+        } else if(cardID === "#control-palette") {
+            selType = "control";
+            selID = controlID;
+        } else if(cardID.indexOf("control-palette-") >= 0) {
+            selType = "control";
+            selID = cardID.replace('#control-palette-', '');
+        } else if(cardID === "#logic-panel") {
+            selType = "logic";
+            selID = logicID;
+        } else if(cardID === "#monitor-panel") {
+            selType = "monitor";
+            selID = monitorID;
+        } else if(cardID.indexOf("monitor-element-")) {
+            selType = "element";
+            selID = cardID.replace('#monitor-element-', '');
+        }
+
+        initCardStyle(postData, cardID, selType === "element");
+
+        const formData = new FormData();
+        formData.append("bool_file", fileUpdate ? '1' : '0');
+        if(fileUpdate) {
+            const selFile = $('#file-demo1').prop('files')[0];
+            if(selFile) {
+                formData.append("new_file", '1');
+                formData.append("file", selFile);
+            } else {
+                formData.append("new_file", '0');
+            }
+        }
+
+        for(let key1 in postData) {
+            if(postData.hasOwnProperty(key1)) {
+                formData.append(key1, postData[key1]);
+            }
+        }
+
+        if(selType.length > 0) {
+            formData.append('selID', selID);
+            formData.append('selType', selType);
+            sendAjax("{{url_for('logic_setting.logic_option')}}", formData, fileUpdate, true);
+            paletteModal.modal('hide');
+        }
+    }
+
+    function saveBuildOrder(evt) {
+        const itemEl = $(evt.item).closest('div.card');
+        const parentID = "#" + $(evt.item).parents('div.card:first').attr('id') + " ";
+        let inputArr = [], postData = {}, keyword = "";
+        if(itemEl.hasClass('action-individual')) {
+            inputArr = ".action-individual";
+            keyword = "act-palette-";
+            postData['selType'] = 'action';
+        } else if(itemEl.hasClass('condition-individual')) {
+            inputArr = ".condition-individual";
+            keyword = "cond-palette-";
+            postData['selType'] = 'condition';
+        } else if(itemEl.hasClass('control-card')) {
+            inputArr = ".control-card";
+            keyword = "control-palette-";
+            postData['selType'] = 'control';
+        } else if(itemEl.hasClass('element-item')) {
+            inputArr = ".element-item";
+            keyword = "monitor-element-";
+            postData['selType'] = "monitor";
+        }
+
+        inputArr = $(parentID + inputArr);
+        for(let ii = 0; ii < inputArr.length; ii++) {
+            postData[$(inputArr[ii]).attr('id').replace(keyword, '')] = ii + 1;
+        }
+
+        sendAjax("{{url_for('logic_build.save_order')}}", postData, false);
+    }
+
+    function fileChange() {
+        fileUpdate = true;
+    }
+
+    function removeImg() {
+        fileUpdate = true;
+        $("#backimg-div").hide();
+        $("#back-img-select").show();
+    }
+
+    $(document).ready(function () {
+        $('.family-select').fontselect().on('change', function() {
+            selFont[$(this).attr('id')] = $(this).val().replace(/\+/g, ' ');
+        });
+
+        if(typeof monitorID !== 'undefined') {
+            $("#file-demo1").fileinput({showUpload: false});
+        }
+    });
+</script>

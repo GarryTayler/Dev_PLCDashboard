@@ -1,0 +1,27 @@
+<script>
+    $(document).ready(function(){
+        variableTbl.on('blur', "tbody input.name-input", function() {
+            const inputOrigin = $(this).attr('origin');
+            const inputName = $(this).val();
+
+            if(inputOrigin !== inputName) {
+                const trVal = $(this).closest('tr').attr('data-row');
+                const remote = varSelect.val().split("-")[1];
+                $(this).attr('origin', inputName);
+                sendAjax("{{url_for('logic_setting.update_variable')}}", {trVal, inputName, remote}, false);
+            }
+        });
+
+        variableTbl.on('blur', "tbody input.analog-unit", function() {
+            const inputOrigin = $(this).attr('origin');
+            const inputUnit = $(this).val();
+
+            if(inputOrigin !== inputUnit) {
+                const trVal = $(this).closest('tr').attr('data-row');
+                const remote = varSelect.val().split("-")[1];
+                $(this).attr('origin', inputUnit);
+                sendAjax("{{url_for('logic_setting.update_variable')}}", {trVal, inputUnit, remote}, false);
+            }
+        });
+    });
+</script>

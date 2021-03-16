@@ -1,0 +1,536 @@
+{% extends "layout.html" %}
+
+{% block content %}
+    <div class="card shadow mb-4">
+        <div class="card-header py-3">
+            <h6 class="m-0 font-weight-bold text-primary">통신설정 > 리모트디바이스</h6>
+        </div>
+        <div class="card-body">
+            <ul class="nav nav-tabs" role="tablist">
+                <li class="nav-item">
+                    <a class="nav-link active" data-toggle="tab" href="#server">
+                        <i class="fa fa-server"></i> 로컬서버
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" data-toggle="tab" href="#client">
+                        <i class="fa fa-user"></i> 리모트디바이스
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" data-toggle="tab" href="#variable">
+                        <i class="fa fa-registered"></i> 변수등록
+                    </a>
+                </li>
+            </ul>
+            <div class="tab-content">
+                <div id="server" class="tab-pane active">
+                    <div class="form-group row">
+                        <div class="col-6">
+                            <div class="table-responsive mt-3">
+                                <label class="form-check-label mb-3">로컬서버 접속설정</label>
+                                <table class="table table-bordered no-context">
+                                    <thead>
+                                        <tr>
+                                            <th>사용</th>
+                                            <th>IP주소</th>
+                                            <th>포트</th>
+                                            {% if selmode == "run" %}
+                                                <th style="width: 35%">상태</th>
+                                            {% endif %}
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td>
+                                                <div class="dark">
+                                                    <div class="ckbx-style-1">
+                                                        <input type="checkbox"{%if local_use=='1'%} checked{%endif%} id="ckbx-style-1-1-local" value="0">
+                                                        <label for="ckbx-style-1-1-local"></label>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                            <td>
+                                                <input type="text" class="form-control mask-input" id="ip-address" value="{{local_ip}}" />
+                                            </td>
+                                            <td>
+                                                <input type="number" class="form-control" id="port-address" value="{{local_port}}" />
+                                            </td>
+                                            {% if selmode == "run" %}
+                                                <td class="{%if local_data.ok%}bg-success{%elif local_data.err%}bg-warning{%endif%}">{{local_data.status}}</td>
+                                            {% endif %}
+                                        </tr>
+                                    </tbody>
+                                </table>
+                                {% if selmode == "stop" and edit_auth %}
+                                    <div class="btn-panel">
+                                        <button class="btn btn-primary btn-icon-split" onclick="updateLocal();">
+                                            <span class="icon text-white-50">
+                                                <i class="fas fa-save"></i>
+                                            </span>
+                                            <span class="text">저장</span>
+                                        </button>
+                                    </div>
+                                {% endif %}
+                            </div>
+                            <div class="table-responsive mt-3">
+                                <label class="form-check-label mb-3">현재 접속중인 클라이언트</label>
+                                <table class="table table-bordered">
+                                    <thead>
+                                        <tr>
+                                            <th style="width: 10%">번호</th>
+                                            <th style="width: 40%">IP주소</th>
+                                            <th style="width: 50%">상태</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% if selmode == "run" %}
+                                            {% for client in local_data.clients %}
+                                                <tr>
+                                                    <td>{{loop.index}}</td>
+                                                    <td>{{client.ip}}</td>
+                                                    <td>{{client.status}}</td>
+                                                </tr>
+                                            {% endfor %}
+                                        {% endif %}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div id="client" class="tab-pane">
+                    <div class="form-group row">
+                        <div class="table-responsive mt-3">
+                            <label class="form-check-label mb-3">리모트디바이스 연결설정</label>
+                            <table class="table table-bordered datatable-tbl {%if selmode=='run' or not edit_auth%}no-context{%endif%}" id="remote-client-table">
+                                <thead>
+                                    <tr>
+                                        <th class="text-center">
+                                            <div class="form-check">
+                                                <input type="checkbox" class="form-check-input check-all">
+                                                <label class="form-check-label"></label>
+                                            </div>
+                                        </th>
+                                        <th>번호</th>
+                                        <th>사용</th>
+                                        <th>이름</th>
+                                        <th>IP주소</th>
+                                        <th>포트</th>
+                                        {% if selmode == "run" %}
+                                            <th style="width: 30%">상태</th>
+                                        {% endif %}
+                                    </tr>
+                                </thead>
+                            </table>
+                            {% if selmode == "stop" and edit_auth %}
+                                <div class="btn-panel">
+                                    <button class="btn btn-primary btn-icon-split" onclick="addClient();">
+                                        <span class="icon text-white-50">
+                                            <i class="fas fa-plus"></i>
+                                        </span>
+                                        <span class="text">추가</span>
+                                    </button>
+                                    <button class="btn btn-warning btn-icon-split" onclick="editClient();">
+                                        <span class="icon text-white-50">
+                                            <i class="fas fa-edit"></i>
+                                        </span>
+                                        <span class="text">편집</span>
+                                    </button>
+                                    <button class="btn btn-danger btn-icon-split" onclick="removeClient();">
+                                        <span class="icon text-white-50">
+                                            <i class="fas fa-trash"></i>
+                                        </span>
+                                        <span class="text">삭제</span>
+                                    </button>
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+                <div id="variable" class="tab-pane">
+                    <div class="form-group row mt-3">
+                        <div class="col-2">
+                            <label class="input-label" for="variable-select">위치</label>
+                            <select class="form-control" id="variable-select" onchange="updateVariable();">
+                                {% for remote in remotes %}
+                                    <option value="remote-{{loop.index}}" remote-id="{{remote.id}}">{{remote.name}}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-2">
+                            <label class="input-label" for="type-select">타입</label>
+                            <select class="form-control" id="type-select" onchange="updateVariable();">
+                                <option value="digital">디지털</option>
+                                <option value="analog">아날로그</option>
+                                <option value="string">문자열</option>
+                                <option value="date">날짜</option>
+                                <option value="time">시간</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <div class="col-7">
+                            <div class="table-responsive mt-3">
+                                <table class="table table-bordered no-context datatable-tbl" id="variable-table">
+                                    <thead>
+                                        <tr>
+                                            <th class="text-center">
+                                                <div class="form-check">
+                                                    <input type="checkbox" class="form-check-input check-all">
+                                                    <label class="form-check-label"></label>
+                                                </div>
+                                            </th>
+                                            <th style="width: 40%">변수이름</th>
+                                            <th style="width: 25%">단위</th>
+                                            <th style="width: 25%">변수주소</th>
+                                        </tr>
+                                    </thead>
+                                </table>
+                                {% if selmode == "stop" and edit_auth %}
+                                <div class="btn-panel">
+                                    <button class="btn btn-primary btn-icon-split" onclick="saveVariable();">
+                                        <span class="icon text-white-50">
+                                            <i class="fas fa-check"></i>
+                                        </span>
+                                        <span class="text">저장</span>
+                                    </button>
+                                </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="client-modal" tabindex="-1" role="dialog">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">리모트디바이스 추가</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="form-group row">
+                        <div class="col-3">
+                            <label class="input-label">사용</label>
+                        </div>
+                        <div class="col-5">
+                            <div class="ckbx-style-1">
+                                <input type="checkbox" checked id="ckbx-style-1-1">
+                                <label for="ckbx-style-1-1"></label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <div class="col-3">
+                            <label class="input-label" for="client-name">이름</label>
+                        </div>
+                        <div class="col-5">
+                            <input type="text" class="form-control" id="client-name" />
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <div class="col-3">
+                            <label class="input-label" for="client-ip">IP주소</label>
+                        </div>
+                        <div class="col-5">
+                            <input type="text" class="form-control mask-input" id="client-ip" />
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <div class="col-3">
+                            <label class="input-label" for="client-port">포트</label>
+                        </div>
+                        <div class="col-5">
+                            <input type="number" class="form-control" id="client-port" value="5000" />
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-secondary btn-icon-split" data-dismiss="modal">
+                        <span class="icon text-white-50">
+                            <i class="fas fa-times"></i>
+                        </span>
+                        <span class="text">취소</span>
+                    </button>
+                    <button class="btn btn-primary btn-icon-split" onclick="doClientAdd();">
+                        <span class="icon text-white-50">
+                            <i class="fas fa-check"></i>
+                        </span>
+                        <span class="text">확인</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block script %}
+    {% include 'common/datatable.html' %}
+    {% include 'common/variable_js.html' %}
+    <script src="{{ url_for('static', filename='js/jquery.inputmask.min.js') }}"></script>
+    <script>
+        const remoteType = $("#type-select");
+        const variableTbl = $("#variable-table");
+        const varSelect = $("#variable-select");
+        const remLimit = parseInt("{{remote_limit}}");
+        const removeCliTbl = $("#remote-client-table");
+        let remoteTbl, remCnt = 0, chkArr = [];
+
+        function addClient() {
+            if(remCnt < remLimit) {
+                $("#client-modal input").val('');
+                $("#client-port").val('5000');
+                $("#client-modal").attr('selid', '0').modal('show');
+            } else {
+                alert(limitMsg);
+            }
+        }
+
+        function editClient() {
+            const selIDs = getTblChk("#remote-client-table");
+            if(selIDs.length > 0) {
+                editCliModal(selIDs.split(',')[0]);
+            } else {
+                alert('리모트디바이스를 선택하세요');
+            }
+        }
+
+        function removeClient() {
+            const url = '{{url_for("communicate.remove_modbus")}}';
+            const customData = {selType: 'remote'};
+            removeCustom(removeCliTbl, url, "", customData);
+        }
+
+        function doClientAdd() {
+            $("#client-modal input").removeClass('border-danger');
+            let postData = getPostData("#client-modal");
+            if(postData.client_name.length > 0 && postData.client_ip.length > 0) {
+                const cliModal = $("#client-modal");
+                postData['selid'] = cliModal.attr('selid');
+                postData['use_flag'] = $("#ckbx-style-1-1").prop('checked') ? '1' : '0';
+                sendAjax("{{url_for('communicate.add_client')}}", postData, false);
+                updateVariable(remoteTbl);
+                cliModal.modal('hide');
+            } else {
+                if(postData.client_name.length === 0) {
+                    $("#client-name").addClass('border-danger');
+                } else {
+                    $("#client-ip").addClass('border-danger');
+                }
+
+                alert('값을 입력하세요');
+            }
+        }
+
+        function updateLocal() {
+            const postData = {
+                ip_address: $("#ip-address").val().trim(),
+                port_addr: $("#port-address").val().trim(),
+                use_flag: $("#ckbx-style-1-1-local").prop('checked') ? '1' : '0'
+            };
+
+            sendAjax("{{url_for('communicate.update_local')}}", postData, false);
+            alert(saveMsg);
+        }
+
+        function remoteAct(flag) {
+            if(flag === "plus") {
+                addClient();
+            } else if(flag === "del") {
+                const selRow = $("#contextmenu").attr("selrow");
+                if(selRow && confirm('삭제하시겠습니까?')) {
+                    sendAjax("{{url_for('communicate.remove_modbus')}}", {selRow, selType: 'remote'}, false);
+                    updateVariable(remoteTbl);
+                }
+            } else if(flag === "edit") {
+                editCliModal($("#contextmenu").attr("selrow"));
+            }
+        }
+
+        function editCliModal(selRow) {
+            const selInput = $("#remote-client-table input[id='check-row-" + selRow + "']");
+            $("#ckbx-style-1-1").prop('checked', selInput.attr('use_flag') === "1");
+            $("#client-name").val(selInput.attr('data-name'));
+            $("#client-ip").val(selInput.attr('ip'));
+            $("#client-port").val(selInput.attr('port'));
+            $("#client-modal").attr('selid', selRow).modal('show');
+        }
+
+        function saveVariable() {
+            let postData = {};
+            if(chkArr.length > 0) {
+                for(let ii = 0; ii < chkArr.length; ii++) {
+                    postData[chkArr[ii]] = '1';
+                }
+            }
+
+            const rowArr = $("#variable-table tbody input.check-row");
+            const prefixStr = varSelect.find(':selected').attr('remote-id') + ';';
+            for(let ii = 0; ii < rowArr.length; ii++) {
+                const rowItem = $(rowArr[ii]);
+                if(rowItem.attr('id')) {
+                    postData[prefixStr + rowItem.attr('id').replace('check-row-', '')] = rowItem.prop('checked') ? '1' : '0';
+                }
+            }
+
+            sendAjax("{{url_for('communicate.update_variable')}}", postData, false);
+            alert(saveMsg);
+        }
+
+        $(document).ready(function () {
+            $('.mask-input').inputmask({
+                alias: "ip"
+            });
+
+            $("#ckbx-style-1-1-local").on('click', function() {
+                updateLocal();
+            });
+
+            dataTables = variableTbl.DataTable({
+                ...dataTableLang,
+                ...dataTableObj,
+                "columnDefs": columnDef,
+                'ajax': {
+                    'url': "{{url_for('logic_setting.variable_list')}}",
+                    'headers': { "X-CSRFToken": csrf_token },
+                    'data': function(data){
+                        let curPage = localStorage.getItem('cur-page');
+                        curPage = curPage ? curPage : 0;
+                        return {
+                            ...data,
+                            start: curPage * parseInt(data.length),
+                            variable: varSelect.val(),
+                            variable_type: remoteType.val(),
+                            variable_id: varSelect.find(':selected').attr('remote-id')
+                        };
+                    }
+                },
+                "columns": [
+                    {
+                        render: function (data, type, row) {
+                            const prefixStr = varSelect.find(':selected').attr('remote-id') + ';';
+                            const selID = remoteType.val() + "-" + row.id
+                            if(chkArr.indexOf(prefixStr + selID) >= 0) {
+                                chkArr.push(prefixStr + selID);
+                            }
+
+                            let html = "<td class='text-center'>";
+                            html += checkForm.replace('data.id', selID).replace('data.attr', '');
+                            html += "</td>";
+
+                            return html;
+                        }
+                    },
+                    {
+                        render: function (data, type, row) {
+                            return '<input type="text" class="form-control" value="' + row.name + '" origin="' + row.name + '" />';
+                        }
+                    },
+                    {
+                        render: function (data, type, row) {
+                            const selType = remoteType.val();
+                            if(selType === "analog") {
+                                return "<input type='text' class='form-control analog-unit' value='" + row.unit + "' origin='" + row.unit + "' />";
+                            } else {
+                                return "";
+                            }
+                        }
+                    },
+                    { "data": "address" }
+                ],
+                "createdRow": function(row, data) {
+                    $(row).attr('data-row', remoteType.val() + "-" + data.id);
+                },
+                "drawCallback": function(oSettings) {
+                    const pageInfo = dataTables.page.info();
+                    if(parseInt(pageInfo.length) * pageInfo.page > pageInfo.recordsTotal) {
+                        dataTables.page(0);
+                        updateVariable();
+                    } else {
+                        setDataTblPage(variableTbl, oSettings._iDisplayLength);
+                        const trArr = $("#variable-table tbody tr");
+                        const prefixStr = varSelect.find(':selected').attr('remote-id') + ';';
+                        for(let ii = 0; ii < trArr.length; ii++) {
+                            const trItem = $(trArr[ii]);
+                            const trID = prefixStr + trItem.find("input[type='checkbox']").attr('id').replace('check-row-', '');
+                            trItem.find("input[type='checkbox']").prop('checked', chkArr.indexOf(trID) >= 0);
+                        }
+                    }
+                }
+            });
+
+            const fieldArr = [
+                {
+                    render: function (data, type, row) {
+                        return checkForm.replaceAll('data.id', row.id).replaceAll('data.attr', "use_flag='" + row.flag + "' data-name='" + row.name + "' ip='" + row.ip + "' port='" + row.port + "'");
+                    }
+                },
+                {"data": "ind"},
+                {"data": "use_flag"},
+                {"data": "name"},
+                {"data": "ip"},
+                {"data": "port"}
+            ];
+            if(curMode === "run") {
+                fieldArr.push({
+                    render: function (data, type, row) {
+                        return row.client.status;
+                    }
+                });
+
+                columnDef.push({
+                    'targets': 6,
+                    'defaultContent': '',
+                    'createdCell': function(td, cellData, rowData) {
+                        if(rowData.client.con) {
+                            $(td).addClass('bg-success');
+                        } else if(rowData.client.err) {
+                            $(td).addClass('bg-danger');
+                        }
+                    }
+                });
+            }
+            remoteTbl = removeCliTbl.DataTable({
+                ...dataTableLang,
+                ...dataTableObj,
+                "columnDefs": columnDef,
+                "order": [[ 1, "asc" ]],
+                "drawCallback": function(oSettings) {
+                    remCnt = oSettings._iRecordsTotal;
+                    setDataTblPage(removeCliTbl, oSettings._iDisplayLength);
+                },
+                'ajax': {
+                    'url': "{{url_for('communicate.client_list')}}",
+                    'headers': { "X-CSRFToken": csrf_token }
+                },
+                "columns": fieldArr,
+                "createdRow": function(row, data) {
+                    $(row).attr('data-row', data.id);
+                }
+            });
+
+            variableTbl.on('click', 'tbody tr', function() {
+                const trArr = $("#variable-table tbody tr");
+                const prefixStr = varSelect.find(':selected').attr('remote-id') + ';'
+                for(let ii = 0; ii < trArr.length; ii++) {
+                    const selChk = $(trArr[ii]).find("input[type='checkbox']");
+                    const selID = prefixStr + selChk.attr('id').replace('check-row-', '');
+                    const selInd = chkArr.indexOf(selID);
+                    const selChk1 = selChk.prop('checked');
+
+                    if(selInd >= 0 && !selChk1) {
+                        chkArr.splice(selInd, 1);
+                    } else if(selInd < 0 && selChk1) {
+                        chkArr.push(selID);
+                    }
+                }
+            });
+        });
+    </script>
+{% endblock %}

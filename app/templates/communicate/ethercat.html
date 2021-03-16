@@ -1,0 +1,546 @@
+{% extends "layout.html" %}
+
+{% block style %}
+    <style>
+        #property-panel {
+            display: none;
+        }
+        .card-group h5 {
+            margin-right: 1rem;
+            margin-top: .3rem;
+        }
+        .card-group .form-check {
+            margin-left: 3rem;
+            margin-top: 0;
+        }
+        .form-check .form-check-label {
+            margin-left: 1.75rem;
+            font-size: 16px;
+        }
+        #auto-refresh {
+            margin-top: 2px;
+        }
+        .icon-div {
+            margin-left: auto;
+            background-color: #e2e2e2;
+            width: 2.5rem;
+            height: 2.5rem;
+            margin-top: -11px;
+            border-radius: 7px;
+            text-align: center;
+            vertical-align: middle;
+            line-height: 2.6rem;
+            cursor: pointer;
+        }
+        .sub-category td.name {
+            padding-left: 2rem;
+        }
+        .sub1-category td.name {
+            padding-left: 4rem;
+        }
+        tbody i {
+            cursor: pointer;
+            margin-right: .5rem;
+        }
+    </style>
+{% endblock %}
+
+{% block content %}
+    <div class="card shadow mb-4">
+        <div class="card-header py-3">
+            <h6 class="m-0 font-weight-bold text-primary">통신설정 > Ethercat IO</h6>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive pt-3">
+                <div class="form-group row">
+                    <div class="col-4">
+                        <div class="mb-2 card-group">
+                            <h6 style="margin-right: 5px;padding-top: 4px;">사용</h6>
+                            <div class="dark">
+                                <div class="ckbx-style-1">
+                                    <input type="checkbox" id="ckbx-style-1-1" value="0" name="ckbx-style-1" {%if ethercat_use%}checked{%endif%}>
+                                    <label for="ckbx-style-1-1"></label>
+                                </div>
+                            </div>
+                            <div class="form-check">
+                                <label class="form-check-label">
+                                    <input type="checkbox" class="form-check-input" id="auto-refresh" {%if ethercat_try%}checked{%endif%}>
+                                    구성오류시 자동 재시도
+                                </label>
+                            </div>
+                            <div class="icon-div" {%if ethercat_try%}style="display:none;"{%endif%}>
+                                <i class="fas fa-redo"></i>
+                            </div>
+                        </div>
+                        <table class="table table-bordered no-context datatable-tbl" id="device-list-table">
+                            <thead>
+                                <tr>
+                                    <th class="text-center" style="width: 10%">
+                                        <div class="form-check">
+                                            <input type="checkbox" class="form-check-input check-all">
+                                            <label class="form-check-label"></label>
+                                        </div>
+                                    </th>
+                                    <th>디바이스</th>
+                                    <th>상태</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr data-row="0" class="category">
+                                    <td class="text-center">
+                                        <div class="form-check">
+                                            <input type="checkbox" class="form-check-input check-row" id="check-row-0">
+                                            <label class="form-check-label" for="check-row-0"></label>
+                                        </div>
+                                    </td>
+                                    <td><i class="fas fa-minus"></i>Ethercat Master</td>
+                                    <td>OK</td>
+                                </tr>
+                                {% for group in group_list %}
+                                    <tr data-row="{{group.device_id}}" class="sub-category">
+                                        <td class="text-center">
+                                            <div class="form-check">
+                                                <input type="checkbox" class="form-check-input check-row" id="check-row-{{group.device_id}}">
+                                                <label class="form-check-label" for="check-row-{{group.device_id}}"></label>
+                                            </div>
+                                        </td>
+                                        <td class="name"><i class="fas fa-minus"></i>{{group.vendor_name}}</td>
+                                        <td>OK</td>
+                                    </tr>
+                                    {% for device in group.devices %}
+                                        <tr data-row="{{device.id}}" class="sub1-category">
+                                            <td class="text-center">
+                                                <div class="form-check">
+                                                    <input type="checkbox" class="form-check-input check-row" id="check-row-{{device.device_id}}">
+                                                    <label class="form-check-label" for="check-row-{{device.device_id}}"></label>
+                                                </div>
+                                            </td>
+                                            <td class="name">{{device.vendor_name}}</td>
+                                            <td>OK</td>
+                                        </tr>
+                                    {% endfor %}
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                        <div class="btn-panel">
+                            <button class="btn btn-primary btn-icon-split" onclick="addSlave();">
+                                <span class="icon text-white-50">
+                                    <i class="fas fa-plus"></i>
+                                </span>
+                                <span class="text">추가</span>
+                            </button>
+                            <button class="btn btn-danger btn-icon-split">
+                                <span class="icon text-white-50">
+                                    <i class="fas fa-trash"></i>
+                                </span>
+                                <span class="text">삭제</span>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="col-8" id="property-panel">
+                        <ul class="nav nav-tabs" role="tablist">
+                            <li class="nav-item">
+                                <a class="nav-link active" data-toggle="tab" href="#channel">
+                                    <i class="fas fa-route"></i> 채널
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" data-toggle="tab" href="#param">
+                                    <i class="fas fa-cog"></i> 파라미터
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" data-toggle="tab" href="#info">
+                                    <i class="fas fa-info"></i> 정보
+                                </a>
+                            </li>
+                        </ul>
+                        <div class="tab-content">
+                            <div id="channel" class="tab-pane">
+                                <div class="form-group row">
+                                    <div class="col-12">
+                                        <div class="table-responsive mt-4">
+                                            <table class="table table-bordered no-context" id="channel-tbl">
+                                                <thead>
+                                                    <tr>
+                                                        <th>채널</th>
+                                                        <th>구분</th>
+                                                        <th>변수</th>
+                                                        <th>타입</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    <tr class="category">
+                                                        <td>Analog Input Ch#0</td>
+                                                        <td>읽기</td>
+                                                        <td>
+                                                            <i class="fas fa-plus"></i>LOCAL.AN.100
+                                                        </td>
+                                                        <td>UNIT</td>
+                                                    </tr>
+                                                    <tr class="sub-category">
+                                                        <td></td>
+                                                        <td></td>
+                                                        <td>... LOCAL.DG.103</td>
+                                                        <td>BOOL</td>
+                                                    </tr>
+                                                    <tr class="category">
+                                                        <td>Analog Input Ch#1</td>
+                                                        <td>읽기</td>
+                                                        <td>
+                                                            <i class="fas fa-plus"></i>LOCAL.AN.101
+                                                        </td>
+                                                        <td>UNIT</td>
+                                                    </tr>
+                                                    <tr class="sub-category">
+                                                        <td></td>
+                                                        <td></td>
+                                                        <td>... LOCAL.DG.104</td>
+                                                        <td>BOOL</td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div id="param" class="tab-pane">
+                                <div class="form-group row">
+                                    <div class="col-12">
+                                        <div class="table-responsive mt-4">
+                                            <table class="table table-bordered no-context">
+                                                <thead>
+                                                    <tr>
+                                                        <th>Index:SubIndex</th>
+                                                        <th>이름</th>
+                                                        <th>값</th>
+                                                        <th>타입</th>
+                                                        <th>엑세스</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    <tr class="category">
+                                                        <td>
+                                                            <i class="fas fa-plus"></i>16#8010:16#00
+                                                        </td>
+                                                        <td>Parameter GT-1238</td>
+                                                        <td></td>
+                                                        <td></td>
+                                                        <td></td>
+                                                    </tr>
+                                                    <tr class="sub-category">
+                                                        <td>.....:16#01</td>
+                                                        <td>Input Filter value:0~10 (unit:ms)</td>
+                                                        <td>0</td>
+                                                        <td>USINT</td>
+                                                        <td>rw</td>
+                                                    </tr>
+                                                    <tr class="sub-category">
+                                                        <td>.....:16#02</td>
+                                                        <td>Reserved</td>
+                                                        <td>0</td>
+                                                        <td>USINT</td>
+                                                        <td>rw</td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div id="info" class="tab-pane">
+                                <div class="form-group row">
+                                    <div class="col-6">
+                                        <div class="table-responsive mt-4">
+                                            <table class="table table-bordered no-context">
+                                                <tbody>
+                                                    <tr>
+                                                        <th style="width: 30%;">Vendor Name</th>
+                                                        <td style="width: 70%;" id="vendor_name_td"></td>
+                                                    </tr>
+                                                    <tr>
+                                                        <th>VendorID</th>
+                                                        <td id="vendor_id_td"></td>
+                                                    </tr>
+                                                    <tr>
+                                                        <th>Device Name</th>
+                                                        <td id="device_name_td"></td>
+                                                    </tr>
+                                                    <tr>
+                                                        <th>Revision No</th>
+                                                        <td id="revision_no_td"></td>
+                                                    </tr>
+                                                    <tr>
+                                                        <th>Product ID</th>
+                                                        <td id="product_id_td"></td>
+                                                    </tr>
+                                                    <tr>
+                                                        <th>Module Ident</th>
+                                                        <td id="module_ident_td"></td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="slave-modal" tabindex="-1" role="dialog">
+        <div class="modal-dialog" role="document" style="max-width: 700px !important;">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Slave추가</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="table-responsive">
+                        <table class="table table-bordered no-context datatable-tbl" id="slave-table">
+                            <thead>
+                                <tr>
+                                    <th class="text-center" style="width: 1%">
+                                        <div class="form-check">
+                                            <input type="checkbox" class="form-check-input check-all">
+                                            <label class="form-check-label"></label>
+                                        </div>
+                                    </th>
+                                    <th>이름</th>
+                                    <th style="width: 15%">Revision</th>
+                                </tr>
+                            </thead>
+                            <tbody></tbody>
+                        </table>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-secondary btn-icon-split" data-dismiss="modal">
+                        <span class="icon text-white-50">
+                            <i class="fas fa-times"></i>
+                        </span>
+                        <span class="text">취소</span>
+                    </button>
+                    <button class="btn btn-primary btn-icon-split" onclick="doSlaveAdd();">
+                        <span class="icon text-white-50">
+                            <i class="fas fa-check"></i>
+                        </span>
+                        <span class="text">확인</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block script %}
+    {% include 'common/datatable.html' %}
+    <script>
+        function addSlave() {
+            const selIDs = getTblChk('#device-list-table').split(',');
+            if(selIDs.length === 1 && selIDs[0].length > 0) {
+                const slaveModal = $("#slave-modal");
+                slaveModal.attr('device', selIDs);
+                initSlave();
+                slaveModal.modal('show');
+            } else {
+                alert('디바이스를 선택하세요');
+            }
+        }
+
+        function initSlave() {
+            $.ajax({
+                url: "{{url_for('communicate.slave_list')}}",
+                data: {deviceID: $("#slave-modal").attr('device')},
+                dataType: 'json',
+                type: 'post',
+                headers: { "X-CSRFToken": csrf_token },
+                success: function(resp) {
+                    if(resp.status) {
+                        const dataList = resp.data_list;
+                        let vendorList = [], groupList = [], htmlList = [];
+                        for(let ii = 0; ii < dataList.length; ii++) {
+                            const dataItem = dataList[ii];
+                            const vendorInd = vendorList.indexOf(dataItem.vendor);
+                            if(vendorInd < 0) {
+                                vendorList.push(dataItem.vendor);
+                                groupList = [dataItem.group];
+                                htmlList.push({
+                                    name: dataItem.vendor,
+                                    group: [{
+                                        name: dataItem.group,
+                                        device: [{
+                                            id: dataItem.id,
+                                            name: dataItem.device,
+                                            revision: dataItem.revision ? dataItem.revision : ''
+                                        }]
+                                    }]
+                                });
+                            } else {
+                                const selVendor = htmlList[vendorInd];
+                                const groupInd = groupList.indexOf(dataItem.group);
+                                if(groupInd < 0) {
+                                    groupList.push(dataItem.group);
+                                    selVendor.group.push({
+                                        name: dataItem.group,
+                                        device: [{
+                                            id: dataItem.id,
+                                            name: dataItem.device,
+                                            revision: dataItem.revision ? dataItem.revision : ''
+                                        }]
+                                    });
+                                } else {
+                                    selVendor.group[groupInd].device.push({
+                                        id: dataItem.id,
+                                        name: dataItem.device,
+                                        revision: dataItem.revision ? dataItem.revision : ''
+                                    });
+                                }
+                            }
+                        }
+
+                        let html = "";
+                        for(let ii = 0; ii < htmlList.length; ii++) {
+                            const htmlItem = htmlList[ii];
+                            if(htmlItem.group.length > 0) {
+                                html += "<tr class='category'><td></td><td><i class='fas fa-minus'></i>" + htmlItem.name + "</td><td></td></tr>";
+                                for(let jj = 0; jj < htmlItem.group.length; jj++) {
+                                    const groupItem = htmlItem.group[jj];
+                                    if(groupItem.device.length > 0) {
+                                        html += "<tr class='sub-category'><td></td><td class='name'><i class='fas fa-minus'></i>" + groupItem.name + "</td><td></td></tr>";
+                                        for(let kk = 0; kk < groupItem.device.length; kk++) {
+                                            const deviceItem = groupItem.device[kk];
+                                            html += "<tr class='sub1-category' data-row='ether-" + deviceItem.id + "'><td>" + checkForm.replaceAll('data.attr', '').replaceAll('data.id', 'ether-' + deviceItem.id) + "</td><td class='name'>" + deviceItem.name + "</td><td>" + deviceItem.revision + "</td></tr>";
+                                        }
+                                    }
+                                }
+                            }
+                        }
+
+                        $("#slave-table tbody").html(html);
+                        const foldIcons = $(".category i, .sub-category i");
+                        foldIcons.unbind('click');
+                        foldIcons.on('click', function () {
+                            foldAct($(this));
+                        });
+                    } else {
+                        alert(resp.message);
+                    }
+                },
+                error: function() {
+                    alert(refreshMsg);
+                }
+            });
+        }
+
+        function foldAct(item) {
+            let showFlag = false;
+            if(item.hasClass('fa-minus')) {
+                item.removeClass('fa-minus');
+                item.addClass('fa-plus');
+            } else {
+                showFlag = true;
+                item.removeClass('fa-plus');
+                item.addClass('fa-minus');
+            }
+
+            let isPlus = false;
+            let parentTr = item.closest('tr').next('tr');
+            let categoryType = item.closest('tr').attr('class');
+            while (parentTr.length && !parentTr.hasClass("category") && !parentTr.hasClass(categoryType)) {
+                if(parentTr.hasClass('sub-category')) {
+                    isPlus = parentTr.find('i:first').hasClass('fa-plus');
+                }
+
+                if(showFlag) {
+                    if(!(parentTr.hasClass('sub1-category') && isPlus)) {
+                        parentTr.removeClass('display-none');
+                    }
+                } else {
+                    parentTr.addClass('display-none');
+                }
+
+                parentTr = parentTr.next('tr');
+            }
+        }
+
+        function doSlaveAdd() {
+            const selIDs = getTblChk("#slave-table", 'ether-');
+            if(selIDs.length > 0) {
+                const slaveModal = $("#slave-modal");
+                sendAjax("{{url_for('communicate.add_slave')}}", {selIDs, parentID: slaveModal.attr('device')});
+            } else {
+                alert('slave를 선택하세요');
+            }
+        }
+
+        function initPanel(selID = '0') {
+            if(parseInt(selID) > 0) {
+                $.ajax({
+                    url: "{{url_for('communicate.ethercat_detail')}}",
+                    data: {selID},
+                    dataType: 'json',
+                    type: 'post',
+                    headers: { "X-CSRFToken": csrf_token },
+                    success: function(resp) {
+                        if(resp.status) {
+                            const vendorData = resp.vendor;
+                            $("#vendor_name_td").text(vendorData.vendor_name);
+                            $("#vendor_id_td").text(vendorData.vendor_id);
+                            $('#revision_no_td').text(vendorData.revision);
+                            $('#product_id_td').text(vendorData.product_id);
+                            $('#module_ident_td').text(vendorData.module_ident);
+                        } else {
+                            alert(resp.message);
+                        }
+                    },
+                    error: function() {
+                        alert(refreshMsg);
+                    }
+                })
+            }
+        }
+
+        function update_ethercat(ethercat_type, selVal) {
+            const ethercat_val = selVal ? '1' : '0';
+            sendAjax("{{url_for('communicate.update_ethercat')}}", {ethercat_type, ethercat_val}, false);
+        }
+
+        $(document).ready(function () {
+            $(".category i, .sub-category i").on('click', function () {
+                foldAct($(this));
+            });
+
+            $("#auto-refresh").on('click', function () {
+                const selClicked = $(this).prop('checked');
+                if(selClicked) {
+                    $(".icon-div").hide();
+                } else {
+                    $(".icon-div").show();
+                }
+
+                update_ethercat('ethercat_try', selClicked);
+            });
+
+            $("#ckbx-style-1-1").on('click', function () {
+                update_ethercat('ethercat_use', $(this).prop('checked'));
+            })
+
+            $("#device-list-table").on('click', 'tbody tr', function () {
+                const selIDs = getTblChk("#device-list-table");
+                const proPanel = $("#property-panel");
+                if(selIDs.length > 0) {
+                    proPanel.show();
+                    initPanel(selIDs.split(',')[0]);
+                } else {
+                    proPanel.hide();
+                }
+            });
+        });
+    </script>
+{% endblock %}

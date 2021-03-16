@@ -1,0 +1,297 @@
+{% extends "layout.html" %}
+
+{% block style %}
+    <style>
+        .limit-input {
+            margin-bottom: 1rem;
+            display: flex;
+        }
+        .limit-input input[type=number] {
+            max-width: 190px;
+            margin-left: auto;
+            margin-top: -7px;
+        }
+    </style>
+{% endblock %}
+
+{% block content %}
+    <div class="card shadow mb-4">
+        <div class="card-header py-3">
+            <h6 class="m-0 font-weight-bold text-primary">데이터설정 > 데이터수집</h6>
+        </div>
+        <div class="card-body">
+            <div class="form-group row">
+                <div class="col-4">
+                    <div class="mb-3">
+                        {% if selmode == "stop" and edit_auth %}
+                            <button class="btn btn-primary btn-icon-split" onclick="dbSetModal();">
+                                <span class="icon text-white-50">
+                                    <i class="fas fa-server"></i>
+                                </span>
+                                <span class="text">DB설정</span>
+                            </button>
+                            <a href="{{url_for('data_set.csv_export', csvType='collect')}}" target="_blank">
+                                <button class="btn btn-primary btn-icon-split" style="float: right;">
+                                    <span class="icon text-white-50">
+                                        <i class="fas fa-file-export"></i>
+                                    </span>
+                                    <span class="text">CSV내보내기</span>
+                                </button>
+                            </a>
+                        {% endif %}
+                    </div>
+                    <table class="table table-bordered datatable-tbl" id="data-collect-table" edit="1">
+                        <thead>
+                            <tr>
+                                <th class="text-center">
+                                    <div class="form-check">
+                                        <input type="checkbox" class="form-check-input check-all">
+                                        <label class="form-check-label"></label>
+                                    </div>
+                                </th>
+                                <th style="width: 20%">번호</th>
+                                <th>변수</th>
+                            </tr>
+                        </thead>
+                    </table>
+                    {% if selmode == "stop" and edit_auth %}
+                        <div class="btn-panel mt-3">
+                            <input type="hidden" id="new-variable" onchange="addVariable();" />
+                            <button class="btn btn-primary btn-icon-split" onclick="showFixed('new-variable');">
+                                <span class="icon text-white-50">
+                                    <i class="fas fa-plus"></i>
+                                </span>
+                                <span class="text">추가</span>
+                            </button>
+                            <button class="btn btn-danger btn-icon-split" onclick="removeVariable();">
+                                <span class="icon text-white-50">
+                                    <i class="fas fa-trash"></i>
+                                </span>
+                                <span class="text">삭제</span>
+                            </button>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="collect-set" tabindex="-1" role="dialog">
+        <div class="modal-dialog" role="document" style="max-width: 700px !important;">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">DB설정</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="table-responsive pt-3">
+                        <p>주의 : DB파일은 가급적 외부 저장장치에 저장하십시오. 내부장치에 저장할 경우,</p>
+                        <p class="mb-3">잦은 쓰기로 인해 용량부족 및 저장장치의 수명단축 가능성이 있습니다.</p>
+                        <div class="form-group row">
+                            <div class="col-2">
+                                <label class="input-label" for="save-path">저장경로</label>
+                            </div>
+                            <div class="col-7">
+                                <input type="text" class="form-control" id="save-path" value="{{setting.path}}" />
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <div class="col-2">
+                                <label class="input-label" for="save-interval">저장주기</label>
+                            </div>
+                            <div class="col-7">
+                                <input type="number" class="form-control" placeholder="내용을 입력해주세요" id="save-interval" value="{{setting.interval}}" />
+                            </div>
+                            <div class="col-3">
+                                <select class="form-control" id="save-unit">
+                                    <option value="SECOND" {%if setting.interval_unit=="SECOND"%}selected{%endif%}>초</option>
+                                    <option value="MINUTE" {%if setting.interval_unit=="MINUTE"%}selected{%endif%}>분</option>
+                                    <option value="HOUR" {%if setting.interval_unit=="HOUR"%}selected{%endif%}>시간</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <div class="col-2">
+                                <label class="input-label">제한</label>
+                            </div>
+                            <div class="col-7">
+                                <div class="form-radio limit-input">
+                                    <div class="form-check">
+                                        <input type="radio" class="form-check-input" name="alarm-limit" value="NONE" id="no-limit" {%if setting==None or setting.limit=="" or setting.limit=="NONE"%}checked{%endif%}>
+                                        <label class="form-check-label" for="no-limit">제한없음</label>
+                                    </div>
+                                </div>
+                                <div class="form-radio limit-input">
+                                    <div class="form-check">
+                                        <input type="radio" class="form-check-input" name="alarm-limit" value="RECORD" id="max-record" {%if setting.limit=="RECORD"%}checked{%endif%}>
+                                        <label class="form-check-label" for="max-record">최대 레코드 수</label>
+                                    </div>
+                                    <input type="number" placeholder="내용을 입력해주세요" class="form-control" id="max-record-cnt" onkeypress="return event.charCode >= 48 && event.charCode <= 57" {%if setting.limit=="RECORD"%}value="{{setting.limit_val}}"{%endif%}>
+                                </div>
+                                <div class="form-radio limit-input">
+                                    <div class="form-check">
+                                        <input type="radio" class="form-check-input" name="alarm-limit" value="CAPACITY" id="save-capacity" {%if setting.limit=="CAPACITY"%}checked{%endif%}>
+                                        <label class="form-check-label" for="save-capacity">저장용량</label>
+                                    </div>
+                                    <input type="number" placeholder="내용을 입력해주세요" class="form-control" id="capacity-value" {%if setting.limit=="CAPACITY"%}value="{{setting.limit_val}}"{%endif%}>
+                                </div>
+                            </div>
+                            <div class="col-3 grid-margin" style="margin-top: auto; margin-bottom: 15px;">
+                                <select class="form-control" id="capacity-unit">
+                                    <option value="KB" {%if setting.limit_unit=="KB"%}selected{%endif%}>KB</option>
+                                    <option value="MB" {%if setting.limit_unit=="MB"%}selected{%endif%}>MB</option>
+                                    <option value="GB" {%if setting.limit_unit=="GB"%}selected{%endif%}>GB</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button class="btn btn-secondary btn-icon-split" data-dismiss="modal">
+                            <span class="icon text-white-50">
+                                <i class="fas fa-times"></i>
+                            </span>
+                            <span class="text">취소</span>
+                        </button>
+                        {% if selmode == "stop" and edit_auth %}
+                            <button class="btn btn-primary btn-icon-split" onclick="saveCollect();">
+                                <span class="icon text-white-50">
+                                    <i class="fas fa-save"></i>
+                                </span>
+                                <span class="text">저장</span>
+                            </button>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block script %}
+    {% include 'common/datatable.html' %}
+    {% include 'common/variable_modal.html' %}
+    <script>
+        let collectTbl;
+        function removeVariable() {
+            removeAction("#data-collect-table", '{{url_for("data_set.remove_variable")}}', '', false);
+            updateVariable(collectTbl);
+        }
+
+        function addVariable() {
+            if(chkArr.length > 0) {
+                sendAjax("{{url_for('data_set.add_variable')}}", {selIDs: chkArr.join(',')}, false);
+                updateVariable(collectTbl);
+            }
+        }
+
+        function collectAct(flag) {
+            const selRow = $("#contextmenu").attr("selrow");
+            if(flag === "plus") {
+                showFixed('new-variable');
+            } else {
+                if(selRow && confirm('삭제하시겠습니까?')) {
+                    sendAjax("{{url_for('data_set.remove_variable')}}", {selRow}, false);
+                    updateVariable(collectTbl);
+                }
+            }
+        }
+
+        function dbSetModal() {
+            $("#collect-set").modal('show');
+        }
+
+        function saveCollect() {
+            $("#collect-set input").removeClass('border-danger');
+
+            let postData = {}, inputValid = true;
+            let inputItem = $("#save-path");
+            let inputVal = inputItem.val().trim();
+            if(inputVal.length > 0) {
+                if(inputVal.substr(-7) === ".sqlite") {
+                    postData['save_path'] = inputVal;
+                } else {
+                    alert('파일 확장자가 정확하지 않습니다');
+                    return false;
+                }
+            } else {
+                inputValid = false;
+                inputItem.addClass('border-danger');
+            }
+
+            if(inputValid) {
+                inputItem = $("#save-interval");
+                inputVal = inputItem.val().trim();
+                if(inputVal.length > 0) {
+                    postData['save_interval'] = inputVal;
+                } else {
+                    inputValid = false;
+                    inputItem.addClass('border-danger');
+                }
+            }
+
+            if(inputValid) {
+                inputVal = $("input[name='alarm-limit']:checked").val();
+                postData['alarm_limit'] = inputVal;
+                if(inputVal === "CAPACITY") {
+                    inputItem = $("#capacity-value");
+                    inputVal = inputItem.val().trim();
+                    if(inputVal.length > 0) {
+                        postData['record_cnt'] = inputVal
+                        postData['record_unit'] = $("#capacity-unit").val();
+                    } else {
+                        inputValid = false;
+                        inputItem.addClass('border-danger');
+                    }
+                } else if(inputVal === "RECORD") {
+                    inputItem = $("#max-record-cnt");
+                    inputVal = inputItem.val().trim();
+                    if(inputVal.length > 0) {
+                        postData['record_cnt'] = inputVal
+                    } else {
+                        inputValid = false;
+                        inputItem.addClass('border-danger');
+                    }
+                }
+            }
+
+            if(inputValid) {
+                postData['interval_unit'] = $("#save-unit").val();
+                postData['set_name'] = 'data_set';
+                sendAjax("{{url_for('data_set.set_save')}}", postData, false);
+                $("#collect-set").modal('hide');
+            } else {
+                alert('값을 입력하세요');
+            }
+        }
+
+        $(document).ready(function () {
+            collectTbl = $("#data-collect-table").DataTable({
+                ...dataTableLang,
+                ...dataTableObj,
+                "columnDefs": columnDef,
+                "order": [[ 1, "asc" ]],
+                "drawCallback": function(oSettings) {
+                    setDataTblPage($("#data-collect-table"), oSettings._iDisplayLength);
+                },
+                'ajax': {
+                    'url': "{{url_for('data_set.collect_list')}}",
+                    'headers': { "X-CSRFToken": csrf_token }
+                },
+                "columns": [
+                    {
+                        render: function (data, type, row) {
+                            return checkForm.replaceAll('data.id', row.id).replaceAll('data.attr', "");
+                        }
+                    },
+                    {"data": "ind"},
+                    {"data": "name"}
+                ],
+                "createdRow": function(row, data) {
+                    $(row).attr('data-row', data.id);
+                }
+            });
+        });
+    </script>
+{% endblock %}

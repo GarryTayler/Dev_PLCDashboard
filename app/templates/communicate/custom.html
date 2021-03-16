@@ -1,0 +1,580 @@
+{% extends "layout.html" %}
+
+{% block style %}
+    <style>
+        .tab-pane {
+            padding-top: 2rem;
+        }
+        .custom-communicate {
+            display: none;
+        }
+    </style>
+{% endblock %}
+
+{% block content %}
+    <div class="card shadow mb-4">
+        <div class="card-header py-3">
+            <h6 class="m-0 font-weight-bold text-primary">통신설정 > 사용자정의통신</h6>
+        </div>
+        <div class="card-body">
+            <ul class="nav nav-tabs" role="tablist">
+                <li class="nav-item">
+                    <a class="nav-link active" data-toggle="tab" href="#channel">
+                        <i class="fa fa-route"></i> 채널
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" data-toggle="tab" href="#frame">
+                        <i class="fa fa-layer-group"></i> 프레임
+                    </a>
+                </li>
+            </ul>
+            <div class="tab-content">
+                <div id="channel" class="tab-pane active">
+                    <div class="form-group row">
+                        <div class="col-6">
+                            <div class="table-responsive">
+                                <table class="table table-bordered datatable-tbl{%if selmode=='run' or not edit_auth%} no-context{%endif%}" id="custom-channel-table">
+                                    <thead>
+                                        <tr>
+                                            <th style="width: 10%" class="text-center">
+                                                <div class="form-check">
+                                                    <input type="checkbox" class="form-check-input check-all">
+                                                    <label class="form-check-label"></label>
+                                                </div>
+                                            </th>
+                                            <th style="width: 20%">번호</th>
+                                            <th>이름</th>
+                                            <th>타입</th>
+                                        </tr>
+                                    </thead>
+                                </table>
+                                {% if selmode == "stop" and edit_auth %}
+                                    <div class="btn-panel">
+                                        <button class="btn btn-primary btn-icon-split" onclick="addChannel();">
+                                            <span class="icon text-white-50">
+                                                <i class="fas fa-plus"></i>
+                                            </span>
+                                            <span class="text">추가</span>
+                                        </button>
+                                        <button class="btn btn-warning btn-icon-split" onclick="editChannel();">
+                                            <span class="icon text-white-50">
+                                                <i class="fas fa-plus"></i>
+                                            </span>
+                                            <span class="text">편집</span>
+                                        </button>
+                                        <button class="btn btn-danger btn-icon-split" onclick="removeChannel();">
+                                            <span class="icon text-white-50">
+                                                <i class="fas fa-trash"></i>
+                                            </span>
+                                            <span class="text">삭제</span>
+                                        </button>
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                        <div class="col-1"></div>
+                        <div class="col-5 pt-3 mt-3">
+                            <div id="serial-input" class="custom-communicate">
+                                <div class="form-group row">
+                                    <div class="col-4">
+                                        <label class="input-label" for="serial-port">포트</label>
+                                    </div>
+                                    <div class="col-8">
+                                        <input type="number" class="form-control" id="serial-port">
+                                    </div>
+                                </div>
+                                <div class="form-group row">
+                                    <div class="col-4">
+                                        <label class="input-label" for="serial-baud">Baud rate (bps)</label>
+                                    </div>
+                                    <div class="col-8">
+                                        <select class="form-control" id="serial-baud">
+                                            <option>1200</option>
+                                            <option>2400</option>
+                                            <option>4800</option>
+                                            <option>9600</option>
+                                            <option>19200</option>
+                                            <option>38400</option>
+                                            <option>57600</option>
+                                            <option>115200</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="form-group row">
+                                    <div class="col-4">
+                                        <label class="input-label" for="serial-parity">Parity bit</label>
+                                    </div>
+                                    <div class="col-8">
+                                        <select class="form-control" id="serial-parity">
+                                            <option value="NONE">None</option>
+                                            <option value="ODD">Odd</option>
+                                            <option value="EVEN">Even</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="form-group row">
+                                    <div class="col-4">
+                                        <label class="input-label" for="serial-stop">Stop bit</label>
+                                    </div>
+                                    <div class="col-8">
+                                        <select class="form-control" id="serial-stop">
+                                            <option value="0">0</option>
+                                            <option value="1">1</option>
+                                            <option value="2">2</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="form-group row">
+                                    <div class="col-4">
+                                        <label class="input-label" for="serial-data">Data bit</label>
+                                    </div>
+                                    <div class="col-8">
+                                        <select class="form-control" id="serial-data">
+                                            <option value="7">7</option>
+                                            <option value="8">8</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="form-group row">
+                                    <div class="col-4">
+                                        <label class="input-label" for="serial-timeout">수신타임아웃(ms)</label>
+                                    </div>
+                                    <div class="col-8">
+                                        <input type="number" class="form-control" id="serial-timeout" value="100" min="0">
+                                    </div>
+                                </div>
+                                <div class="form-group row">
+                                    <div class="col-4">
+                                        <label class="input-label" for="serial-delay">송신딜레이(ms)</label>
+                                    </div>
+                                    <div class="col-8">
+                                        <input type="number" class="form-control" id="serial-delay" value="0" min="0">
+                                    </div>
+                                </div>
+                            </div>
+                            <div id="tcp-input" class="custom-communicate">
+                                <div class="form-group row">
+                                    <div class="col-4">
+                                        <label class="input-label" for="custom-ip">IP주소</label>
+                                    </div>
+                                    <div class="col-8">
+                                        <input type="text" class="form-control mask-ip" id="custom-ip">
+                                    </div>
+                                </div>
+                                <div class="form-group row">
+                                    <div class="col-4">
+                                        <label class="input-label" for="custom-port">포트</label>
+                                    </div>
+                                    <div class="col-8">
+                                        <input type="number" class="form-control" id="custom-port">
+                                    </div>
+                                </div>
+                                <div class="form-group row">
+                                    <div class="col-4">
+                                        <label class="input-label" for="custom-timeout">수신타임아웃(ms)</label>
+                                    </div>
+                                    <div class="col-8">
+                                        <input type="number" class="form-control" id="custom-timeout" min="0" value="100">
+                                    </div>
+                                </div>
+                            </div>
+                            <div id="tcp_client-input" class="custom-communicate">
+                                <div class="form-group row">
+                                    <div class="col-4">
+                                        <label class="input-label" for="tcpclient-ip">IP주소</label>
+                                    </div>
+                                    <div class="col-8">
+                                        <input type="text" class="form-control mask-ip" id="tcpclient-ip">
+                                    </div>
+                                </div>
+                                <div class="form-group row">
+                                    <div class="col-4">
+                                        <label class="input-label" for="tcpclient-port">포트</label>
+                                    </div>
+                                    <div class="col-8">
+                                        <input type="number" class="form-control" id="tcpclient-port">
+                                    </div>
+                                </div>
+                                <div class="form-group row">
+                                    <div class="col-4">
+                                        <label class="input-label" for="tcpclient-connect">연결타임아웃</label>
+                                    </div>
+                                    <div class="col-8">
+                                        <input type="text" class="form-control mask-time" id="tcpclient-connect">
+                                    </div>
+                                </div>
+                                <div class="form-group row">
+                                    <div class="col-4">
+                                        <label class="input-label" for="tcpclient-timeout">수신타임아웃(ms)</label>
+                                    </div>
+                                    <div class="col-8">
+                                        <input type="number" class="form-control" id="tcpclient-timeout" min="0" value="100">
+                                    </div>
+                                </div>
+                            </div>
+                            {% if selmode == "stop" and edit_auth %}
+                                <div class="form-group custom-communicate" id="save-panel">
+                                    <div class="col-12">
+                                        <div class="btn-panel">
+                                            <button class="btn btn-primary btn-icon-split" onclick="saveDetail();">
+                                                <span class="icon text-white-50">
+                                                    <i class="fas fa-check"></i>
+                                                </span>
+                                                <span class="text">저장</span>
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+                <div id="frame" class="tab-pane">
+                    <div class="form-group row">
+                        <div class="col-4">
+                            <div class="table-responsive">
+                                <table class="table table-bordered datatable-tbl{%if selmode=='run' or not edit_auth%} no-context{%endif%}" id="custom-frame-table" edit="1">
+                                    <thead>
+                                        <tr>
+                                            <th style="width: 20%" class="text-center">
+                                                <div class="form-check">
+                                                    <input type="checkbox" class="form-check-input check-all">
+                                                    <label class="form-check-label"></label>
+                                                </div>
+                                            </th>
+                                            <th style="width: 30%">번호</th>
+                                            <th style="width: 50%">이름</th>
+                                        </tr>
+                                    </thead>
+                                </table>
+                                {% if selmode == "stop" and edit_auth %}
+                                    <div class="btn-panel">
+                                        <button class="btn btn-primary btn-icon-split" onclick="addFrame();">
+                                            <span class="icon text-white-50">
+                                                <i class="fas fa-plus"></i>
+                                            </span>
+                                            <span class="text">추가</span>
+                                        </button>
+                                        <button class="btn btn-danger btn-icon-split" onclick="removeFrame();">
+                                            <span class="icon text-white-50">
+                                                <i class="fas fa-trash"></i>
+                                            </span>
+                                            <span class="text">삭제</span>
+                                        </button>
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                        <div class="col-8">
+                            <div class="custom-communicate" id="segment-panel">
+                                <div class="table-responsive">
+                                    <label class="form-check-label mb-3">프레임 세그먼트</label>
+                                    <table class="table table-bordered datatable-tbl{%if selmode=='run' or not edit_auth%} no-context{%endif%}" id="custom-segment-table">
+                                        <thead>
+                                            <tr>
+                                                <th class="text-center">
+                                                    <div class="form-check">
+                                                        <input type="checkbox" class="form-check-input check-all-2">
+                                                        <label class="form-check-label"></label>
+                                                    </div>
+                                                </th>
+                                                <th style="width: 15%;">번호</th>
+                                                <th style="width: 35%;">타입</th>
+                                                <th style="width: 50%;">내용</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="segment-tbody"></tbody>
+                                    </table>
+                                    {% if selmode == "stop" and edit_auth %}
+                                        <div class="btn-panel">
+                                            <button class="btn btn-primary btn-icon-split" onclick="addSegment();">
+                                                <span class="icon text-white-50">
+                                                    <i class="fas fa-plus"></i>
+                                                </span>
+                                                <span class="text">추가</span>
+                                            </button>
+                                            <button class="btn btn-warning btn-icon-split" onclick="editSegment();">
+                                                <span class="icon text-white-50">
+                                                    <i class="fas fa-edit"></i>
+                                                </span>
+                                                <span class="text">편집</span>
+                                            </button>
+                                            <button class="btn btn-danger btn-icon-split" onclick="removeSegment();">
+                                                <span class="icon text-white-50">
+                                                    <i class="fas fa-trash"></i>
+                                                </span>
+                                                <span class="text">삭제</span>
+                                            </button>
+                                        </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="channel-modal" tabindex="-1" role="dialog">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">채널 추가</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="form-group row">
+                        <div class="col-3">
+                            <label class="input-label" for="channel-name">이름</label>
+                        </div>
+                        <div class="col-9">
+                            <input type="text" class="form-control" id="channel-name" />
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <div class="col-3">
+                            <label class="input-label" for="channel-type">타입</label>
+                        </div>
+                        <div class="col-9">
+                            <select class="form-control" id="channel-type">
+                                <option value="SERIAL">SERIAL</option>
+                                <option value="TCP_CLIENT">TCP CLIENT</option>
+                                <option value="TCP_SERVER">TCP SERVER</option>
+                                <option value="UDP_CLIENT">UDP CLIENT</option>
+                                <option value="UDP_SERVER">UDP SERVER</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-secondary btn-icon-split" data-dismiss="modal">
+                        <span class="icon text-white-50">
+                            <i class="fas fa-times"></i>
+                        </span>
+                        <span class="text">취소</span>
+                    </button>
+                    <button class="btn btn-primary btn-icon-split" onclick="doChannelAdd();">
+                        <span class="icon text-white-50">
+                            <i class="fas fa-check"></i>
+                        </span>
+                        <span class="text">확인</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="frame-modal" tabindex="-1" role="dialog">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">채널 추가</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="form-group row">
+                        <div class="col-3">
+                            <label class="input-label" for="frame-name">이름</label>
+                        </div>
+                        <div class="col-9">
+                            <input type="text" class="form-control" id="frame-name" />
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-secondary btn-icon-split" data-dismiss="modal">
+                        <span class="icon text-white-50">
+                            <i class="fas fa-times"></i>
+                        </span>
+                        <span class="text">취소</span>
+                    </button>
+                    <button class="btn btn-primary btn-icon-split" onclick="doFrameAdd();">
+                        <span class="icon text-white-50">
+                            <i class="fas fa-check"></i>
+                        </span>
+                        <span class="text">확인</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="segment-modal" tabindex="-1" role="dialog">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">세그먼트편집</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <input type="hidden" id="segment-id" value="" />
+                    <div class="form-group row">
+                        <div class="col-3">
+                            <label class="input-label" for="segment-type">세그먼트타입</label>
+                        </div>
+                        <div class="col-9">
+                            <select class="form-control" id="segment-type">
+                                <option value="<H>">상수(HEX)</option>
+                                <option value="<S>">문자열</option>
+                                <option value="<V>">변수 입력</option>
+                                <option value="<B>">BCC 입력</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div id="H-panel" class="segment-panel">
+                        <div class="alert alert-info" role="alert">
+                            0~FF까지 1바이트크기의 HEX 상수값을 입력합니다
+                            대소문자는 구별하지 않으며, 1바이트를 초과하는 값을
+                            입력하면 1바이트까지 인식합니다.
+                        </div>
+                        <div class="form-group row">
+                            <div class="col-3">
+                                <label class="input-label" for="segment-hex">상수(HEX)</label>
+                            </div>
+                            <div class="col-9">
+                                <input type="text" class="form-control" id="segment-hex" />
+                            </div>
+                        </div>
+                    </div>
+                    <div class="segment-panel" id="S-panel">
+                        <div class="alert alert-info" role="alert">
+                            최대 xx자까지 문자열을 입력합니다.
+                        </div>
+                        <div class="form-group row">
+                            <div class="col-3">
+                                <label class="input-label" for="segment-string">문자열</label>
+                            </div>
+                            <div class="col-9">
+                                <input type="text" class="form-control" id="segment-string" />
+                            </div>
+                        </div>
+                    </div>
+                    <div class="segment-panel" id="V-panel">
+                        <div class="alert alert-info" role="alert">
+                            변수 및 바이트크기를 입력합니다.
+                            바이트크기는 숫자를 직접 입력하거나 변수를 지정할 수 있습니다.
+                        </div>
+                        <div class="form-group row">
+                            <div class="col-3">
+                                <label class="input-label" for="segment-variable">변수</label>
+                            </div>
+                            <div class="col-9">
+                                <div class="input-group">
+                                    <input type="text" class="form-control" id="segment-variable" readonly />
+                                    <span class="input-group-append dropdown">
+                                        <button class="btn btn-primary dropdown-toggle" data-toggle="dropdown"></button>
+                                        <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                                            <a class="dropdown-item" href="#" onclick="showFixed('segment-variable');">고정변수</a>
+                                            <a class="dropdown-item" href="#" onclick="showFluid('segment-variable');">가변변수</a>
+                                        </div>
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <div class="col-3">
+                                <label class="input-label" for="segment-byte">바이트크기</label>
+                            </div>
+                            <div class="col-9">
+                                <div class="value-radio">
+                                    <div class="form-check mb-2">
+                                        <input type="checkbox" class="form-check-input" id="segment-byte-radio" checked>
+                                        <label class="form-check-label" for="segment-byte-radio">변수</label>
+                                    </div>
+                                    <input type="number" class="form-control alt-input">
+                                    <div class="input-group">
+                                        <input class="form-control" type="text" id="segment-byte" readonly />
+                                        <span class="input-group-append dropdown">
+                                            <button class="btn btn-primary dropdown-toggle" data-toggle="dropdown"></button>
+                                            <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                                                <a class="dropdown-item" href="#" onclick="showFixed('segment-byte', 'analog');">고정변수</a>
+                                                <a class="dropdown-item" href="#" onclick="showFluid('segment-byte', 'analog');">가변변수</a>
+                                            </div>
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="segment-panel" id="B-panel">
+                        <div class="alert alert-info" role="alert">
+                            BCC 를 계산하기 위해 타입과 범위를 설정합니다.
+                        </div>
+                        <div class="form-group row">
+                            <div class="col-3">
+                                <label class="input-label" for="segment-btype">타입</label>
+                            </div>
+                            <div class="col-9">
+                                <select class="form-control" id="segment-btype">
+                                    <option value="BYTE_SUM">BYTE SUM</option>
+                                    <option value="WORD_SUM">WORD SUM</option>
+                                    <option value="7BIT_SUM">7BIT SUM</option>
+                                    <option value="7BIT_SUM_1s_Comp">7BIT SUM 1s Comp</option>
+                                    <option value="7BIT_XOR">7BIT XOR</option>
+                                    <option value="BYTE_SUM_1s_Comp">BYTE SUM 1s Comp</option>
+                                    <option value="BYTE_SUM_2s_Comp">BYTE SUM 2s Comp</option>
+                                    <option value="BYTE_XOR">BYTE XOR</option>
+                                    <option value="CRC16_STANDARD">CRC16 STANDARD</option>
+                                    <option value="CRC16_CCITT">CRC16 CCITT</option>
+                                    <option value="CRC16_MODBUS">CRC16 MODBUS</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <div class="col-3">
+                                <label class="input-label" for="segment-start">시작세그먼트</label>
+                            </div>
+                            <div class="col-9">
+                                <input type="number" class="form-control" id="segment-start" />
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <div class="col-3">
+                                <label class="input-label" for="segment-end">종료세그먼트</label>
+                            </div>
+                            <div class="col-9">
+                                <input type="number" class="form-control" id="segment-end" />
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <div class="col-12">
+                                <div class="form-check">
+                                    <input type="checkbox" class="form-check-input" id="segment-ascii">
+                                    <label class="form-check-label" for="segment-ascii">ASCII로 변환</label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-secondary btn-icon-split" data-dismiss="modal">
+                        <span class="icon text-white-50">
+                            <i class="fas fa-times"></i>
+                        </span>
+                        <span class="text">취소</span>
+                    </button>
+                    <button class="btn btn-primary btn-icon-split" onclick="doSegmentAdd();">
+                        <span class="icon text-white-50">
+                            <i class="fas fa-check"></i>
+                        </span>
+                        <span class="text">확인</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block script %}
+    {% include 'common/datatable.html' %}
+    {% include 'common/variable_modal.html' %}
+    {% include 'communicate/custom_js.html' %}
+{% endblock %}

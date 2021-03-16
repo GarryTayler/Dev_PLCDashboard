@@ -1,0 +1,76 @@
+<script>
+    const alarmTable = $("#alarm-table");
+    let selPanel = '', selAlarm = 0, alarmTbl = null, alarmCnt = 0;
+
+    function selectRow(selType, options="") {
+        const optionArr = options.length > 0 ? JSON.parse(options) : {};
+        selPanel = $("#alarm-modal").length > 0 ? "#" + selType + "-alarm" : "#" + selType + "-input";
+
+        initInputs(selPanel, optionArr, "alarm-");
+
+        $(".alarm-input").hide();
+        $(".btn-panel").show();
+        $(selPanel).show();
+    }
+
+    function saveDetail() {
+        let postData = getPostData(selPanel);
+        postData['alarm_id'] = selAlarm;
+        sendAjax("{{url_for('data_set.update_setting')}}", postData, false);
+        alert(saveMsg);
+    }
+
+    $(document).ready(function () {
+        alarmTable.on('click', "tbody tr", function () {
+            const inputArr = $("#alarm-table input.check-row").filter(':checked');
+            if(inputArr.length > 0) {
+                const inputItem = $(inputArr[0]);
+                const selChk = inputItem.attr('id').replace('check-row-', '');
+                if(selChk !== selAlarm) {
+                    selAlarm = selChk;
+                    const selTr = inputItem.closest('tr');
+                    const selOptions = $(selTr).attr('data-options');
+                    const selType = $(selTr).data("type");
+                    selectRow(selType, selOptions);
+                }
+            } else {
+                $(".alarm-input").hide();
+                selAlarm = 0;
+            }
+        });
+
+        alarmTbl = alarmTable.DataTable({
+            ...dataTableLang,
+            ...dataTableObj,
+            "columnDefs": columnDef,
+            "drawCallback": function(oSettings) {
+                alarmCnt = oSettings._iRecordsTotal;
+                setDataTblPage(alarmTable, oSettings._iDisplayLength);
+            },
+            'ajax': {
+                'url': "{{url_for('data_set.alarm_list')}}",
+                'headers': { "X-CSRFToken": csrf_token }
+            },
+            "initComplete": function(setting, resp) {
+                $("#alarm-table tbody input[type='checkbox']:first").trigger('click');
+            },
+            "columns": [
+                {
+                    render: function (data, type, row) {
+                        return checkForm.replaceAll('data.id', row.id).replaceAll('data.attr', "data-name='" + row.name + "' mtype='" + row.type + "' category='" + row.category + "' confirm='" + row.confirm + "'");
+                    }
+                },
+                {"data": "ind"},
+                {"data": "cat_str"},
+                {"data": "name"},
+                {"data": "firm_str"},
+                {"data": "type_str"}
+            ],
+            "createdRow": function(row, data) {
+                $(row).attr('data-row', data.id).attr('data-options', data.options).attr('data-type', data.type.toLowerCase());
+            }
+        });
+
+        $(".mask-time").inputmask(timeFormat);
+    });
+</script>

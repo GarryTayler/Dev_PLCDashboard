@@ -1,0 +1,67 @@
+.logic-build-modal .card {
+    color: #ffffff;
+    border: none;
+}
+.logic-build-modal .card-header {
+    border-bottom: none;
+}
+.logic-build-modal i {
+    font-size: 18px;
+    cursor: pointer;
+}
+.cond-group > .card-header {
+    background-color: #a38408;
+}
+.cond-group > .card-body {
+    background-color: #d9d507;
+    overflow: auto;
+}
+.action-group > .card-header {
+    background-color: #9602d1;
+}
+.action-group > .card-body {
+    background-color: #b81aed;
+    overflow: auto;
+}
+.control-card > .card-header {
+    background-color: #015d91;
+}
+.control-card > .card-body {
+    background-color: #0686cf;
+    overflow: auto;
+}
+.control-panel > .card-header {
+    background-color: #039E9E;
+}
+.control-panel > .card-body {
+    background-color: #55C2C2;
+    overflow: auto;
+}
+.condition-individual > .card-header {
+    background-color: #C14428;
+}
+.condition-individual > .card-body {
+    background-color: #E94C2A;
+    border-bottom-right-radius: 7px;
+    border-bottom-left-radius: 7px;
+}
+.action-individual > .card-header {
+    background-color: #A60C72;
+}
+.action-individual > .card-body {
+    background-color: #D11B94;
+    border-bottom-right-radius: 7px;
+    border-bottom-left-radius: 7px;
+}
+div.card.condition-individual:not(:last-child),
+div.card.action-individual:not(:last-child),
+div.card.control-card:not(:last-child) {
+    margin-bottom: 1rem;
+}
+div.card.action-individual,
+div.card.condition-individual {
+    background-color: rgba(0,0,0,0);
+}
+.card-body p.desc-label:last-child {
+    margin-bottom: 0;
+}
