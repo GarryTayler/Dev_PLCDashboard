@@ -25,6 +25,7 @@ const dataTableLang = {
     }
 };
 const dataTableObj = {
+    //'lengthMenu': [ [10, 25, 50, -1], [10, 25, 50, "모두"] ],
     'bAutoWidth': false,
     'processing': true,
     'serverSide': true,
