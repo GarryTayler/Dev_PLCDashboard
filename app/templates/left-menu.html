@@ -1,0 +1,267 @@
+<ul class="navbar-nav bg-gradient-primary sidebar sidebar-dark accordion" id="accordionSidebar">
+    <a class="sidebar-brand d-flex align-items-center justify-content-center" href="/">
+        {% if control_logo|length > 0 %}
+            <img src="{{url_for('static', filename='upload/' + control_logo)}}" alt="logo-img" class="logo-img" />
+        {% else %}
+            <div class="sidebar-brand-icon rotate-n-15">
+                <i class="fas fa-laugh-wink"></i>
+            </div>
+            <div class="sidebar-brand-text mx-3">로고</div>
+        {% endif %}
+    </a>
+
+    <hr class="sidebar-divider">
+    <div class="sidebar-heading">
+        모니터링
+    </div>
+    <li class="nav-item">
+        <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseTwo" aria-expanded="true" aria-controls="collapseTwo">
+            <i class="fas fa-fw fa-desktop"></i>
+            <span>모니터링</span>
+        </a>
+        <div id="collapseTwo" class="collapse{% if '/monitor/' in request.path %} show{% endif %}" aria-labelledby="headingTwo" data-parent="#accordionSidebar">
+            <div class="bg-white py-2 collapse-inner rounded">
+                <h6 class="collapse-header">모니터링:</h6>
+                {% for monitor in monitors %}
+                    {% if not 'monitor-' ~ monitor.id in auth_list %}
+                        <a class="collapse-item{% if selMonitor and selMonitor.id == monitor.id %} logic-set-active{% endif %}" href="{{url_for('monitor.detail', selid=monitor.id)}}">
+                            {% if monitor.name|length > 8 %}
+                                {{monitor.name[:8]}}...
+                            {% else %}
+                                {{monitor.name}}
+                            {% endif %}
+                            <i class="fas fa-trash build-remove-icon"></i>
+                        </a>
+                    {% endif %}
+                {% endfor %}
+                <a class="collapse-item" href="javascript:void(0);" onclick="showAddMonitor();">
+                    <i class="fas fa-fw fa-plus-circle"></i>
+                </a>
+            </div>
+        </div>
+    </li>
+
+    <hr class="sidebar-divider">
+    <div class="sidebar-heading">
+        로직구성
+    </div>
+    <li class="nav-item">
+        <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapsePages" aria-expanded="true" aria-controls="collapsePages">
+            <i class="fas fa-fw fa-edit"></i>
+            <span>로직구성</span>
+        </a>
+        <div id="collapsePages" class="collapse{% if '/logic_build/' in request.path %} show{% endif %}" aria-labelledby="headingPages" data-parent="#accordionSidebar">
+            <div class="bg-white py-2 collapse-inner rounded">
+                <h6 class="collapse-header">로직구성:</h6>
+                {% for control in logic_list %}
+                    {% if not  'logic-' ~ control.id in auth_list %}
+                        <a class="collapse-item{% if logic and control.id == logic.id %} logic-set-active{% endif %}" href="{{url_for('logic_build.logic', selid=control.id)}}">
+                            {% if control.name|length > 8 %}
+                                {{control.name[:8]}}...
+                            {% else %}
+                                {{control.name}}
+                            {% endif %}
+                            <i class="fas fa-trash build-remove-icon"></i>
+                        </a>
+                    {% endif %}
+                {% endfor %}
+                {% if selmode == "stop" %}
+                    <a class="collapse-item" href="javascript:void(0);" onclick="showAddLogic();">
+                        <i class="fas fa-fw fa-plus-circle"></i>
+                    </a>
+                {% endif %}
+            </div>
+        </div>
+    </li>
+
+    <hr class="sidebar-divider">
+    <div class="sidebar-heading">
+        로직설정
+    </div>
+    <li class="nav-item">
+        <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseSetting" aria-expanded="true" aria-controls="collapseSetting">
+            <i class="fas fa-fw fa-cogs"></i>
+            <span>로직설정</span>
+        </a>
+        <div id="collapseSetting" class="collapse{% if '/logic_setting/' in request.path %} show{% endif %}" aria-labelledby="headingSetting" data-parent="#accordionSidebar">
+            <div class="bg-white py-2 collapse-inner rounded">
+                <h6 class="collapse-header">로직설정:</h6>
+                {% if not 'variable' in auth_list %}
+                    <a class="collapse-item{% if '/logic_setting/variable' in request.path %} logic-set-active{% endif %}" href="{{url_for('logic_setting.variable')}}">변수</a>
+                {% endif %}
+                {% if not 'condition' in auth_list %}
+                    <a class="collapse-item{% if '/logic_setting/condition' in request.path and not '/logic_setting/condition_group' in request.path %} logic-set-active{% endif %}" href="{{url_for('logic_setting.condition')}}">조건</a>
+                {% endif %}
+                {% if not 'condition_group' in auth_list %}
+                    <a class="collapse-item{% if '/logic_setting/condition_group' in request.path %} logic-set-active{% endif %}" href="{{url_for('logic_setting.condgroup')}}">조건그룹</a>
+                {% endif %}
+                {% if not 'action' in auth_list %}
+                    <a class="collapse-item{% if '/logic_setting/action' in request.path and not '/logic_setting/action_group' in request.path %} logic-set-active{% endif %}" href="{{url_for('logic_setting.action')}}">동작</a>
+                {% endif %}
+                {% if not 'action_group' in auth_list %}
+                    <a class="collapse-item{% if '/logic_setting/action_group' in request.path %} logic-set-active{% endif %}" href="{{url_for('logic_setting.action_group')}}">동작그룹</a>
+                {% endif %}
+                {% if not 'control' in auth_list %}
+                    <a class="collapse-item{% if '/logic_setting/control' in request.path %} logic-set-active{% endif %}" href="{{url_for('logic_setting.control')}}">제어</a>
+                {% endif %}
+                {% if not 'recipe' in auth_list %}
+                    <a class="collapse-item{% if '/logic_setting/recipe' in request.path %} logic-set-active{% endif %}" href="{{url_for('logic_setting.recipe_panel')}}">레시피</a>
+                {% endif %}
+            </div>
+        </div>
+    </li>
+
+    <hr class="sidebar-divider"/>
+    <div class="sidebar-heading">
+        데이터설정
+    </div>
+    <li class="nav-item">
+        <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseServer" aria-expanded="true" aria-controls="collapseServer">
+            <i class="fas fa-fw fa-chart-bar"></i>
+            <span>데이터설정</span>
+        </a>
+        <div id="collapseServer" class="collapse{% if '/data_set/' in request.path %} show{% endif %}" aria-labelledby="headingServer" data-parent="#accordionSidebar">
+            <div class="bg-white py-2 collapse-inner rounded">
+                <h6 class="collapse-header">데이터설정:</h6>
+                {% if not 'collect' in auth_list %}
+                    <a class="collapse-item{% if '/data_set/collect' in request.path %} logic-set-active{% endif %}" href="{{url_for('data_set.collect')}}">데이터수집</a>
+                {% endif %}
+                {% if not 'alarm' in auth_list %}
+                    <a class="collapse-item{% if '/data_set/alarm' in request.path %} logic-set-active{% endif %}" href="{{url_for('data_set.alarm')}}">알람</a>
+                {% endif %}
+            </div>
+        </div>
+    </li>
+
+    <hr class="sidebar-divider">
+    <div class="sidebar-heading">
+        통신설정
+    </div>
+    <li class="nav-item">
+        <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseCommunicate" aria-expanded="true" aria-controls="collapseCommunicate">
+            <i class="fas fa-fw fa-network-wired"></i>
+            <span>통신설정</span>
+        </a>
+        <div id="collapseCommunicate" class="collapse{% if '/communicate/' in request.path %} show{% endif %}" aria-labelledby="headingCommunicate" data-parent="#accordionSidebar">
+            <div class="bg-white py-2 collapse-inner rounded">
+                <h6 class="collapse-header">통신설정:</h6>
+                {% if not 'ethercat' in auth_list %}
+                    <a class="collapse-item{% if '/communicate/ethercat' in request.path %} logic-set-active{% endif %}" href="{{url_for('communicate.ethercat')}}">EtherCAT I/O</a>
+                {% endif %}
+                {% if not 'modbus' in auth_list %}
+                    <a class="collapse-item{% if '/communicate/modbus' in request.path %} logic-set-active{% endif %}" href="{{url_for('communicate.modbus')}}">Modbus통신</a>
+                {% endif %}
+                {% if not 'custom' in auth_list %}
+                    <a class="collapse-item{% if '/communicate/custom' in request.path %} logic-set-active{% endif %}" href="{{url_for('communicate.custom')}}">사용자정의통신</a>
+                {% endif %}
+                {% if not 'remote' in auth_list %}
+                    <a class="collapse-item{% if '/communicate/remote' in request.path %} logic-set-active{% endif %}" href="{{url_for('communicate.remote')}}">리모트디바이스</a>
+                {% endif %}
+            </div>
+        </div>
+    </li>
+
+    <hr class="sidebar-divider d-none d-md-block">
+    <div class="text-center d-none d-md-inline">
+        <button class="rounded-circle border-0" id="sidebarToggle"></button>
+    </div>
+</ul>
+
+<div class="modal fade" id="new-logic-modal" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">로직편집</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group row">
+                    <div class="col-3">
+                        <label for="ckbx-style-1-1-logic" class="input-label">사용</label>
+                    </div>
+                    <div class="col-7">
+                        <div class="dark">
+                            <div class="ckbx-style-1">
+                                <input type="checkbox" checked id="ckbx-style-1-1-logic" value="0">
+                                <label for="ckbx-style-1-1-logic"></label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group row">
+                    <div class="col-3">
+                        <label for="logic-name" class="input-label">이름</label>
+                    </div>
+                    <div class="col-7">
+                        <input type="text" class="form-control" placeholder="이름을 입력하세요" id="logic-name">
+                    </div>
+                </div>
+                <div class="form-group row">
+                    <div class="col-3">
+                        <label for="logic-mode" class="input-label">우선모드</label>
+                    </div>
+                    <div class="col-7">
+                        <select class="form-control" id="logic-mode">
+                            <option value="NONE">없음</option>
+                            <option value="PRIORITY">우선순위지정</option>
+                            <option value="FIRST_ONLY">선입우선</option>
+                            <option value="LAST_ONLY">후입우선</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary btn-icon-split" data-dismiss="modal">
+                    <span class="icon text-white-50">
+                        <i class="fas fa-times"></i>
+                    </span>
+                    <span class="text">취소</span>
+                </button>
+                <button class="btn btn-primary btn-icon-split" id="logic-add-btn" data-url="{{url_for('logic_build.edit_logic')}}">
+                    <span class="icon text-white-50">
+                        <i class="fas fa-check"></i>
+                    </span>
+                    <span class="text">확인</span>
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="monitor-modal" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">모니터입력</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <div class="alert alert-danger display-none" id="monitor-alert" role="alert">
+                        이름을 입력하세요
+                    </div>
+                    <label for="monitor-name" class="input-label">이름</label>
+                    <input type="text" class="form-control" placeholder="이름을 입력하세요" id="monitor-name">
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary btn-icon-split" data-dismiss="modal">
+                    <span class="icon text-white-50">
+                        <i class="fas fa-times"></i>
+                    </span>
+                    <span class="text">취소</span>
+                </button>
+                <button class="btn btn-primary btn-icon-split" id="monitor-add-btn">
+                    <span class="icon text-white-50">
+                        <i class="fas fa-check"></i>
+                    </span>
+                    <span class="text">확인</span>
+                </button>
+            </div>
+        </div>
+    </div>
+</div>

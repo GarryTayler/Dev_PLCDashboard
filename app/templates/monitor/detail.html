@@ -1,0 +1,1658 @@
+{% extends "layout.html" %}
+
+{% block style %}
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/fileinput.min.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/datetimepicker.min.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-slider/11.0.2/css/bootstrap-slider.min.css" integrity="sha512-3q8fi8M0VS+X/3n64Ndpp6Bit7oXSiyCnzmlx6IDBLGlY5euFySyJ46RUlqIVs0DPCGOypqP8IRk/EyPvU28mQ==" crossorigin="anonymous" />
+    <style>
+        .header-badge i {
+            font-size: 18px;
+            cursor: pointer;
+            color: #000;
+        }
+        .monitor-title {
+            font-weight: bold;
+        }
+        .digital-content,
+        .analog-content,
+        .digital-elem,
+        .card.element-item .header-badge{
+            display: none;
+        }
+        .chart-body {
+            min-width: 32rem !important;
+            min-height: 28rem !important;
+        }
+        .image-item {
+            width: 100%;
+            padding: 3px;
+            cursor: pointer;
+            min-height: 100px;
+        }
+        .sel-image {
+            width: 100%;
+            display: none;
+        }
+        .image-item.selected {
+            background-color: #000;
+        }
+        .element-item > .card-header {
+            min-width: 200px;
+            border-bottom: none;
+        }
+        .element-item > .card-body {
+            width: 100%;
+            min-width: 200px;
+            min-height: 150px;
+            position: relative;
+        }
+        .element-item {
+            color: #000;
+            margin: 5px;
+            display: inline-flex;
+        }
+        .icon-img {
+            width: 1.5rem;
+        }
+        .digital-round {
+            width: 50px;
+            height: 50px;
+            margin: 0 auto;
+            border-radius: 50%;
+            border: 4px solid #616161;
+        }
+        .element-detail {
+            top: 50%;
+            left: 50%;
+            width: 55%;
+            margin: auto;
+            display: table;
+            text-align: center;
+            position: absolute;
+            transform: translate(-50%, -50%);
+        }
+        .element-image {
+            width: 100%;
+            max-height: 100%;
+        }
+        .address-span {
+            bottom: 10px;
+            left: 1.25rem;
+            position: absolute;
+            color: #0e0e0e !important;
+            font-size: 13px !important;
+        }
+        .detail-text {
+            font-size: 16px;
+            font-weight: 600;
+            text-align: center;
+            display: table-cell;
+            vertical-align: middle;
+        }
+        .vertical {
+            width: 70%;
+            display: inline-block;
+            transform: rotate(-90deg);
+            -webkit-transform: rotate(-90deg);
+        }
+        .progress {
+            height: 1.5rem;
+        }
+        .progress-bar {
+            height: 100%;
+        }
+        .progress-text {
+            position: absolute;
+            transform: translateX(-50%);
+        }
+        .d180_gauge {
+            margin-top: -1rem;
+            max-width: 200px;
+        }
+        .slider.slider-horizontal {
+            width: 100%;
+        }
+        .btn-pushbtn {
+            width: 70px;
+            box-shadow: 0 4px #999;
+        }
+        .btn-pushbtn:active {
+            box-shadow: 0 5px #666;
+            transform: translateY(4px);
+        }
+        .center-align {
+            margin-left: auto;
+            margin-right: auto;
+        }
+        #table-panel thead input[type='text'] {
+            min-width: 240px;
+        }
+        #table-panel th,
+        #table-panel td {
+            min-width: 170px;
+        }
+        .monitor-body {
+            overflow: hidden;
+            position: relative;
+        }
+        .back-img {
+            top: 0;
+            left: 0;
+            position: absolute;
+        }
+        .set-val-unit {
+            right: 20px;
+            font-size: 16px !important;
+            font-weight: bold;
+            position: absolute;
+        }
+        .gauge-text {
+            left: 50%;
+            position: absolute;
+            transform: translate(-50%, -50%);
+        }
+        .d180_gauge_text {
+            top: 70%;
+        }
+        .d360_gauge_text {
+            top: 45%;
+        }
+        .remove-btn {
+            margin-top: 10px;
+        }
+        #table-tbl .form-check-input {
+            margin-top: 13px;
+        }
+        #backimg-div img {
+            width: 50%;
+        }
+        .tgl-div {
+            display: flex;
+            justify-content: center;
+        }
+        .tgl-btn {
+            outline: 0;
+            display: block;
+            width: 4em;
+            height: 2em;
+            position: relative;
+            cursor: pointer;
+            user-select: none;
+        }
+        .tgl {
+            display: none;
+        }
+        .tgl:checked + .tgl-btn:after {
+            left: 50%;
+        }
+        .tgl-btn:after {
+            position: relative;
+            display: block;
+            content: "";
+            width: 50%;
+            height: 100%;
+        }
+        .tgl-light + .tgl-btn {
+            background: #4d4d4d;
+            border-radius: 2em;
+            padding: 2px;
+            transition: all .4s ease;
+        }
+        .tgl-light + .tgl-btn:after {
+            border-radius: 50%;
+            background: #fff;
+            transition: all .2s ease;
+        }
+    </style>
+{% endblock %}
+
+{% block content %}
+    <div class="card shadow mb-4">
+        <div class="card-body">
+            <div class="card" id="monitor-panel" back_img="{{selMonitor.back_img}}">
+                <div class="card-header">
+                    <div class="row">
+                        <div class="col-2 monitor-title">{{selMonitor.name}}</div>
+                        <div class="col-4"></div>
+                        <div class="col-6">
+                            <div class="header-badge">
+                                <span class="dropdown no-arrow">
+                                    <i class="fas fa-plus-circle mr-4 dropdown-toggle" data-toggle="dropdown"></i>
+                                    <div class="dropdown-menu dropdown-menu-right" aria-labelledby="dropdownMenuButton">
+                                        <a class="dropdown-item" href="javascript:void(0);" onclick="addElement('read_val');">값읽기</a>
+                                        <a class="dropdown-item" href="javascript:void(0);" onclick="addElement('set_val');">값쓰기</a>
+                                        <a class="dropdown-item" href="javascript:void(0);" onclick="addElement('chart');">챠트</a>
+                                        <a class="dropdown-item" href="javascript:void(0);" onclick="addElement('table');">테이블</a>
+                                    </div>
+                                </span>
+                                <i class="fas fa-palette mr-4" onclick="showPalette('#monitor-panel', true)"></i>
+                                <i class="fas fa-edit" onclick="editMonitor();"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body monitor-body">
+                    {% if selMonitor.back_img|length > 0 %}
+                        <img src="{{url_for('static', filename='upload/' + selMonitor.back_img)}}" alt="back-img" class="back-img" />
+                    {%endif%}
+                    {% for element in element_list %}
+                        <div class="card element-item" id="monitor-element-{{element.id}}" elem="{{element.elemoptions}}" {%if element.width|length > 0%}style="width: {{element.width}}px; height: {{element.height}}px;"{%endif%}>
+                            <div class="card-header">
+                                <div class="row">
+                                    <div class="col-5">{{element.name}}</div>
+                                    <div class="col-7">
+                                        <div class="header-badge" data-id="{{element.id}}">
+                                            <i class="fas fa-palette mr-2" onclick="showPalette('#monitor-element-{{element.id}}')"></i>
+                                            <i class="fas fa-edit mr-2" data-type="{{element.type}}" data-options="{{element.options}}" data-name="{{element.name}}" {%if element.type=='read_val'%}read_digital_on_img="{{element.read_digital_on_img}}" read_digital_off_img="{{element.read_digital_off_img}}" read_digital_icon_img={{element.read_digital_icon_img}}{%elif element.type=='set_val'%}set_digital_icon_img="{{element.set_digital_icon_img}}"{%endif%}></i>
+                                            <i class="fas fa-trash"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="card-body {%if element.type=='chart'%}chart-body{%endif%}">
+                                {% if element.type == 'read_val' %}
+                                    {% if element.read_digital_icon_img|length > 0 %}
+                                        <img src="{{url_for('static', filename='upload/' + element.read_digital_icon_img)}}" alt="icon-img" class="icon-img" />
+                                    {% endif %}
+                                    <div class="element-detail">
+                                        {% if 'digital-' in element.read_val_variable_selid %}
+                                            {% if element.read_digital_type == 'text' %}
+                                                <span class="detail-text">{% if element.shm_val == '1' %}ON{% else %}OFF{% endif %}</span>
+                                            {% elif element.read_digital_type == 'lamp' %}
+                                                <div class="digital-round" style="background-color: {%if element.shm_val=='1'%}{{element.read_digital_color}}{%else%}#e2e2e2{%endif%}"></div>
+                                            {% else %}
+                                                {% if element.shm_val == '1'%}
+                                                    <img src="{{url_for('static', filename='upload/' + element.read_digital_on_img)}}" alt="digital-img" class="element-image" />
+                                                {% else %}
+                                                    <img src="{{url_for('static', filename='upload/' + element.read_digital_off_img)}}" alt="digital-img" class="element-image" />
+                                                {% endif %}
+                                            {% endif %}
+                                        {% elif 'analog-' in element.read_val_variable_selid %}
+                                            {% if element.read_analog_type == 'text' %}
+                                                <span class="detail-text">{{element.shm_val}}</span>
+                                            {% elif element.read_analog_type == '180d_gage' %}
+                                                <span class="gauge-text d180_gauge_text">{{element.shm_val}}</span>
+                                                <canvas class="d180_gauge gauge-canvas" data-val="{{element.shm_val}}" data-min="{{element.read_analog_min}}" data-max="{{element.read_analog_max}}" data-color="{{element.read_analog_color}}"></canvas>
+                                            {% elif element.read_analog_type == '360d_gage' %}
+                                                <span class="gauge-text d360_gauge_text">{{element.shm_val}}</span>
+                                                <canvas class="gauge-canvas" data-val="{{element.shm_val}}" data-min="{{element.read_analog_min}}" data-max="{{element.read_analog_max}}" data-color="{{element.read_analog_color}}"></canvas>
+                                            {% elif element.read_analog_type == 'horizon' %}
+                                                <span>{{element.shm_val}}</span>
+                                                <div class="progress">
+                                                    <div class="progress-bar" role="progressbar" style="background-color: {{element.read_analog_color}}" val="{{element.shm_val}}" min="{{element.read_analog_min}}" max="{{element.read_analog_max}}"></div>
+                                                </div>
+                                            {% elif element.read_analog_type == 'vertical' %}
+                                                <span class="progress-text">{{element.shm_val}}</span>
+                                                <div class="progress vertical">
+                                                    <div class="progress-bar" role="progressbar" style="background-color: {{element.read_analog_color}}" val="{{element.shm_val}}" min="{{element.read_analog_min}}" max="{{element.read_analog_max}}"></div>
+                                                </div>
+                                            {% endif %}
+                                        {% else %}
+                                            <span class="detail-text">{{element.shm_val}}</span>
+                                        {% endif %}
+                                    </div>
+                                    {% if 'analog-' in element.read_val_variable_selid %}
+                                        <span class="set-val-unit">{{element.unit}}</span>
+                                    {% endif %}
+                                {% elif element.type == 'set_val' %}
+                                    {% if element.set_digital_icon_img|length > 0 %}
+                                        <img src="{{url_for('static', filename='upload/' + element.set_digital_icon_img)}}" alt="icon-img" class="icon-img" />
+                                    {% endif %}
+                                    <div class="element-detail" selid="{{element.set_val_variable_selid}}">
+                                        {% if 'digital-' in element.set_val_variable_selid %}
+                                            {% if element.set_digital_type == 'combobox' %}
+                                                <select class="form-control set-val-input">
+                                                    <option value="1" {%if element.shm_val==1%}selected{%endif%}>ON</option>
+                                                    <option value="0" {%if element.shm_val==0%}selected{%endif%}>OFF</option>
+                                                </select>
+                                            {% elif element.set_digital_type == 'pushbtn' %}
+                                                <button class="btn btn-pushbtn" style="background-color: {%if element.shm_val=='1'%}{{element.set_digital_color}}{%else%}#6c757d{%endif%}" mode="{{element.set_digital_push}}" color="{{element.set_digital_color}}" data-val="{{element.shm_val}}"></button>
+                                            {% else %}
+                                                <div class="tgl-div">
+                                                    <input type="checkbox" class="tgl tgl-light set-val-input" id="ckbx-style-1-1-{{element.id}}" {%if element.shm_val=='1'%}checked{%endif%} color="{{element.set_digital_color}}">
+                                                    <label class="tgl-btn" for="ckbx-style-1-1-{{element.id}}"></label>
+                                                </div>
+                                            {% endif %}
+                                        {% elif 'analog-' in element.set_val_variable_selid %}
+                                            {% if element.set_analog_type == 'slider' %}
+                                                <input class="set-digital-slider" data-slider-id='ex1Slider' type="text" data-slider-min="{{element.set_analog_min}}" data-slider-max="{{element.set_analog_max}}" data-slider-step=".1" data-slider-value="{{element.shm_val}}"/>
+                                            {% elif element.set_analog_type == 'manual' %}
+                                                <input type="number" class="form-control set-val-input" origin="{{element.shm_val}}" value="{{element.shm_val}}" min="{{element.set_analog_min}}" max="{{element.set_analog_max}}" />
+                                            {% endif %}
+                                        {% elif 'string-' in element.set_val_variable_selid %}
+                                            <input type="text" class="form-control set-val-input" origin="{{element.shm_val}}" value="{{element.shm_val}}" str="1" />
+                                        {% elif 'date-' in element.set_val_variable_selid %}
+                                            <input type="text" class="form-control set-val-input date-picker" data-val="{{element.shm_val}}" />
+                                        {% elif 'time-' in element.set_val_variable_selid %}
+                                            <input type="text" class="form-control set-val-input time-picker" data-val="{{element.shm_val}}" />
+                                        {% endif %}
+                                    </div>
+                                    {% if 'analog-' in element.set_val_variable_selid %}
+                                        <span class="set-val-unit">{{element.unit}}</span>
+                                    {% endif %}
+                                {% elif element.type == 'chart' %}
+                                    <canvas class="chartContainer" id="chartContainer-{{element.id}}" options="{{element.options}}"></canvas>
+                                {% elif element.type == 'table' %}
+                                    <div class="table-responsive">
+                                        <table class="table table-bordered no-context">
+                                            <thead>
+                                                <tr>
+                                                    <th></th>
+                                                    {% for ind in range(element['max-row']) %}
+                                                        <th>{{element['row-' + ind|string]}}</th>
+                                                    {% endfor %}
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                {% for ind in range(element['max-column']) %}
+                                                <tr>
+                                                    <th>{{element['column-' + ind|string]}}</th>
+                                                    {% for ind1 in range(element['max-row']) %}
+                                                        <td>{{element['table-' + ind|string + '-' + ind1|string]}}</td>
+                                                    {% endfor %}
+                                                </tr>
+                                                {% endfor %}
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                {% endif %}
+                                {% if element.read_val_address == '1' %}
+                                    <span class="address-span">{{element.read_val_variable_sellocstr}}</span>
+                                {% elif element.set_val_address == '1' %}
+                                    <span class="address-span">{{element.set_val_variable_sellocstr}}</span>
+                                {% endif %}
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="read_val-modal" tabindex="-1" role="dialog">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">값읽기</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="alert alert-danger insert-alert" role="alert">
+                        값을 입력하세요
+                    </div>
+                    <div class="form-group row">
+                        <div class="col-3">
+                            <label class="input-label" for="read-val-name">이름</label>
+                        </div>
+                        <div class="col-7">
+                            <input type="text" class="form-control" id="read-val-name" />
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <div class="col-3">
+                            <label class="input-label" for="read-val-variable">변수선택</label>
+                        </div>
+                        <div class="col-7">
+                            <div class="input-group">
+                                <input type="text" class="form-control" readonly id="read-val-variable" onchange="variableChange();">
+                                <span class="input-group-append">
+                                    <button class="btn btn-primary" onclick="showFixed('read-val-variable');">선택</button>
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="digital-content">
+                        <div class="form-group row">
+                            <div class="col-3">
+                                <label class="input-label" for="read-digital-type">타입</label>
+                            </div>
+                            <div class="col-7">
+                                <select class="form-control condition-select" id="read-digital-type">
+                                    <option value="text">텍스트</option>
+                                    <option value="lamp" condition="1">램프</option>
+                                    <option value="image" condition="1">이미지전환</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div id="lamp-panel" class="digital-elem">
+                            <div class="form-group row">
+                                <div class="col-3">
+                                    <label class="input-label" for="read-digital-color">색상</label>
+                                </div>
+                                <div class="col-7">
+                                    <input type="text" id="read-digital-color" class="form-control color-picker" />
+                                </div>
+                            </div>
+                        </div>
+                        <div id="image-panel" class="digital-elem">
+                            <div class="form-group row">
+                                <div class="col-3">
+                                    <label class="input-label" for="read-digital-on">ON 이미지</label>
+                                </div>
+                                <div class="col-4">
+                                    <input type="hidden" id="read-digital-on" data-text="ON 이미지를" />
+                                    <button class="btn btn-primary" onclick="selectImage('read-digital-on');">이미지선택</button>
+                                </div>
+                                <div class="col-5">
+                                    <img src="" class="sel-image" alt="on-image" id="read-digital-on-img" />
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <div class="col-3">
+                                    <label class="input-label" for="read-digital-off">OFF 이미지</label>
+                                </div>
+                                <div class="col-4">
+                                    <input type="hidden" id="read-digital-off" data-text="OFF 이미지" />
+                                    <button class="btn btn-primary" onclick="selectImage('read-digital-off');">이미지선택</button>
+                                </div>
+                                <div class="col-5">
+                                    <img src="" class="sel-image" alt="on-image" id="read-digital-off-img" />
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="analog-content">
+                        <div class="form-group row">
+                            <div class="col-3">
+                                <label class="input-label" for="read-analog-type">타입</label>
+                            </div>
+                            <div class="col-7">
+                                <select class="form-control" id="read-analog-type">
+                                    <option value="text">텍스트</option>
+                                    <option value="180d_gage">180도 게이지</option>
+                                    <option value="360d_gage">360도 게이지</option>
+                                    <option value="horizon">가로 막대</option>
+                                    <option value="vertical">세로 막대</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="digital-elem">
+                            <div class="form-group row">
+                                <div class="col-3">
+                                    <label class="input-label" for="read-analog-min">최소값</label>
+                                </div>
+                                <div class="col-7">
+                                    <input type="number" id="read-analog-min" class="form-control" />
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <div class="col-3">
+                                    <label class="input-label" for="read-analog-max">최대값</label>
+                                </div>
+                                <div class="col-7">
+                                    <input type="number" id="read-analog-max" class="form-control" />
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <div class="col-3">
+                                    <label class="input-label" for="read-analog-color">색상</label>
+                                </div>
+                                <div class="col-7">
+                                    <input type="text" id="read-analog-color" class="form-control color-picker" />
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <div class="col-3">
+                            <label class="input-label" for="read-digital-icon">아이콘</label>
+                        </div>
+                        <div class="col-4">
+                            <input type="hidden" id="read-digital-icon" value="0" data-text="아이콘을" />
+                            <button class="btn btn-primary" onclick="selectImage('read-digital-icon');">이미지선택</button>
+                            <button class="btn btn-danger remove-btn" onclick="removeImage('#read');">이미지삭제</button>
+                        </div>
+                        <div class="col-5">
+                            <img src="" class="sel-image" alt="icon-image" id="read-digital-icon-img" />
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <div class="col-12">
+                            <div class="form-check">
+                                <input type="checkbox" class="form-check-input" id="read-val-address" checked value="0">
+                                <label class="form-check-label" for="read-val-address">변수주소 표시</label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-secondary btn-icon-split" data-dismiss="modal">
+                        <span class="icon text-white-50">
+                            <i class="fas fa-times"></i>
+                        </span>
+                        <span class="text">취소</span>
+                    </button>
+                    <button class="btn btn-primary btn-icon-split" onclick="doAddElement('read_val');">
+                        <span class="icon text-white-50">
+                            <i class="fas fa-check"></i>
+                        </span>
+                        <span class="text">확인</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="set_val-modal" tabindex="-1" role="dialog">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">값쓰기</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="alert alert-danger insert-alert" role="alert">
+                        값을 입력하세요
+                    </div>
+                    <div class="form-group row">
+                        <div class="col-3">
+                            <label class="input-label" for="set-val-name">이름</label>
+                        </div>
+                        <div class="col-7">
+                            <input type="text" class="form-control" id="set-val-name" />
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <div class="col-3">
+                            <label class="input-label" for="set-val-variable">변수선택</label>
+                        </div>
+                        <div class="col-7">
+                            <div class="input-group">
+                                <input type="text" class="form-control" readonly id="set-val-variable" onchange="variableChange();">
+                                <span class="input-group-append">
+                                    <button class="btn btn-primary" onclick="showFixed('set-val-variable');">선택</button>
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="digital-content">
+                        <div class="form-group row">
+                            <div class="col-3">
+                                <label class="input-label" for="set-digital-type">타입</label>
+                            </div>
+                            <div class="col-7">
+                                <select class="form-control" id="set-digital-type">
+                                    <option value="combobox">콤보박스</option>
+                                    <option value="pushbtn">푸시버튼</option>
+                                    <option value="locus">락커스위치</option>
+                                    <option value="lottery">로터리스위치</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div id="locus-panel" class="digital-elem">
+                            <div class="form-group row">
+                                <div class="col-3">
+                                    <label class="input-label" for="set-digital-color">색상</label>
+                                </div>
+                                <div class="col-7">
+                                    <input type="text" id="set-digital-color" class="form-control color-picker" />
+                                </div>
+                            </div>
+                        </div>
+                        <div id="combobox-panel" class="digital-elem">
+                            <div class="form-group row">
+                                <div class="col-3">
+                                    <label class="input-label" for="set-digital-push">푸시버튼동작</label>
+                                </div>
+                                <div class="col-7">
+                                    <select class="form-control" id="set-digital-push">
+                                        <option value="onoff">누를때마다 ON/OFF변경(토글)</option>
+                                        <option value="ontab">누를때만 ON(탭)</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="analog-content">
+                        <div class="form-group row">
+                            <div class="col-3">
+                                <label class="input-label" for="set-analog-type">타입</label>
+                            </div>
+                            <div class="col-7">
+                                <select class="form-control" id="set-analog-type">
+                                    <option value="manual">직접입력</option>
+                                    <option value="slider">슬라이더</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <div class="col-3">
+                                <label class="input-label" for="set-analog-min">최소값</label>
+                            </div>
+                            <div class="col-7">
+                                <input type="number" id="set-analog-min" class="form-control" />
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <div class="col-3">
+                                <label class="input-label" for="set-analog-max">최대값</label>
+                            </div>
+                            <div class="col-7">
+                                <input type="number" id="set-analog-max" class="form-control" />
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <div class="col-3">
+                            <label class="input-label" for="set-digital-icon">아이콘</label>
+                        </div>
+                        <div class="col-4">
+                            <input type="hidden" id="set-digital-icon" data-text="아이콘을" />
+                            <button class="btn btn-primary" onclick="selectImage('set-digital-icon');">이미지선택</button>
+                            <button class="btn btn-danger remove-btn" onclick="removeImage('#set');">이미지삭제</button>
+                        </div>
+                        <div class="col-5">
+                            <img src="" class="sel-image" alt="on-image" id="set-digital-icon-img" />
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <div class="col-12">
+                            <div class="form-check">
+                                <input type="checkbox" class="form-check-input" id="set-val-address" checked value="0">
+                                <label class="form-check-label" for="set-val-address">변수주소 표시</label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-secondary btn-icon-split" data-dismiss="modal">
+                        <span class="icon text-white-50">
+                            <i class="fas fa-times"></i>
+                        </span>
+                        <span class="text">취소</span>
+                    </button>
+                    <button class="btn btn-primary btn-icon-split" onclick="doAddElement('set_val');">
+                        <span class="icon text-white-50">
+                            <i class="fas fa-check"></i>
+                        </span>
+                        <span class="text">확인</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="chart-modal" tabindex="-1" role="dialog">
+        <div class="modal-dialog" role="document" style="max-width: 700px !important;">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">챠트</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="form-group row">
+                        <div class="col-2">
+                            <label class="input-label" for="chart-name">이름</label>
+                        </div>
+                        <div class="col-4">
+                            <input type="text" class="form-control" id="chart-name" />
+                        </div>
+                    </div>
+                    <div class="table-responsive">
+                        <table class="table table-bordered dataTable no-context" id="chart-sel-table">
+                            <thead>
+                                <tr>
+                                    <th style="width: 10%" class="text-center">
+                                        <div class="form-check">
+                                            <input type="checkbox" class="form-check-input check-all">
+                                            <label class="form-check-label"></label>
+                                        </div>
+                                    </th>
+                                    <th style="width: 30%">변수</th>
+                                    <th style="width: 20%">색상</th>
+                                    <th style="width: 20%">타입</th>
+                                    <th style="width: 20%">선굵기</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for data in variable_list %}
+                                    <tr data-row="chart-{{data.id}}">
+                                        <td class="text-center">
+                                            <div class="form-check">
+                                                <input type="checkbox" class="form-check-input check-row" id="check-row-chart-{{data.id}}">
+                                                <label class="form-check-label" for="check-row-chart-{{data.id}}"></label>
+                                            </div>
+                                        </td>
+                                        <td>{{data.name}}</td>
+                                        <td>
+                                            <input type="text" class="form-control color-picker" id="chart-color-{{data.id}}" data-color="{{data.color}}" />
+                                        </td>
+                                        <td>
+                                            <select class="form-control" id="chart-type-{{data.id}}">
+                                                <option value="line"{%if data.type=="line"%} selected{%endif%}>실선</option>
+                                                <option value="dot"{%if data.type=="dot"%} selected{%endif%}>점선</option>
+                                            </select>
+                                        </td>
+                                        <td>
+                                            <input type="text" placeholder="선굵기" class="form-control" id="chart-width-{{data.id}}" value="{{data.width}}" />
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-secondary btn-icon-split" data-dismiss="modal">
+                        <span class="icon text-white-50">
+                            <i class="fas fa-times"></i>
+                        </span>
+                        <span class="text">취소</span>
+                    </button>
+                    <button class="btn btn-primary btn-icon-split" onclick="doAddElement('chart');">
+                        <span class="icon text-white-50">
+                            <i class="fas fa-check"></i>
+                        </span>
+                        <span class="text">확인</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="table-modal" row="0" column="0" tabindex="-1" role="dialog">
+        <div class="modal-dialog" role="document" style="max-width: 900px !important;">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">테이블</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="form-group row">
+                        <div class="col-2">
+                            <label class="input-label" for="table-name">이름</label>
+                        </div>
+                        <div class="col-4">
+                            <input type="text" class="form-control" id="table-name" />
+                        </div>
+                    </div>
+                    <div class="table-responsive" id="table-panel">
+                        <table class="table table-bordered no-context" id="table-tbl">
+                            <thead>
+                            </thead>
+                            <tbody>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-success btn-icon-split" onclick="addNewColumn();">
+                        <span class="icon text-white-50">
+                            <i class="fas fa-check"></i>
+                        </span>
+                        <span class="text">행추가</span>
+                    </button>
+                    <button class="btn btn-warning btn-icon-split" onclick="removeColumn();">
+                        <span class="icon text-white-50">
+                            <i class="fas fa-check"></i>
+                        </span>
+                        <span class="text">행삭제</span>
+                    </button>
+                    <button class="btn btn-success btn-icon-split" onclick="addNewRow();">
+                        <span class="icon text-white-50">
+                            <i class="fas fa-check"></i>
+                        </span>
+                        <span class="text">열추가</span>
+                    </button>
+                    <button class="btn btn-warning btn-icon-split" onclick="removeRow();">
+                        <span class="icon text-white-50">
+                            <i class="fas fa-check"></i>
+                        </span>
+                        <span class="text">열삭제</span>
+                    </button>
+                </div>
+                <div class="btn-panel">
+                    <button class="btn btn-primary btn-icon-split" onclick="doAddElement('table');">
+                        <span class="icon text-white-50">
+                            <i class="fas fa-check"></i>
+                        </span>
+                        <span class="text">확인</span>
+                    </button>
+                    <button class="btn btn-secondary btn-icon-split" data-dismiss="modal">
+                        <span class="icon text-white-50">
+                            <i class="fas fa-times"></i>
+                        </span>
+                        <span class="text">취소</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="image-modal" tabindex="-1" role="dialog">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">이미지선택</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <ul class="nav nav-tabs" role="tablist">
+                        <li class="nav-item">
+                            <a class="nav-link active" data-toggle="tab" href="#image-select">
+                                <i class="fa fa-check"></i> 이미지선택
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" data-toggle="tab" href="#image-upload">
+                                <i class="fa fa-upload"></i> 이미지업로드
+                            </a>
+                        </li>
+                    </ul>
+                    <div class="tab-content">
+                        <div id="image-select" class="tab-pane active">
+                            <div class="form-group row mt-3">
+                                {% for image in image_list %}
+                                    <div class="col-3">
+                                        <img src="{{ url_for('static', filename='upload/' + image.userid + '/' + image.url) }}" class="image-item" data-id="{{image.id}}" />
+                                    </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+                        <div id="image-upload" class="tab-pane">
+                            <div class="form-group">
+                                <input id="file-demo" type="file" class="file" data-preview-file-type="any">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-secondary btn-icon-split" data-dismiss="modal">
+                        <span class="icon text-white-50">
+                            <i class="fas fa-times"></i>
+                        </span>
+                        <span class="text">취소</span>
+                    </button>
+                    <button class="btn btn-primary btn-icon-split" onclick="doSelectImage();">
+                        <span class="icon text-white-50">
+                            <i class="fas fa-check"></i>
+                        </span>
+                        <span class="text">확인</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block script %}
+    {% include 'common/datatable.html' %}
+    {% include 'common/variable_modal.html' %}
+    {% include 'common/logicbuild.html' %}
+    <script src="{{ url_for('static', filename='js/datetimepicker.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/jquery.inputmask.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/fileinput.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/gauge.min.js') }}"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-slider/11.0.2/bootstrap-slider.min.js" integrity="sha512-f0VlzJbcEB6KiW8ZVtL+5HWPDyW1+nJEjguZ5IVnSQkvZbwBt2RfCBY0CBO1PsMAqxxrG4Di6TfsCPP3ZRwKpA==" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@2.8.0"></script>
+
+    <script>
+        let selType = "", insertID = '0';
+        const btnDefaultColor = '#6c757d', chartBack = "rgba(255, 255, 255, 0)";
+        const monitorID = "{{selMonitor.id}}";
+        const assetPath = "{{url_for('static', filename='upload/')}}";
+        const gaugeOpt = {
+            angle: -0.25,
+            lineWidth: 0.3,
+            radiusScale: 0.7,
+            pointer: {
+                length: 0,
+                strokeWidth: 0
+            },
+            staticLabels: {
+                font: "16px sans-serif",
+                labels: [],
+                fractionDigits: 1
+            },
+            colorStart: '#CF3280',
+            colorStop: '#DA2763',
+            limitMax: false,
+            limitMin: false,
+            highDpiSupport: true
+        };
+        const tableModal = $('#table-modal');
+        const digitalElem = $(".digital-elem"), digitalContent = $('.digital-content'), analogContent = $('.analog-content');
+        const variableInput = `
+            <td>
+                <div class="input-group">
+                    <input type="text" class="form-control" value="input.val" id="input.id" input.attr readonly />
+                    <span class="input-group-append">
+                        <button class="btn btn-primary" onclick="showFixed('input.id');">선택</button>
+                    </span>
+                </div>
+            </td>
+        `;
+        const tableInput = "<th><div class='form-check'><input type='checkbox' class='form-check-input' id='dataid'><label class='form-check-label' for='dataid'><input type='text' class='form-control' value='data.val' id='data.id'></label></div></th>";
+
+        function addElement(type) {
+            selType = "#" + type + "-modal";
+
+            if(["set_val", "read_val"].indexOf(type) >= 0) {
+                analogContent.hide();
+                digitalContent.hide();
+                digitalElem.hide();
+
+                $(selType + " select").val('text');
+
+                const inputArr = $(selType + " input");
+                for(let ii = 0; ii < inputArr.length; ii++) {
+                    $(inputArr[ii]).val('').removeAttr('selid').removeAttr('seltype').removeAttr('sellocstr');
+                }
+            }
+
+            $("img.sel-image").attr('src', '').hide();
+
+            insertID = "0";
+            $(".insert-alert").hide();
+            $(selType).modal('show');
+        }
+
+        function doAddElement(type) {
+            let postData = {};
+            let inputValid = true;
+            $(selType + " input").removeClass('border-danger');
+
+            if(type === "set_val" || type === "read_val") {
+                const inputArr = $(selType + " input," + selType + " select");
+                for (let ii = 0; ii < inputArr.length; ii++) {
+                    const inputItem = inputArr[ii];
+                    const inputID = $(inputItem).attr('id');
+                    const inputID1 = $("#" + inputID);
+                    const inputVal = $(inputItem).val() ? $(inputItem).val().trim() : '';
+
+                    if(["set-val-address", "read-val-address"].indexOf(inputID) >= 0) {
+                        postData[inputID.replaceAll('-', '_')] = $(inputItem).prop('checked') ? "1" : "0";
+                    } else {
+                        const filterParents = inputID1.parents("div")
+                            .filter(function () {
+                                return $(this).css('display') === "none";
+                            }).length;
+
+                        if (filterParents === 0 && inputVal.length === 0 && $(inputItem).attr('id').indexOf('digital-icon') < 0) {
+                            if($(inputItem).attr('type') === "hidden") {
+                                $(selType + " .insert-alert").text($(inputItem).data('text') + ' 선택하세요');
+                                $(selType + " .insert-alert").show();
+                            } else {
+                                showErr(inputID);
+                                $(selType + " .insert-alert").text('값을 입력하세요');
+                                $(selType + " .insert-alert").show();
+                            }
+
+                            inputValid = false;
+                            break;
+                        } else if (filterParents === 0) {
+                            if(inputID.indexOf('-name') >= 0) {
+                                postData['elem_name'] = inputVal;
+                            } else {
+                                const inputKey = inputID.replaceAll('-', '_');
+                                postData[inputKey] = inputVal;
+                                if (inputID1.attr("seltype")) {
+                                    postData[inputKey + "_selid"] = inputID1.attr("selid");
+                                    postData[inputKey + "_seltype"] = inputID1.attr("seltype");
+                                    postData[inputKey + "_sellocstr"] = inputID1.attr("sellocstr");
+                                }
+                            }
+                        }
+                    }
+                }
+            } else if(type === 'chart') {
+                const nameInput = $("#chart-name");
+                const chartName = nameInput.val().trim();
+                if(chartName.length > 0) {
+                    const selIDs = getTblChk("#chart-sel-table", "chart-");
+                    if(selIDs.length > 0) {
+                        postData['selids'] = selIDs;
+                        postData['elem_name'] = chartName;
+
+                        const chartAttr = ['chart-color-', 'chart-type-', 'chart-width-'];
+                        const idArr = selIDs.split(',');
+                        for(let ii = 0; ii < idArr.length; ii++) {
+                            const idItem = idArr[ii];
+                            for(let jj = 0; jj < chartAttr.length; jj++) {
+                                const attrItem = chartAttr[jj];
+                                postData[attrItem.replaceAll('-', '_') + idItem] = $("#" + attrItem + idItem).val();
+                            }
+                        }
+                    } else {
+                        alert('표시할 변수를 선택하세요');
+                        inputValid = false;
+                    }
+                } else {
+                    inputValid = false;
+                    alert('이름을 입력하세요');
+                    nameInput.addClass('border-danger');
+                }
+            } else {
+                postData = getTableData();
+                const nameInput = $("#table-name");
+                const tblName = nameInput.val().trim();
+                if(tblName.length > 0) {
+                    if(parseInt(tableModal.attr('row')) > 0 &&
+                        parseInt(tableModal.attr('column')) > 0) {
+                        postData['elem_name'] = tblName;
+                        postData['max-row'] = tableModal.attr('row');
+                        postData['max-column'] = tableModal.attr('column');
+                        for(let key in postData) {
+                            if(postData.hasOwnProperty(key) && postData[key].length === 0) {
+                                inputValid = false;
+                                $("#" + key).addClass('border-danger');
+                                alert('값을 입력하세요');
+                                break;
+                            }
+                        }
+                    } else {
+                        alert('변수를 추가하세요');
+                        inputValid = false;
+                    }
+                } else {
+                    alert('이름을 입력하세요');
+                    inputValid = false;
+                    nameInput.addClass('border-danger');
+                }
+            }
+
+            if(inputValid) {
+                postData['seltype'] = type;
+                postData['monitorID'] = monitorID;
+                postData['selid'] = insertID;
+
+                sendAjax("{{url_for('monitor.add_element')}}", postData);
+            }
+        }
+
+        function variableChange() {
+            const selInput = selType.replace("#", "").split("-")[0].replaceAll("_", "-");
+            let selid = $("#" + selInput + "-variable").attr('selid').trim();
+            selid = selid.length > 0 ? selid.split('-')[0] : "";
+
+            analogContent.hide();
+            digitalContent.hide();
+            if(selid === "digital") {
+                digitalContent.show();
+            } else if (selid === "analog") {
+                analogContent.show();
+            }
+        }
+
+        function selectImage(selInput) {
+            $("#file-demo").fileinput('clear');
+            $("#image-modal").attr('selinput', selInput).modal('show');
+        }
+
+        function doSelectImage() {
+            const selTab = $(".tab-pane.active").attr('id');
+            const fileCnt = $('#file-demo').fileinput('getFilesCount');
+            const selCnt = $(".image-item.selected").length;
+            let isValid = false;
+            let isUpload = false;
+            if(selTab === "image-upload" && fileCnt > 0) {
+                isValid = true;
+                isUpload = true;
+            } else if(selTab === "image-select" && selCnt > 0) {
+                isValid = true;
+            }
+
+            if(isValid) {
+                const imgModal = $("#image-modal");
+                const selInput = "#" + imgModal.attr('selinput');
+                if(isUpload) {
+                    const selFile = $("#file-demo").prop('files')[0];
+                    let formData = new FormData();
+                    formData.append("file", selFile);
+                    $.ajax({
+                        url : "{{url_for('monitor.upload_image')}}",
+                        type : 'POST',
+                        data : formData,
+                        dataType: 'json',
+                        headers: { "X-CSRFToken": csrf_token },
+                        processData: false,
+                        contentType: false,
+                        success : function(resp) {
+                            if(resp.status) {
+                                $(selInput).val(resp.id);
+                                const selImg = selInput + "-img"
+                                $(selImg).attr('src', assetPath + resp.url);
+                                $(selImg).show();
+                            } else {
+                                alert(resp.message);
+                            }
+                        }
+                    });
+                } else {
+                    const selImg = $(".image-item.selected");
+                    $(selInput).val(selImg.data('id'));
+                    const selImg1 = selInput + "-img"
+                    $(selImg1).attr('src', selImg.attr('src'));
+                    $(selImg1).show();
+                }
+
+                imgModal.modal('hide');
+            } else {
+                alert('이미지를 선택하세요');
+            }
+        }
+
+        function addNewRow() {
+            tableModal.attr('row', parseInt(tableModal.attr('row')) + 1);
+            drawTableModal();
+        }
+
+        function addNewColumn() {
+            tableModal.attr('column', parseInt(tableModal.attr('column')) + 1);
+            drawTableModal();
+        }
+
+        function getTableData() {
+            let inputData = {};
+            const inputArr = $("#table-panel input[type='text']");
+            for(let ii = 0; ii < inputArr.length; ii++) {
+                const inputItem = $(inputArr[ii]);
+                inputData[inputItem.attr('id')] = inputItem.val().trim();
+                if(inputItem.attr('selid')) {
+                    inputData[inputItem.attr('id') + "-selid"] = inputItem.attr('selid');
+                    inputData[inputItem.attr('id') + "-seltype"] = inputItem.attr('seltype');
+                    inputData[inputItem.attr('id') + "-sellocstr"] = inputItem.attr('sellocstr');
+                }
+            }
+
+            return inputData;
+        }
+
+        function drawTableModal(selArr = [], typeStr = '', inputData = {}, isDraw = true) {
+            const rowCnt = parseInt(tableModal.attr('row'));
+            const columnCnt = parseInt(tableModal.attr('column'));
+
+            if(isDraw) {
+                inputData = getTableData();
+            }
+
+            if(rowCnt > 0 || columnCnt > 0) {
+                let html = "<th></th>", ind = 0;
+                for(let ii = 0; ii < rowCnt; ii++) {
+                    if(typeStr === 'row' && selArr.indexOf(ii) >= 0) continue;
+                    const idInd = 'row-' + ii;
+                    const inputVal = inputData.hasOwnProperty(idInd) ? inputData[idInd] : '';
+                    html += tableInput.replaceAll('dataid', 'chk-row-' + ind).replaceAll('data.id', 'row-' + ind).replaceAll('data.val', inputVal);
+                    ind++;
+                }
+                $("#table-tbl thead").html(html);
+
+                html = ""; ind = 0;
+                for(let ii = 0; ii < columnCnt; ii++) {
+                    if(typeStr === 'column' && selArr.indexOf(ii) >= 0) continue;
+                    const idInd = 'column-' + ii;
+                    const inputVal = inputData.hasOwnProperty(idInd) ? inputData[idInd] : '';
+                    html += "<tr>" + tableInput.replaceAll('dataid', 'chk-column-' + ind).replaceAll('data.id', 'column-' + ind).replaceAll('data.val', inputVal);
+
+                    let ind1 = 0;
+                    for(let jj = 0; jj < rowCnt; jj++) {
+                        if(typeStr === 'row' && selArr.indexOf(jj) >= 0) continue;
+
+                        const idInd1 = 'table-' + ii + "-" + jj;
+                        const inputVal1 = inputData.hasOwnProperty(idInd1) ? inputData[idInd1] : '';
+                        let attrStr = "";
+                        if(inputData.hasOwnProperty(idInd1 + "-selid")) {
+                            attrStr = "selid='" + inputData[idInd1 + "-selid"] + "' seltype='" + inputData[idInd1 + "-seltype"] + "' sellocstr='" + inputData[idInd1 + "-sellocstr"] + "'";
+                        }
+
+                        html += variableInput.replaceAll('input.id', 'table-' + ind + "-" + ind1).replaceAll('input.attr', attrStr).replaceAll('input.val', inputVal1);
+                        ind1++;
+                    }
+
+                    ind++;
+                    html += "</tr>";
+                }
+
+                $("#table-tbl tbody").html(html);
+            } else {
+                $("#table-tbl thead").html("");
+                $("#table-tbl tbody").html("");
+            }
+
+            if(typeStr === 'row') {
+                tableModal.attr('row', rowCnt - selArr.length);
+            } else if(typeStr === "column") {
+                tableModal.attr('column', columnCnt - selArr.length);
+            }
+        }
+
+        // 열삭제
+        function removeRow() {
+            const rowChk = $("#table-tbl thead input.form-check-input").filter(':checked');
+            if(rowChk.length > 0) {
+                let selArr = [];
+                for(let ii = 0; ii < rowChk.length; ii++) {
+                    selArr.push(parseInt($(rowChk[ii]).attr('id').replace('chk-row-', '')));
+                }
+
+                drawTableModal(selArr, 'row');
+            }
+        }
+
+        // 행삭제
+        function removeColumn() {
+            const rowChk = $("#table-tbl tbody input.form-check-input").filter(':checked');
+            if(rowChk.length > 0) {
+                let selArr = [];
+                for(let ii = 0; ii < rowChk.length; ii++) {
+                    selArr.push(parseInt($(rowChk[ii]).attr('id').replace('chk-column-', '')));
+                }
+
+                drawTableModal(selArr, 'column');
+            }
+        }
+
+        function editMonitor() {
+            $("#monitor-name").val($(".monitor-title").text());
+            $("#monitor-modal").attr('selid', monitorID).modal('show');
+        }
+
+        function removeImage(type) {
+            $(type + "-digital-icon").val('');
+            $(type + "-digital-icon-img").attr('src', '').hide();
+        }
+
+        function updateTimeArr(timeArr = [], respItem = '') {
+            if(timeArr.length === 0) {
+                timeArr.push(respItem);
+            } else {
+                for(let ii = 0; ii < timeArr.length; ii++) {
+                    if(timeArr[ii] >= respItem) {
+                        timeArr.splice(ii, 0, respItem);
+                        break;
+                    }
+                }
+            }
+
+            return timeArr;
+        }
+
+        $(document).ready(() => {
+            $(".color-picker").spectrum(spectrumObj);
+
+            $("#file-demo").fileinput({
+                showUpload: false
+            });
+
+            $(".condition-select").on('change', function () {
+                const selSelect = "#" + $(this).val() + "-panel";
+                digitalElem.hide();
+                const selOption = $(this).find(':checked').attr('condition');
+                if(selOption === "1") {
+                    $(selSelect).show();
+                } else {
+                    $(selSelect).hide();
+                }
+            });
+
+            $("#set-digital-type").on('change', function() {
+                const selVal = $(this).val();
+                const locusPanel = $("#locus-panel");
+                const comboPanel = $("#combobox-panel");
+                if(["pushbtn", "lottery", "locus"].indexOf(selVal) >= 0) {
+                    locusPanel.show();
+                    if(selVal === "pushbtn") {
+                        comboPanel.show();
+                    } else {
+                        comboPanel.hide();
+                    }
+                } else {
+                    locusPanel.hide();
+                    comboPanel.hide();
+                }
+            });
+
+            $('.image-item').on('click', function() {
+                $('.image-item').removeClass('selected');
+                $(this).toggleClass('selected');
+            });
+
+            $("div.header-badge i.fa-trash").on('click', function() {
+                removeChild("{{url_for('monitor.remove_element')}}", {elemID: $(this).closest('div').data('id')});
+            });
+
+            $("i.fas.fa-edit").on('click', function() {
+                const elemID = $(this).closest('div').data('id');
+                const elemName = $(this).data('name');
+                const elemType = $(this).data('type');
+                const elemModal = "#" + elemType + "-modal";
+                const elemOptions = $(this).data('options');
+
+                selType = "#" + elemType + "-modal";
+
+                const inputArr = $(elemModal + " input," + elemModal + " select");
+                for(let ii = 0; ii < inputArr.length; ii++) {
+                    const inputItem = $(inputArr[ii]);
+                    for(let key in elemOptions) {
+                        if (elemOptions.hasOwnProperty(key)) {
+                            const itemKey = key.replaceAll('_', "-");
+                            if(itemKey === inputItem.attr('id')) {
+                                inputItem.val(elemOptions[key]);
+                                // delete elemOptions[key];
+                                if(key + "_selid" in elemOptions) {
+                                    inputItem.attr('selid', elemOptions[key + "_selid"]);
+                                    inputItem.attr('seltype', elemOptions[key + "_seltype"]);
+                                    inputItem.attr('sellocstr', elemOptions[key + "_sellocstr"]);
+                                    delete elemOptions[key + "_selid"]
+                                    delete elemOptions[key + "_seltype"]
+                                    delete elemOptions[key + "_sellocstr"]
+                                }
+                                break;
+                            }
+                        }
+                    }
+                }
+
+                if(['read_val', 'set_val'].indexOf(elemType) >= 0) {
+                    $(elemModal + " .form-check-input").prop('checked', elemOptions.set_val_address === "1");
+                    const hiddenArr = $(elemModal + " img.sel-image");
+                    for(let ii = 0; ii < hiddenArr.length; ii++) {
+                        const hiddenItem = $(hiddenArr[ii]);
+                        const idStr = hiddenItem.attr('id').replaceAll('-', '_');
+                        if($(this).attr(idStr)) {
+                            hiddenItem.attr('src', assetPath + $(this).attr(idStr));
+                            hiddenItem.show();
+                        }
+                    }
+
+                    analogContent.hide();
+                    digitalContent.hide();
+                    digitalElem.hide();
+
+                    $("#read-val-address").prop('checked', elemOptions['read_val_address'] === '1');
+
+                    if(elemOptions.hasOwnProperty('read_analog_type')) {
+                        analogContent.show();
+                        $("#" + elemOptions['read_analog_type'] + "-panel").show();
+
+                        if(['180d_gage', '360d_gage', 'horizon', 'vertical'].indexOf(elemOptions['read_analog_type']) >= 0) {
+                            digitalElem.show();
+                        }
+                    } else if(elemOptions.hasOwnProperty('read_digital_type')) {
+                        digitalContent.show();
+                        const digitalType = elemOptions['read_digital_type'];
+                        $("#" + digitalType + "-panel").show();
+                        if(digitalType === "lamp") {
+                            $("#read-digital-color").spectrum({
+                                ...spectrumObj,
+                                color: elemOptions['read_digital_color']
+                            });
+                        }
+                    } else if(elemOptions.hasOwnProperty('set_digital_type')) {
+                        digitalContent.show();
+                        if(['locus', 'lottery', 'pushbtn'].indexOf(elemOptions['set_digital_type']) >= 0) {
+                            $("#set-digital-color").spectrum({
+                                ...spectrumObj,
+                                color: elemOptions['set_digital_color']
+                            });
+
+                            $("#locus-panel").show();
+                        }
+
+                        if(elemOptions['set_digital_type'] === "pushbtn") {
+                            $("#combobox-panel").show();
+                        }
+                    } else if(elemOptions.hasOwnProperty('set_analog_type')) {
+                        analogContent.show();
+                    }
+                } else if(elemType === "table") {
+                    tableModal.attr('row', parseInt(elemOptions['max-row']) + 1);
+                    tableModal.attr('column', parseInt(elemOptions['max-column']) + 1);
+                    drawTableModal([], '', elemOptions, false);
+                }
+
+                insertID = elemID;
+                $("#" + elemType.replaceAll('_', '-') + "-name").val(elemName);
+                $(".insert-alert").hide();
+                $(elemModal).modal('show');
+            });
+
+            $("#read-analog-type").on('change', function() {
+                const selType = $(this).val();
+                const digitalElem = $(".analog-content .digital-elem");
+                if(selType === "text") {
+                    digitalElem.hide();
+                } else {
+                    digitalElem.show();
+                }
+            });
+
+            let roundArr = $(".gauge-canvas");
+            for(let ii = 0; ii < roundArr.length; ii++) {
+                const gaugeItem = $(roundArr[ii]);
+                const newGauge = new Gauge(gaugeItem[0]);
+                newGauge.maxValue = gaugeItem.data('max');
+                newGauge.minValue = gaugeItem.data('min');
+                gaugeOpt.staticLabels.labels = '';
+                gaugeOpt.colorStart = gaugeOpt.colorStop = gaugeItem.data('color');
+                if(gaugeItem.hasClass('d180_gauge')) {
+                    gaugeOpt.angle = 0;
+                    gaugeOpt.lineWidth = .3;
+                } else {
+                    gaugeOpt.angle = -.5;
+                    gaugeOpt.lineWidth = .2;
+                }
+                newGauge.setOptions(gaugeOpt);
+                newGauge.set(gaugeItem.data('val'));
+            }
+
+            roundArr = $(".btn-pushbtn");
+            if(curMode === "stop") {
+                roundArr.attr('disabled', true);
+            } else {
+                for(let ii = 0; ii < roundArr.length; ii++) {
+                    const btnItem = $(roundArr[ii]);
+                    const btnMode = btnItem.attr('mode');
+                    const btnColor = btnItem.attr('color');
+                    if(btnMode === "onoff") {
+                        btnItem.on('click', function () {
+                            $(this).toggleClass('clicked');
+                            if($(this).hasClass('clicked')) {
+                                $(this).css('background-color', btnColor);
+                            } else {
+                                $(this).css('background-color', btnDefaultColor);
+                            }
+                        });
+                    } else {
+                        btnItem.on('mousedown', function () {
+                            $(this).addClass('clicked');
+                            $(this).css('background-color', btnColor);
+                        });
+
+                        btnItem.on('mouseup', function() {
+                            $(this).removeClass('clicked');
+                            $(this).css('background-color', btnDefaultColor);
+                        });
+                    }
+                }
+            }
+
+            const sortPanel = $("#monitor-panel .card-body:first")[0];
+            new Sortable(sortPanel, {
+                animation: 150,
+                ghostClass: 'blue-background-class',
+                onEnd: function (evt) {
+                    saveBuildOrder(evt);
+                }
+            });
+
+            roundArr = $(".element-item");
+            roundArr.resizable({
+                minWidth: 202,
+                minHeight: 198,
+                stop: function(event, ui) {
+                    const elemID = $(this).attr('id').replace('monitor-element-', '');
+                    sendAjax("{{url_for('monitor.set_size')}}", {elemID, selWidth: ui.size.width, selHeight: ui.size.height}, false);
+                }
+            });
+
+            for(let ii = 0; ii < roundArr.length; ii++) {
+                const roundItem = $(roundArr[ii]);
+                const optStr = roundItem.attr('elem');
+                const optArr = optStr.length > 0 ? JSON.parse(optStr) : {};
+                initCardStyle(optArr, "#" + roundItem.attr('id'), true);
+            }
+
+            roundArr = $(".progress-bar");
+            for(let ii = 0; ii < roundArr.length; ii++) {
+                const proItem = $(roundArr[ii]);
+                const proVal = parseFloat($(proItem).attr('val')) * 100 / (parseFloat($(proItem).attr('max')) - parseFloat($(proItem).attr('min')));
+                $(proItem).css('width', proVal + "%");
+            }
+
+            $('.set-digital-slider').slider({
+                formatter: function(value) {
+                    return '현재 값: ' + value;
+                }
+            }).on('slideStop', function(e) {
+                const selID = $(this).closest('div.element-detail').attr('selid');
+                sendAjax("{{url_for('logic_setting.write_variable')}}", {writeValue: e.value, varAdd: selID, varType: selID.split('-')[0]}, false);
+            });
+
+            if(curMode === 'stop') {
+                $('.set-digital-slider').slider('disable');
+                $('.set-val-input').attr('disabled', true);
+            } else {
+                $('.time-picker').inputmask(timeFormat);
+                $('.date-picker').datetimepicker({
+                    format: 'YYYY-MM-DD',
+                    defaultDate: new Date()
+                });
+
+                $('.set-val-input').on('change', function() {
+                    if(curMode === "run") {
+                        if($(this).hasClass("tgl-light")) {
+                            const setColor = $(this).attr('color');
+                            const nextLabel = $(this).next().filter('label.tgl-btn');
+                            if(setColor && $(this).prop('checked')) {
+                                nextLabel.css('background', setColor);
+                            } else {
+                                nextLabel.css('background', "#4d4d4d");
+                            }
+                        }
+
+                        const selID = $(this).closest('div.element-detail').attr('selid');
+                        const selVal = $(this).attr('type') === "checkbox" ? ($(this).prop('checked') ? '1' : '0') : $(this).val();
+                        let isValid = true;
+                        if($(this).attr('min')) {
+                            const minVal = parseFloat($(this).attr('min'));
+                            const maxVal = parseFloat($(this).attr('max'));
+                            const selVal1 = parseFloat(selVal);
+                            if(selVal1 < minVal || maxVal < selVal1) {
+                                isValid = false;
+                                $(this).val($(this).attr('origin'));
+                                alert(minVal + '~' + maxVal + "범위의 값을 입력하세요");
+                            } else {
+                                $(this).attr('origin', selVal);
+                            }
+                        } else if($(this).attr('str')) {
+                            if(selVal.length > 32) {
+                                isValid = false;
+                                $(this).val($(this).attr('origin'));
+                                alert("문자열의 최대길이는 32자입니다");
+                            } else {
+                                $(this).attr('origin', selVal);
+                            }
+                        }
+
+                        if(isValid) {
+                            sendAjax("{{url_for('logic_setting.write_variable')}}", {writeValue: selVal, varAdd: selID, varType: selID.split('-')[0]}, false);
+                        }
+                    }
+                });
+            }
+
+            let chartArr = {};
+            roundArr = $(".chartContainer");
+            for(let ii = 0; ii < roundArr.length; ii++) {
+                const chartItem = $(roundArr[ii]);
+                const chartID = chartItem.attr('id');
+                const chartOpt = chartItem.attr('options');
+                const optArr = chartOpt.length > 0 ? JSON.parse(chartOpt) : {};
+                $.ajax({
+                    url: "{{url_for('monitor.chart_data')}}",
+                    data: {selids: optArr.selids},
+                    dataType: 'json',
+                    type: 'POST',
+                    headers: { "X-CSRFToken": csrf_token },
+                    success: function(resp) {
+                        if(resp.status) {
+                            const idData = resp.ids;
+                            const respData = resp.rows;
+
+                            let timeArr = [];
+                            for(let key1 in respData) {
+                                if(respData.hasOwnProperty(key1)) {
+                                    for(let jj = 0; jj < respData[key1].length; jj++) {
+                                        const respItem = respData[key1][jj].create;
+                                        if(timeArr.indexOf(respItem) < 0) {
+                                            timeArr = updateTimeArr(timeArr, respItem);
+                                        }
+                                    }
+                                }
+                            }
+
+                            let datasets = [];
+                            if(timeArr.length > 0) {
+                                for(let key1 in respData) {
+                                    if(respData.hasOwnProperty(key1)) {
+                                        let dataArr = [];
+                                        for(let kk = 0; kk < timeArr.length; kk++) {
+                                            let selVal = 0;
+                                            for(let jj = 0; jj < respData[key1].length; jj++) {
+                                                const respItem = respData[key1][jj];
+                                                if(timeArr.indexOf(respItem.create) >= 0) {
+                                                    selVal = parseInt(respItem.value);
+                                                    break;
+                                                }
+                                            }
+
+                                            dataArr.push(selVal);
+                                        }
+
+                                        datasets.push({
+                                            label: key1,
+                                            backgroundColor: chartBack,
+                                            borderColor: optArr['chart_color_' + idData[key1]],
+                                            data: dataArr
+                                        });
+                                    }
+                                }
+                            }
+
+                            chartArr[chartID] = new Chart(chartItem[0].getContext('2d'), {
+                                type: 'line',
+                                data: {
+                                    labels: timeArr,
+                                    datasets: datasets
+                                },
+                                options: {}
+                            });
+                        } else {
+                            alert(resp.message);
+                        }
+                    },
+                    error: function() {
+                        alert(refreshMsg);
+                    }
+                });
+            }
+
+            $(".card.element-item").hover(function() {
+                $(this).find('.header-badge').show();
+            }, function() {
+                $(this).find('.header-badge').hide();
+            });
+        });
+    </script>
+{% endblock %}

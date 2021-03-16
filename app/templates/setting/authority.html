@@ -1,0 +1,188 @@
+{% extends "layout.html" %}
+
+{% block style %}
+    <style>
+        .form-check-label {
+            margin-top: 5px;
+            margin-left: 10px;
+        }
+    </style>
+{% endblock %}
+
+{% block content %}
+    <div class="card shadow mb-4">
+        <div class="card-header py-3">
+            <h6 class="m-0 font-weight-bold text-primary">권한설정</h6>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-2">
+                    <select class="form-control" id="user-select" onchange="initAuth();">
+                        {% for user in users %}
+                            <option value="{{user.id}}">{{user.userid}}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
+            <div class="table-responsive mt-4">
+                <table class="table table-bordered no-context" id="authority-tbl">
+                    <thead>
+                        <tr>
+                            <th>항목</th>
+                            <th>
+                                <div class="form-check">
+                                    <input type="checkbox" class="form-check-input view-all">
+                                    <label class="form-check-label">보기</label>
+                                </div>
+                            </th>
+                            <th>
+                                <div class="form-check">
+                                    <input type="checkbox" class="form-check-input edit-all">
+                                    <label class="form-check-label">편집/삭제</label>
+                                </div>
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for monitor in monitors %}
+                            <tr>
+                                <td>{{monitor.name}}</td>
+                                <td>
+                                    <div class="form-check">
+                                        <input type="checkbox" class="form-check-input view-check" id="monitor-{{monitor.id}}-read">
+                                        <label class="form-check-label" for="monitor-{{monitor.id}}-read"></label>
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="form-check">
+                                        <input type="checkbox" class="form-check-input edit-check" id="monitor-{{monitor.id}}-write">
+                                        <label class="form-check-label" for="monitor-{{monitor.id}}-write"></label>
+                                    </div>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                        {% for logic in logic_list %}
+                            <tr>
+                                <td>{{logic.name}}</td>
+                                <td>
+                                    <div class="form-check">
+                                        <input type="checkbox" class="form-check-input view-check" id="logic-{{logic.id}}-read">
+                                        <label class="form-check-label" for="logic-{{logic.id}}-read"></label>
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="form-check">
+                                        <input type="checkbox" class="form-check-input edit-check" id="logic-{{logic.id}}-write">
+                                        <label class="form-check-label" for="logic-{{logic.id}}-write"></label>
+                                    </div>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                        {% for menu in menu_list %}
+                            <tr>
+                                <td>{{menu.name}}</td>
+                                <td>
+                                    <div class="form-check">
+                                        <input type="checkbox" class="form-check-input view-check" id="{{menu.id}}-read">
+                                        <label class="form-check-label" for="{{menu.id}}-read"></label>
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="form-check">
+                                        <input type="checkbox" class="form-check-input edit-check" id="{{menu.id}}-write">
+                                        <label class="form-check-label" for="{{menu.id}}-write"></label>
+                                    </div>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+                <div class="btn-panel">
+                    <div class="btn-panel alarm-input">
+                        <button class="btn btn-primary btn-icon-split" onclick="saveAuthority();">
+                            <span class="icon text-white-50">
+                                <i class="fas fa-check"></i>
+                            </span>
+                            <span class="text">저장</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block script %}
+    <script>
+        function saveAuthority() {
+            let postData = {};
+            const inputChk = $("#authority-tbl tbody input[type='checkbox']");
+            for(let ii = 0; ii < inputChk.length; ii++) {
+                const chkItem = $(inputChk[ii]);
+                postData[chkItem.attr('id')] = chkItem.prop('checked') ? '1' : '0';
+            }
+
+            postData['userid'] = $("#user-select").val();
+            sendAjax("{{url_for('userbp.save_authority')}}", postData, false);
+            alert(saveMsg);
+        }
+
+        function initHeaderChk() {
+            const viewChk = "#authority-tbl tbody .view-check";
+            if($(viewChk).length === $(viewChk).filter(':checked').length) {
+                $(".view-all").prop('checked', true);
+            }
+
+            const editChk = "#authority-tbl tbody .edit-check";
+            if($(editChk).length === $(editChk).filter(':checked').length) {
+                $(".edit-all").prop('checked', true);
+            }
+        }
+
+        function initAuth() {
+            const selUser = $("#user-select").val();
+            const respFunc = function(resp) {
+                if(resp.status) {
+                    $("#authority-tbl tbody input[type='checkbox']").prop('checked', false);
+                    const respData = resp.data;
+                    if(respData && respData.length > 0) {
+                        for(let ii = 0; ii < respData.length; ii++) {
+                            const respItem = respData[ii];
+                            $("#" + respItem.menu + "-read").prop('checked', respItem.read === "1");
+                            $("#" + respItem.menu + "-write").prop('checked', respItem.edit === "1");
+                        }
+                    } else {
+                        $(".view-check").prop('checked', true);
+                        if(resp.type === "admin") {
+                            $(".edit-check").prop('checked', true);
+                        }
+                    }
+
+                    initHeaderChk();
+                } else {
+                    alert(resp.message);
+                }
+            };
+
+            sendAjax("{{url_for('userbp.get_auth')}}", {selUser}, false, false, respFunc);
+        }
+
+        $(document).ready(function () {
+            $(".view-all, .edit-all").click(function () {
+                const selClass = $(this).hasClass('view-all') ? '.view-check' : '.edit-check';
+                $(selClass).prop('checked', $(this).prop('checked'));
+            });
+
+            $("#authority-tbl tbody td").on('click', function(e) {
+                const selChk = $(this).find("input[type='checkbox']");
+                if(selChk.length > 0 && $(e.target).is('td')) {
+                    selChk.prop('checked', !selChk.prop('checked'));
+                }
+
+                initHeaderChk();
+            });
+
+            initAuth();
+        });
+    </script>
+{% endblock %}

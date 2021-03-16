@@ -1,0 +1,44 @@
+{% extends "layout.html" %}
+
+{% block content %}
+    <div class="card shadow mb-4">
+        <div class="card-header py-3">
+            <h6 class="m-0 font-weight-bold text-primary">상태바 > 알람테이블</h6>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-bordered dataTable">
+                    <thead>
+                        <tr>
+                            <th>발생시간</th>
+                            <th>해제시간</th>
+                            <th>확인시간</th>
+                            <th>분류</th>
+                            <th>메시지</th>
+                            <th>변수</th>
+                            <th>값</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>2020-09-26 12:06:30</td>
+                            <td></td>
+                            <td></td>
+                            <td>정보</td>
+                            <td>변수1이 ON되었습니다</td>
+                            <td>디지털값30(LOCAL.DG.100)</td>
+                            <td>TRUE</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block script %}
+    <script>
+        const columnDef1 = [];
+    </script>
+    {% include 'common/datatable.html' %}
+{% endblock %}

@@ -1,0 +1,291 @@
+{% extends "layout.html" %}
+
+{% block style %}
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.22/css/jquery.dataTables.min.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/datetimepicker.min.css') }}">
+    <style>
+        #variable-table tbody tr td {
+            position: relative;
+        }
+    </style>
+{% endblock %}
+
+{% block content %}
+    <div class="card shadow mb-4">
+        <div class="card-header py-3">
+            <h6 class="m-0 font-weight-bold text-primary">로직설정 > 변수 > 변수편집</h6>
+        </div>
+        <div class="card-body">
+            <div class="row mb-3">
+                <div class="col-2">
+                    <label class="input-label" for="variable-select">위치</label>
+                    <select class="form-control" id="variable-select" onchange="updateVariable();">
+                        <option value="local-0" remote-id="0">로컬</option>
+                        {% for remote in remotes %}
+                            <option value="remote-{{loop.index}}" remote-id="{{remote.id}}">{{remote.name}}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-2">
+                    <label class="input-label" for="type-select">타입</label>
+                    <select class="form-control" id="type-select" onchange="updateVariable();">
+                        <option value="digital">디지털</option>
+                        <option value="analog">아날로그</option>
+                        <option value="string">문자열</option>
+                        <option value="date">날짜</option>
+                        <option value="time">시간</option>
+                    </select>
+                </div>
+            </div>
+            <div class="table-responsive">
+                <table class="table table-bordered no-context" id="variable-table">
+                    <thead>
+                        <tr>
+                            <th style="width: 20%">변수이름</th>
+                            <th style="width: 15%">단위</th>
+                            <th>변수주소</th>
+                            <th style="width: 15%">현재값</th>
+                            <th style="width: 15%">값쓰기</th>
+                            <th style="width: 15%">기본값</th>
+                        </tr>
+                    </thead>
+                </table>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block script %}
+    <script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/1.10.22/js/jquery.dataTables.min.js"></script>
+    <script src="{{ url_for('static', filename='js/datetimepicker.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/jquery.inputmask.min.js') }}"></script>
+    {% include 'common/socket.html' %}
+    {% include 'common/variable_js.html' %}
+    <script>
+        const variableTbl = $("#variable-table");
+        const varSelect = $("#variable-select");
+        const typeSelect = $("#type-select");
+
+        function updateDefault(inputItem) {
+            const inputOrigin = inputItem.attr('origin');
+            const inputDefault = inputItem.val();
+
+            if(inputOrigin !== inputDefault) {
+                inputItem.attr('origin', inputDefault);
+                sendAjax("{{url_for('logic_setting.update_variable')}}", {trVal: inputItem.closest('tr').attr('data-row'), inputDefault, remote: varSelect.find(':selected').attr('remote-id')}, false);
+            }
+        }
+
+        function updateWrite(inputItem) {
+            const writeValue = inputItem.val();
+            const writeOrigin = inputItem.attr('origin');
+
+            if(writeValue.length > 32) {
+                alert('문자열의 최대 길이는 32입니다');
+            } else {
+                if(writeValue !== writeOrigin) {
+                    // inputItem.attr('origin', writeValue);
+                    sendAjax("{{url_for('logic_setting.write_variable')}}", {writeValue, varAdd: inputItem.attr('addr'), varType: typeSelect.val()}, false);
+                }
+            }
+        }
+
+        $(document).ready(function () {
+            setInterval(function () {
+                if(socket) {
+                    const sel_var = varSelect.val();
+                    const sel_type = typeSelect.val();
+                    const page_info = dataTables.page.info();
+                    socket.emit('localvar', {
+                        variable: sel_var,
+                        type: sel_type,
+                        start: page_info.start,
+                        end: page_info.end
+                    });
+                }
+            }, 500);
+
+            if(socket) {
+                socket.on('localvar', function(resp) {
+                    const sel_var = varSelect.val();
+                    const sel_type = typeSelect.val();
+                    const page_info = dataTables.page.info();
+                    const {data, data_list} = resp;
+                    if(data.variable === sel_var && data.type === sel_type &&
+                            parseInt(data.start) === page_info.start && parseInt(data.end) === page_info.end) {
+                        for(let ii = 0; ii < data_list.length; ii++) {
+                            const dataItem = data_list[ii];
+                            const valText = dataItem.val.toString().trim();
+                            $("#current-" + dataItem.key).text(valText);
+                            // $("#current-write-" + dataItem.key).val(valText).attr('origin', valText);
+                        }
+                    }
+                });
+            }
+
+            columnDef.push({
+                'targets': 3,
+                'defaultContent': '',
+                'createdCell':  function (td, cellData, rowData, row) {
+                    $(td).attr('id', 'current-' + row);
+                }
+            });
+            columnDef.push({
+                'targets': 4,
+                'defaultContent': '',
+                'createdCell': function(td) {
+                    if(curMode === "run" && curAuth) {
+                        $(td).find(".mask-time").inputmask(timeFormat);
+                        const datePicker = $(td).find(".date-picker");
+                        if(datePicker) {
+                            datePicker.datetimepicker({
+                                format: 'YYYY-MM-DD'
+                            });
+
+                            datePicker.on("dp.change", function() {
+                                updateWrite(datePicker);
+                            });
+                        }
+                    }
+                }
+            });
+            columnDef.push({
+                'targets': 5,
+                'defaultContent': '',
+                'createdCell': function(td) {
+                    if(curMode === "stop" && curAuth) {
+                        $(td).find(".mask-time").inputmask(timeFormat);
+
+                        const datePicker = $(td).find(".date-picker");
+                        if(datePicker) {
+                            datePicker.datetimepicker({
+                                format: 'YYYY-MM-DD'
+                            });
+
+                            datePicker.on("dp.change", function() {
+                                updateDefault(datePicker);
+                            });
+                        }
+                    }
+                }
+            });
+
+            dataTables = $("#variable-table").DataTable({
+                ...dataTableLang,
+                ...dataTableObj,
+                "columnDefs": columnDef,
+                "drawCallback": function(oSettings) {
+                    const pageInfo = dataTables.page.info();
+                    if(parseInt(pageInfo.length) * pageInfo.page > pageInfo.recordsTotal) {
+                        dataTables.page(0);
+                        updateVariable();
+                    } else {
+                        setDataTblPage($("#variable-table"), oSettings._iDisplayLength);
+                    }
+                },
+                'ajax': {
+                    'url': "{{url_for('logic_setting.variable_list')}}",
+                    'headers': { "X-CSRFToken": csrf_token },
+                    'data': function(data){
+                        let curPage = localStorage.getItem('cur-page');
+                        curPage = curPage ? curPage : 0;
+                        data = {
+                            ...data,
+                            start: curPage * parseInt(data.length),
+                            variable: varSelect.val(),
+                            variable_type: typeSelect.val(),
+                            variable_id: varSelect.find(':selected').attr('remote-id')
+                        }
+
+                        return data;
+                    }
+                },
+                "columns": [
+                    {
+                        render: function (data, type, row) {
+                            let html = '<input disabled type="text" class="form-control name-input" value="' + row.name + '" origin="' + row.name + '" />';
+                            return removeDisable(html);
+                        }
+                    },
+                    {
+                        render: function (data, type, row) {
+                            const selType = typeSelect.val();
+                            if(selType === "analog") {
+                                let html = "<input disabled type='text' class='form-control analog-unit' value='" + row.unit + "' origin='" + row.unit + "' />";
+                                return removeDisable(html);
+                            } else {
+                                return "";
+                            }
+                        }
+                    },
+                    { "data": "address" },
+                    {
+                        render: function () {
+                            return '';
+                        }
+                    },
+                    {
+                        render: function (data, type, row, chk) {
+                            let html = "";
+                            const selType = typeSelect.val();
+                            if(selType === "digital") {
+                                html = "<select disabled class='form-control write-input' id='current-write-" + chk.row + "' addr='" + row.address + "'><option value='-1'></option><option value='FALSE'>FALSE</option><option value='TRUE'>TRUE</option></select>";
+                            } else {
+                                let cls = 'form-control write-input'; itype = 'text';
+                                if (selType === 'time') {
+                                    cls += ' mask-time';
+                                } else if (selType === 'date') {
+                                    cls += ' date-picker';
+                                } else if (selType === 'analog') {
+                                    itype = 'number';
+                                }
+
+                                html = "<input disabled id='current-write-" + chk.row + "' type='" + itype + "' class='" + cls + "' addr='" + row.address + "'/>";
+                            }
+
+                            return removeDisable(html, 'run');
+                        }
+                    },
+                    {
+                        render: function (data, type, row) {
+                            if(varSelect.val().split("-")[0] === "local") {
+                                let html = "";
+                                const selType = typeSelect.val();
+                                if(selType === "digital") {
+                                    html = "<select disabled class='form-control default-input' origin='" + row.default + "'>";
+                                    html += "<option value='-1'></option>";
+                                    html += row.default === "FALSE" ? "<option value='FALSE' selected>FALSE</option>" : "<option value='FALSE'>FALSE</option>";
+                                    html += row.default === "TRUE" ? "<option value='TRUE' selected>TRUE</option>" : "<option value='TRUE'>TRUE</option>"
+                                    html += "</select>";
+                                } else {
+                                    let cls = 'form-control default-input'; itype = 'text';
+                                    if (selType === 'time') {
+                                        cls += ' mask-time';
+                                    } else if (selType === 'date') {
+                                        cls += ' date-picker';
+                                    } else if (selType === 'analog') {
+                                        itype = 'number';
+                                    }
+
+                                    html = "<input disabled type='" + itype + "' class='" + cls + "' value='" + row.default + "' origin='" + row.default + "' />";
+                                }
+
+                                return removeDisable(html);
+                            } else {
+                                return '';
+                            }
+                        }
+                    }
+                ]
+            });
+
+            variableTbl.on('change', "tbody .default-input", function() {
+                updateDefault($(this));
+            });
+
+            variableTbl.on('change', "tbody .write-input", function() {
+                updateWrite($(this));
+            });
+        });
+    </script>
+{% endblock %}

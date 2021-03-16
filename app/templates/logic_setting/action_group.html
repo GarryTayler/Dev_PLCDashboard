@@ -1,0 +1,205 @@
+{% extends "layout.html" %}
+
+{% block style %}
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/logbuild.css') }}">
+{% endblock %}
+
+{% block content %}
+    <div class="card shadow mb-4">
+        <div class="card-header py-3">
+            <h6 class="m-0 font-weight-bold text-primary">로직설정 > 동작그룹</h6>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-bordered datatable-tbl {%if selmode == 'run' or not edit_auth%}no-context{%endif%}" id="actiongroup-table" build="1">
+                    <thead>
+                        <tr>
+                            <th class="text-center">
+                                <div class="form-check">
+                                    <input type="checkbox" class="form-check-input check-all">
+                                    <label class="form-check-label"></label>
+                                </div>
+                            </th>
+                            <th>번호</th>
+                            <th>이름</th>
+                            <th>동작모드</th>
+                            <th>실행횟수</th>
+                            <th>할당</th>
+                            {% if selmode == "run" %}
+                                <th>상태</th>
+                            {% endif %}
+                        </tr>
+                    </thead>
+                </table>
+            </div>
+            {% if selmode == "stop" and edit_auth %}
+                <div class="btn-panel">
+                    <button class="btn btn-warning btn-icon-split" onclick="doActGroupBuild();">
+                        <span class="icon text-white-50">
+                            <i class="fas fa-layer-group"></i>
+                        </span>
+                        <span class="text">구성</span>
+                    </button>
+                    <button class="btn btn-primary btn-icon-split" onclick="doActGroupCreate();">
+                        <span class="icon text-white-50">
+                            <i class="fas fa-plus"></i>
+                        </span>
+                        <span class="text">추가</span>
+                    </button>
+                    <button class="btn btn-success btn-icon-split" onclick="doActGroupEdit();">
+                        <span class="icon text-white-50">
+                            <i class="fas fa-edit"></i>
+                        </span>
+                        <span class="text">편집</span>
+                    </button>
+                    <button class="btn btn-danger btn-icon-split" onclick="doActGroupRemove();">
+                        <span class="icon text-white-50">
+                            <i class="fas fa-trash"></i>
+                        </span>
+                        <span class="text">삭제</span>
+                    </button>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <div class="modal fade logic-build-modal" id="act-group-build" tabindex="-1" role="dialog">
+        <div class="modal-dialog" role="document" style="max-width: 900px !important;">
+            <div class="modal-content">
+                <div class="card action-group" id="act-group-palette">
+                    <div class="card-header">
+                        <div class="row">
+                            <div class="col-3">
+                                <span id="actgroup-name"></span>
+                            </div>
+                            <div class="col-3">
+                                <span id="actgroup-mode"></span>
+                            </div>
+                            <div class="col-3">
+                                <span id="actgroup-status">실행중...</span>
+                            </div>
+                            <div class="col-3">
+                                <div class="header-badge">
+                                    <i class="fas fa-plus-circle mr-4" onclick="addActGroup();"></i>
+                                    <i class="fas fa-palette" onclick="showPalette('#act-group-palette')"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block script %}
+    <script src="{{ url_for('static', filename='js/datetimepicker.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/jquery.inputmask.min.js') }}"></script>
+    {% include 'common/datatable.html' %}
+    {% include 'common/logicbuild.html' %}
+    {% include 'logic_build/logic_action_modal.html' %}
+    {% include 'common/variable_modal.html' %}
+    {% include 'common/action_modal.html' %}
+    {% include 'logic_setting/actgroup_modal.html' %}
+    {% include 'communicate/custom_js.html' %}
+    {% include 'logic_setting/recipe_js.html' %}
+    <script>
+        function doActGroupBuild(selRow = '') {
+            const selChk = selRow.length > 0 ? [selRow] : getTblChk("#actiongroup-table", "actgroup-").split(',');
+            if(selChk.length > 0 && selChk[0].length > 0) {
+                actGroupID = selChk[0];
+                $.ajax({
+                    url: "{{url_for('logic_build.action_group')}}",
+                    data: {actGroupID},
+                    dataType: 'json',
+                    type: 'post',
+                    headers: {"X-CSRFToken": csrf_token},
+                    success: function (resp) {
+                        if (resp.status) {
+                            const selActGroup = resp.actgroup;
+                            $("#actgroup-name").text(selActGroup.name);
+                            $("#actgroup-mode").text(selActGroup.mode);
+
+                            const actGroupOpt = selActGroup.options.length > 0 ? JSON.parse(selActGroup.options) : {};
+                            initCardStyle(actGroupOpt, "#act-group-palette");
+
+                            drawLogicAction(resp.page_list);
+
+                            $("#act-group-build").modal('show');
+                            initLogicIcons();
+                        } else {
+                            alert(resp.message);
+                        }
+                    },
+                    error: function() {
+                        alert(refreshMsg);
+                    }
+                });
+            } else {
+                alert('구성할 행을 선택하세요');
+            }
+        }
+
+        $(document).ready(function() {
+            const sortPanel =$("#act-group-palette .card-body")[0];
+            new Sortable(sortPanel, {
+                animation: 150,
+                ghostClass: 'blue-background-class',
+                onEnd: function (evt) {
+                    saveBuildOrder(evt);
+                }
+            });
+
+            const fieldArr = [
+                {
+                    render: function (data, type, row) {
+                        const attrStr = "data-name='" + row.name + "' mode='" + row.mode1 + "' cnt='" + row.cnt + "'";
+                        return checkForm.replaceAll('data.id', "actgroup-" + row.id).replaceAll('data.attr', attrStr);
+                    }
+                },
+                {"data": "ind"},
+                {"data": "name"},
+                {"data": "mode"},
+                {"data": "cnt"},
+                {"data": "control_name"}
+            ];
+            if(curMode === "run") {
+                fieldArr.push({
+                    render: function (data, type, row) {
+                        return row.run.status;
+                    }
+                });
+                columnDef.push({
+                    'targets': 6,
+                    'defaultContent': '',
+                    'createdCell': function(td, cellData, rowData) {
+                        if(rowData.run.busy) {
+                            $(td).addClass('bg-warning');
+                        } else if(rowData.run.done) {
+                            $(td).addClass('bg-success');
+                        }
+                    }
+                })
+            }
+            dataTables = $("#actiongroup-table").DataTable({
+                ...dataTableLang,
+                ...dataTableObj,
+                "columnDefs": columnDef,
+                "drawCallback": function(oSettings) {
+                    actGroupCnt = oSettings._iRecordsTotal;
+                    setDataTblPage($("#actiongroup-table"), oSettings._iDisplayLength);
+                },
+                'ajax': {
+                    'url': "{{url_for('logic_setting.actgroup_list')}}",
+                    'headers': { "X-CSRFToken": csrf_token }
+                },
+                "columns": fieldArr,
+                "createdRow": function(row, data) {
+                    $(row).attr('data-row', "actgroup-" + data.id);
+                }
+            });
+        });
+    </script>
+{% endblock %}

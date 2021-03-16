@@ -1,0 +1,79 @@
+{% extends "layout.html" %}
+
+{% block content %}
+    <div class="card shadow mb-4">
+        <div class="card-header py-3">
+            <h6 class="m-0 font-weight-bold text-primary">설정내보내기</h6>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-3">
+                    <div class="table-responsive">
+                        <table class="table table-bordered dataTable">
+                            <thead>
+                                <tr>
+                                    <th>항목</th>
+                                    <th>
+                                        <div class="form-check">
+                                            <div class="form-check">
+                                                <input type="checkbox" class="form-check-input check-all">
+                                                <label class="form-check-label"></label>
+                                            </div>
+                                        </div>
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>변수</td>
+                                    <td>
+                                        <div class="form-check">
+                                            <div class="form-check">
+                                                <input type="checkbox" class="form-check-input check-row">
+                                                <label class="form-check-label"></label>
+                                            </div>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>조건</td>
+                                    <td>
+                                        <div class="form-check">
+                                            <div class="form-check">
+                                                <input type="checkbox" class="form-check-input check-row">
+                                                <label class="form-check-label"></label>
+                                            </div>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>조건그룹</td>
+                                    <td>
+                                        <div class="form-check">
+                                            <div class="form-check">
+                                                <input type="checkbox" class="form-check-input check-row">
+                                                <label class="form-check-label"></label>
+                                            </div>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            <button class="btn btn-primary btn-icon-split">
+                <span class="icon text-white-50">
+                    <i class="fas fa-download"></i>
+                </span>
+                <span class="text">다운로드</span>
+            </button>
+            <button class="btn btn-secondary btn-icon-split">
+                <span class="icon text-white-50">
+                    <i class="fas fa-times"></i>
+                </span>
+                <span class="text">CLOSE</span>
+            </button>
+        </div>
+    </div>
+{% endblock %}

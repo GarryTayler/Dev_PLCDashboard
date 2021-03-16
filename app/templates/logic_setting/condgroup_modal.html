@@ -1,0 +1,132 @@
+<div class="modal fade" id="cond-group" tabindex="-1" role="dialog" style="z-index: 1070">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">조건그룹추가</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group row">
+                    <div class="col-3">
+                        <label for="cond-group-name" class="input-label">이름</label>
+                    </div>
+                    <div class="col-7">
+                        <input type="text" class="form-control" placeholder="이름을 입력하세요" id="cond-group-name">
+                    </div>
+                </div>
+                <div class="form-group row">
+                    <div class="col-3">
+                        <label for="cond-group-operator" class="input-label">연산자</label>
+                    </div>
+                    <div class="col-7">
+                        <select class="form-control" id="cond-group-operator">
+                            <option value="AND">AND</option>
+                            <option value="OR">OR</option>
+                            <option value="XOR">XOR</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-group row">
+                    <div class="col-12">
+                        <div class="form-check">
+                            <div class="form-check">
+                                <input type="checkbox" class="form-check-input" id="cond-group-reverse">
+                                <label class="form-check-label" for="cond-group-reverse">결과반전</label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary btn-icon-split" data-dismiss="modal">
+                    <span class="icon text-white-50">
+                        <i class="fas fa-times"></i>
+                    </span>
+                    <span class="text">취소</span>
+                </button>
+                <button class="btn btn-primary btn-icon-split" onclick="doSaveCondGroup();">
+                    <span class="icon text-white-50">
+                        <i class="fas fa-check"></i>
+                    </span>
+                    <span class="text">확인</span>
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    const condGroupLimit = parseInt("{{condgroup_limit}}");
+    let condGroupCnt = 0, condGroupID = 0;
+
+    function condGroupAct(flag) {
+        const selRow = $("#contextmenu").attr("selrow");
+        if(flag === "plus") {
+            doCondGroupCreate();
+        } else if(flag === "del") {
+            if(selRow && confirm('삭제하시겠습니까?')) {
+                sendAjax("{{url_for('logic_build.remove_cond_group')}}", {selRow}, false);
+                updateCondGroupTbl();
+            }
+        } else if(flag === "edit") {
+            showCondGroupEdit($("#check-row-" + selRow));
+        } else if(flag === "build") {
+            doCondGroupBuild(selRow.replace('condgroup-', ''));
+        }
+    }
+
+    function doCondGroupRemove(selID = "#condgroup-table") {
+        removeAction(selID, '{{url_for("logic_build.remove_cond_group")}}', 'condgroup-', false);
+        updateCondGroupTbl();
+    }
+
+    function doCondGroupCreate() {
+        if(condGroupCnt < condGroupLimit) {
+            condGroupID = 0;
+            $("#cond-group-name").val('');
+            $("#cond-group-operator").val('AND');
+            $("#cond-group-reverse").prop('checked', false);
+            $("#cond-group").modal('show');
+        } else {
+            alert(limitMsg);
+        }
+    }
+
+    function updateCondGroupTbl() {
+        updateVariable(typeof logicCondGroupTbl === "undefined" ? dataTables : logicCondGroupTbl);
+    }
+
+    function doSaveCondGroup() {
+        const nameInput = $("#cond-group-name");
+        nameInput.removeClass('border-danger');
+        const inputName = nameInput.val().trim();
+        if(inputName.length > 0) {
+            const postData = getPostData("#cond-group");
+            postData['cond_group_reverse'] = $("#cond-group-reverse").prop('checked') ? '1' : '0';
+            postData['cond_group_id'] = condGroupID;
+            sendAjax("{{url_for('logic_build.edit_cond_group')}}", postData, false);
+            updateCondGroupTbl();
+            $("#cond-group").modal('hide');
+        } else {
+            alert('이름을 입력하세요');
+            nameInput.addClass('border-danger');
+        }
+    }
+
+    function showCondGroupEdit(selChk) {
+        condGroupID = selChk.attr('id').replace('check-row-condgroup-', '');
+        $("#cond-group-name").val(selChk.attr('data-name').trim());
+        $("#cond-group-operator").val(selChk.attr('operator').trim());
+        $("#cond-group-reverse").prop('checked', selChk.attr('reverse') === "YES");
+        $("#cond-group").modal('show');
+    }
+
+    function doCondGroupEdit(selID = "#condgroup-table") {
+        const selChk = $(selID + " input.check-row").filter(':checked');
+        if(selChk.length > 0) {
+            showCondGroupEdit($(selChk[0]));
+        }
+    }
+</script>

@@ -1,0 +1,109 @@
+{% extends "layout.html" %}
+
+{% block style %}
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/fileinput.min.css') }}">
+{% endblock %}
+
+{% block content %}
+    <div class="card shadow mb-4">
+        <div class="card-header py-3">
+            <h6 class="m-0 font-weight-bold text-primary">기본설정</h6>
+        </div>
+        <div class="card-body">
+            <div class="form-group row">
+                <div class="col-1">
+                    <label class="input-label" for="control-name">컨트롤러 이름</label>
+                </div>
+                <div class="col-3">
+                    <input type="text" class="form-control" id="control-name" value="{{control_name}}" placeholder="컨트롤러 이름" />
+                </div>
+            </div>
+            <div class="form-group row">
+                <div class="col-1">
+                    <label class="input-label" for="file-demo">로고</label>
+                </div>
+                <div class="col-3">
+                    {% if control_logo|length > 0 %}
+                        <div id="logo-img">
+                            <img src="{{url_for('static', filename='upload/' + control_logo)}}" alt="logo-img" class="logo-img" />
+                            <div class="btn-panel">
+                                <button class="btn btn-danger btn-icon-split mb-2" onclick="removeImg();">
+                                    <span class="icon text-white-50">
+                                        <i class="fas fa-times"></i>
+                                    </span>
+                                    <span class="text">삭제</span>
+                                </button>
+                            </div>
+                        </div>
+                    {% endif %}
+                    <div id="file-select" {%if control_logo|length > 0%}style="display: none;"{%endif%}>
+                        <label class="text-danger">로고사이즈: 192 X 60</label>
+                        <input id="file-demo" type="file" accept="image/*" onchange="fileChange();">
+                    </div>
+                </div>
+            </div>
+            <div class="form-group row">
+                <div class="col-1">
+                    <label class="input-label" for="control-zone">표준시간대</label>
+                </div>
+                <div class="col-3">
+                    <select class="form-control" id="control-zone">
+                        {% for timezone in timezones %}
+                            <option value="{{timezone.id}}" {%if timezone.id|string == zone%}selected{%endif%}>{{timezone.name}}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
+            <div class="form-group row">
+                <div class="col-4">
+                    <div class="btn-panel">
+                        <button class="btn btn-primary btn-icon-split" onclick="saveSetting();">
+                            <span class="icon text-white-50">
+                                <i class="fas fa-save"></i>
+                            </span>
+                            <span class="text">저장</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block script %}
+    <script src="{{ url_for('static', filename='js/fileinput.min.js') }}"></script>
+    <script>
+        let fileUpdate = false;
+        function fileChange() {
+            fileUpdate = true;
+        }
+
+        function removeImg() {
+            fileUpdate = true;
+            $("#logo-img").hide();
+            $("#file-select").show();
+        }
+
+        function saveSetting() {
+            const formData = new FormData();
+            if(fileUpdate) {
+                const selFile = $('#file-demo').prop('files')[0];
+                if(selFile) {
+                    formData.append("new_file", '1');
+                    formData.append("file", selFile);
+                } else {
+                    formData.append("new_file", '0');
+                }
+            }
+            formData.append("bool_file", fileUpdate ? '1' : '0');
+            formData.append("timezone", $("#control-zone").val());
+            formData.append("control", $("#control-name").val().trim());
+
+            sendAjax("{{url_for('userbp.update_setting')}}", formData);
+        }
+
+        $(document).ready(function() {
+            $("#file-demo").fileinput({showUpload: false});
+        });
+    </script>
+{% endblock %}

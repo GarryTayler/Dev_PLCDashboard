@@ -1,0 +1,137 @@
+<div class="modal fade" id="action-group" tabindex="-1" role="dialog" style="z-index: 1060;">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">동작그룹추가</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group row">
+                    <div class="col-3">
+                        <label for="action-group-name" class="input-label">이름</label>
+                    </div>
+                    <div class="col-7">
+                        <input type="text" class="form-control" placeholder="이름을 입력하세요" id="action-group-name">
+                    </div>
+                </div>
+                <div class="form-group row">
+                    <div class="col-3">
+                        <label for="action-group-mode" class="input-label">동작모드</label>
+                    </div>
+                    <div class="col-7">
+                        <select class="form-control" id="action-group-mode">
+                            <option value="SEQ">순차제어</option>
+                            <option value="SCAN">스캔</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-group row">
+                    <div class="col-3">
+                        <label for="action-group-cnt" class="input-label">실행횟수</label>
+                    </div>
+                    <div class="col-7">
+                        <input type="number" class="form-control" id="action-group-cnt" value="1" >
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary btn-icon-split" data-dismiss="modal">
+                    <span class="icon text-white-50">
+                        <i class="fas fa-times"></i>
+                    </span>
+                    <span class="text">취소</span>
+                </button>
+                <button class="btn btn-primary btn-icon-split" onclick="doSaveActGroup();">
+                    <span class="icon text-white-50">
+                        <i class="fas fa-check"></i>
+                    </span>
+                    <span class="text">확인</span>
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    const actGroupLimit = parseInt("{{actgroup_limit}}");
+    let actGroupCnt = 0;
+    let actGroupID = 0;
+
+    function doActGroupCreate() {
+        if(actGroupCnt < actGroupLimit) {
+            actGroupID = 0
+            $("#action-group-name").val('');
+            $("#action-group-mode").val('SEQ');
+            $("#action-group-cnt").val('1');
+            $("#action-group").modal('show');
+        } else {
+            alert(limitMsg);
+        }
+    }
+
+    function doActGroupRemove(selID = "#actiongroup-table") {
+        removeAction(selID, '{{url_for("logic_build.remove_action_group")}}', 'actgroup-', false);
+        updateActGroupTbl();
+    }
+
+    function updateActGroupTbl() {
+        updateVariable(typeof logicActGroupTbl === "undefined" ? dataTables : logicActGroupTbl);
+    }
+
+    function actionGroupAct(flag) {
+        const selRow = $("#contextmenu").attr("selrow");
+        if(flag === "plus") {
+            doActGroupCreate();
+        } else if(flag === "del") {
+            if(selRow && confirm('삭제하시겠습니까?')) {
+                sendAjax("{{url_for('logic_build.remove_action_group')}}", {selRow}, false);
+                updateActGroupTbl()
+            }
+        } else if(flag === "edit") {
+            showActGroupEdit($("#check-row-" + selRow));
+        } else if(flag === "build") {
+            doActGroupBuild(selRow.replace('actgroup-', ''));
+        }
+    }
+
+    function showActGroupEdit(selChk) {
+        actGroupID = selChk.attr('id').replace('check-row-actgroup-', '');
+        $("#action-group-name").val(selChk.attr('data-name').trim());
+        $("#action-group-mode").val(selChk.attr('mode').trim());
+        $("#action-group-cnt").val(selChk.attr('cnt'));
+        $("#action-group").modal('show');
+    }
+
+    function doActGroupEdit() {
+        const selChk = $("#actiongroup-table input.check-row").filter(':checked');
+        if(selChk.length > 0) {
+            showActGroupEdit($(selChk[0]));
+        }
+    }
+
+    function doSaveActGroup() {
+        const inputName = $("#action-group-name").val().trim();
+        const inputCnt = $("#action-group-cnt").val().trim();
+        if(inputName.length > 0 && inputCnt.length > 0 &&
+            (parseInt(inputCnt) > 0 && parseInt(inputCnt) < 32768)) {
+            const postData = {
+                inputName,
+                inputCnt,
+                inputMode: $("#action-group-mode").val(),
+                act_group_id: actGroupID
+            };
+
+            sendAjax("{{url_for('logic_build.edit_action_group')}}", postData, false);
+            updateActGroupTbl()
+            $("#action-group").modal('hide');
+        } else if(inputName.length === 0) {
+            alert('이름을 입력하세요');
+        } else if(inputCnt.length === 0) {
+            alert('실행횟수를 입력하세요');
+        } else {
+            alert('실행횟수는 1~32767의 정수여야 합니다');
+        }
+    }
+</script>

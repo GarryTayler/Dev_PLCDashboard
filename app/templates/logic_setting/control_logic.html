@@ -1,0 +1,197 @@
+<div class="modal fade" id="control-modal" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">제어추가</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group row">
+                    <div class="col-3">
+                        <label for="ckbx-style-1-1" class="input-label">사용</label>
+                    </div>
+                    <div class="col-7">
+                        <div class="dark">
+                            <div class="ckbx-style-1">
+                                <input type="checkbox" checked id="ckbx-style-1-1" value="0">
+                                <label for="ckbx-style-1-1"></label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group row">
+                    <div class="col-3">
+                        <label for="control-name" class="input-label">이름</label>
+                    </div>
+                    <div class="col-7">
+                        <input type="text" class="form-control" placeholder="이름을 입력하세요" id="control-name">
+                    </div>
+                </div>
+                <div class="form-group row">
+                    <div class="col-3">
+                        <label for="control-prior" class="input-label">우선순위</label>
+                    </div>
+                    <div class="col-7">
+                        <input type="number" class="form-control" id="control-prior">
+                    </div>
+                </div>
+                <div class="form-group row">
+                    <div class="col-12">
+                        <div class="form-check">
+                            <div class="form-check">
+                                <input type="checkbox" class="form-check-input" id="control-apply" checked>
+                                <label class="form-check-label" for="control-apply">우선모드적용</label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary btn-icon-split" data-dismiss="modal">
+                    <span class="icon text-white-50">
+                        <i class="fas fa-times"></i>
+                    </span>
+                    <span class="text">취소</span>
+                </button>
+                <button class="btn btn-primary btn-icon-split" onclick="doSaveControl();">
+                    <span class="icon text-white-50">
+                        <i class="fas fa-check"></i>
+                    </span>
+                    <span class="text">확인</span>
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    const controlModal = $("#control-modal");
+
+    function controlCreate() {
+        if(controlCnt < controlLimit) {
+            controlID = 0;
+            $("#control-name").val('');
+            $("#control-prior").val('');
+            controlModal.modal('show');
+        } else {
+            alert(limitMsg);
+        }
+    }
+
+    function doSaveControl() {
+        const inputName = $("#control-name").val().trim();
+        const inputCnt = $("#control-prior").val().trim();
+        if(inputName.length > 0 && inputCnt.length > 0 &&
+            (parseInt(inputCnt) >= 0 && parseInt(inputCnt) < 32768)) {
+            const postData = {
+                inputName,
+                inputCnt,
+                controlID,
+                use_flag: $("#ckbx-style-1-1").prop('checked') ? '1' : '0',
+                mode: $("#control-apply").prop('checked') ? '1' : '0'
+            };
+
+            sendAjax("{{url_for('logic_build.edit_control')}}", postData, false);
+            updateVariable(logicControlTbl);
+            controlModal.modal('hide');
+        } else if(inputName.length === 0) {
+            alert('이름을 입력하세요');
+        } else if(inputCnt.length === 0) {
+            alert('우선순위를 입력하세요');
+        } else {
+            alert('우선순위는 0~32767의 정수여야 합니다');
+        }
+    }
+
+    function controlEdit(selChk) {
+        controlID = selChk.attr('id').replace('check-row-', '');
+        $("#control-name").val(selChk.attr('data-name'));
+        $("#control-prior").val(selChk.attr('priority'));
+        $("#control-apply").prop('checked', selChk.attr('mode') === "1");
+        $("#ckbx-style-1-1").prop('checked', selChk.attr('useflag') === "1");
+
+        controlModal.modal('show');
+    }
+
+    function editControl() {
+        const selChk = $(controlTbl + " input.check-row").filter(':checked');
+        if(selChk.length > 0) {
+            controlEdit($(selChk[0]));
+        }
+    }
+
+    function controlBuild(selRow = '') {
+        const selChk = selRow.length > 0 ? [selRow] : getTblChk(controlTbl).split(",");
+        if(selChk.length > 0 && selChk[0].length > 0) {
+            controlID = parseInt(selChk[0]);
+            $.ajax({
+                url: "{{url_for('logic_build.control')}}",
+                data: {controlID},
+                dataType: 'json',
+                type: 'post',
+                headers: {"X-CSRFToken": csrf_token},
+                success: function (resp) {
+                    if(resp.status) {
+                        const selControl = resp.selControl;
+                        $("#selcontrol-name").text(selControl.name);
+                        $("#selcontrol-useflag").text(selControl.useflag);
+                        $("#selcontrol-priority").text("우선순위: " + selControl.priority);
+                        const controlOpt = selControl.options.length > 0 ? JSON.parse(selControl.options) : {};
+                        initCardStyle(controlOpt, "#control-palette");
+
+                        const selActGroup = resp.actgroup;
+                        actGroupID = selActGroup.id;
+                        const actgroupName = $("#actgroup-name");
+                        actgroupName.text(selActGroup.name);
+                        actgroupName.attr('actgroup', selActGroup.id);
+                        $("#actgroup-mode").text(selActGroup.mode);
+                        const actGroupOpt = selActGroup.options.length > 0 ? JSON.parse(selActGroup.options) : {};
+                        initCardStyle(actGroupOpt, "#act-group-palette");
+
+                        const selCondGroup = resp.condgroup;
+                        condGroupID = selCondGroup.id;
+                        const condgroupName = $("#condgroup-name");
+                        condgroupName.text(selCondGroup.name);
+                        condgroupName.attr('condgroup', selCondGroup.id);
+                        const condGroupOpt = selCondGroup.options.length > 0 ? JSON.parse(selCondGroup.options) : {};
+
+                        initCardStyle(condGroupOpt, "#cond-group-palette");
+
+                        drawLogicCond(resp.cond_page_list);
+                        drawLogicAction(resp.act_page_list);
+
+                        $("#logic-control-modal").modal('show');
+                        initLogicIcons();
+                    } else {
+                        alert(resp.message);
+                    }
+                }
+            });
+        } else {
+            alert('구성할 행을 선택하세요');
+        }
+    }
+
+    function controlAct(flag) {
+        const selRow = $("#contextmenu").attr("selrow");
+        if(flag === "plus") {
+            controlCreate();
+        } else if(flag === "del") {
+            if(selRow && confirm('삭제하시겠습니까?')) {
+                sendAjax("{{url_for('logic_build.remove_control')}}", {selRow}, false);
+                updateVariable(logicControlTbl);
+            }
+        } else if(flag === "edit") {
+            controlEdit($("#check-row-" + selRow));
+        } else if(flag === "build") {
+            controlBuild(selRow);
+        }
+    }
+
+    function controlRemove() {
+        removeAction(controlTbl, '{{url_for("logic_build.remove_control")}}', '', false);
+        updateVariable(logicControlTbl);
+    }
+</script>

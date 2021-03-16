@@ -1,0 +1,279 @@
+{% extends 'index.html' %}
+
+{% block style %}
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/logbuild.css') }}">
+{% endblock %}
+
+{% block content %}
+    <div class="card shadow mb-4 logic-build-modal">
+        <div class="card-body">
+            <input type="hidden" id="condgroup-name"/>
+            <input type="hidden" id="actgroup-name"/>
+            <div class="card control-panel" id="logic-panel" options="{{logic.options}}">
+                <div class="card-header">
+                    <div class="row">
+                        <div class="col-2">
+                            <span>{{logic.name}}</span>
+                        </div>
+                        <div class="col-4">
+                            <span>{{config.USE_FLAG_KR[logic.use_flag|int]}}</span><br/>
+                            <span>우선모드: {{config.LOGIC_MODE[logic.mode]}}</span><br/>
+                            {% if logic.mode == 'PRIORITY' %}
+                                <span>유효우선순위: {{priority}}</span>
+                            {% endif %}
+                        </div>
+                        <div class="col-6">
+                            {% if selmode == "stop" and edit_auth %}
+                                <div class="header-badge">
+                                    <i class="fas fa-plus-circle mr-4" onclick="showControlModal();"></i>
+                                    <i class="fas fa-palette mr-4" onclick="showPalette('#logic-panel')"></i>
+                                    <i class="fas fa-edit" id="logic-item-{{logic.id}}" onclick="showAddLogic({{logic.id}});" mode="{{logic.mode}}" useflag="{{logic.use_flag}}" data-name="{{logic.name}}"></i>
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body">
+                    {% for control in controls %}
+                        <div class="card control-card" id="control-palette-{{control.control.id}}" options="{{control.control.options}}">
+                            <div class="card-header">
+                                <div class="row">
+                                    <div class="col-2">
+                                        <span>{{control.control.name}}</span>
+                                    </div>
+                                    <div class="col-4">
+                                        <span>{{control.control.use_flag}}</span><br />
+                                        <span>유효함</span><br />
+                                        <span>우선순위: {{control.control.priority}}</span>
+                                    </div>
+                                    <div class="col-6">
+                                        {% if selmode == "stop" and edit_auth %}
+                                            <div class="header-badge" data-id="{{control.control.id}}">
+                                                <i class="fas fa-chevron-circle-up mr-4" type="#control-body-"></i>
+                                                <i class="fas fa-chevron-circle-down mr-4" type="#control-body-"></i>
+                                                <i class="fas fa-palette mr-4" onclick="showPalette('#control-palette-{{control.control.id}}')"></i>
+                                                <i class="fas fa-edit mr-4" onclick="showControlModal('{{control.control.id}}')"></i>
+                                                <i class="fas fa-trash" url="{{url_for('logic_build.del_control')}}"></i>
+                                            </div>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="card-body" id="control-body-{{control.control.id}}" flag="0">
+                                <div class="row">
+                                    <div class="col-6">
+                                        <div class="card cond-group" id="cond-group-palette-{{control.condgroup.id}}" options="{{control.condgroup.options}}">
+                                            <div class="card-header">
+                                                <div class="row">
+                                                    <div class="col-3">
+                                                        <span>{{control.condgroup.name}}</span>
+                                                    </div>
+                                                    <div class="col-3">
+                                                        <span>유효함</span>
+                                                    </div>
+                                                    <div class="col-6">
+                                                        {% if selmode == "stop" and edit_auth %}
+                                                            <div class="header-badge">
+                                                                <i class="fas fa-plus-circle mr-4" onclick="selectCondition('{{control.condgroup.id}}');"></i>
+                                                                <i class="fas fa-palette mr-4" onclick="showPalette('#cond-group-palette-{{control.condgroup.id}}')"></i>
+                                                                <i class="fas fa-edit" onclick="selectCondGroup('{{control.control.id}}', '{{control.condgroup.id}}');"></i>
+                                                            </div>
+                                                        {% endif %}
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="card-body sortable-panel">
+                                                {% for cond in control.cond_page_list %}
+                                                    <div class="card condition-individual" id="cond-palette-{{cond.id}}" options="{{cond.options}}">
+                                                        <div class="card-header">
+                                                            <div class="row">
+                                                                <div class="col-3">
+                                                                    <span>{{cond.name}}({{cond.type}})</span>
+                                                                </div>
+                                                                <div class="col-3">
+                                                                    <span>{{cond.use_flag}}</span><br/>
+                                                                    <span>유효함</span>
+                                                                </div>
+                                                                <div class="col-6">
+                                                                    <div class="header-badge" data-id="{{cond.id}}">
+                                                                        <i class="fas fa-chevron-circle-up mr-4" type="#cond-body-"></i>
+                                                                        <i class="fas fa-chevron-circle-down mr-4" type="#cond-body-"></i>
+                                                                        <i class="fas fa-palette mr-4" onclick="showPalette('#cond-palette-{{cond.id}}');"></i>
+                                                                        <i class="fas fa-edit mr-4" onclick="selectCondition('{{control.condgroup.id}}', '{{cond.id}}');"></i>
+                                                                        <i class="fas fa-trash" url="{{url_for('logic_build.remove_cond')}}"></i>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <div class="card-body" id="cond-body-{{cond.id}}" flag="0">
+                                                            <p class="desc-label">{{cond.desc}}</p>
+                                                        </div>
+                                                    </div>
+                                                {% endfor %}
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-6">
+                                        <div class="card action-group" id="act-group-palette-{{control.actgroup.id}}" options="{{control.actgroup.options}}">
+                                            <div class="card-header">
+                                                <div class="row">
+                                                    <div class="col-3">
+                                                        <span>{{control.actgroup.name}}</span>
+                                                    </div>
+                                                    <div class="col-3">
+                                                        <span>{{control.actgroup.mode}}</span><br/>
+                                                        <span>실행중...</span>
+                                                    </div>
+                                                    <div class="col-6">
+                                                        {% if selmode == "stop" and edit_auth %}
+                                                            <div class="header-badge">
+                                                                <i class="fas fa-plus-circle mr-4" onclick="selectAction('{{control.actgroup.id}}');"></i>
+                                                                <i class="fas fa-palette mr-4" onclick="showPalette('#act-group-palette-{{control.actgroup.id}}');"></i>
+                                                                <i class="fas fa-edit" onclick="selectActGroup('{{control.control.id}}', '{{control.actgroup.id}}');"></i>
+                                                            </div>
+                                                        {% endif %}
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="card-body sortable-panel">
+                                                {% for action in control.act_page_list %}
+                                                    <div class="card action-individual" id="act-palette-{{action.id}}" options="{{action.options}}">
+                                                        <div class="card-header">
+                                                            <div class="row">
+                                                                <div class="col-3">
+                                                                    <span>{{action.name}}({{action.type}})</span>
+                                                                </div>
+                                                                <div class="col-3">
+                                                                    <span>{{action.use_flag}}</span><br/>
+                                                                    <span>유효함</span>
+                                                                </div>
+                                                                <div class="col-6">
+                                                                    <div class="header-badge" data-id="{{action.id}}">
+                                                                        <i class="fas fa-chevron-circle-up mr-4" type="#act-body-"></i>
+                                                                        <i class="fas fa-chevron-circle-down mr-4" type="#act-body-"></i>
+                                                                        <i class="fas fa-palette mr-4" onclick="showPalette('#act-palette-{{action.id}}')"></i>
+                                                                        <i class="fas fa-edit mr-4" onclick="selectAction('{{control.actgroup.id}}', '{{action.id}}');"></i>
+                                                                        <i class="fas fa-trash" url="{{url_for('logic_build.remove_action')}}"></i>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <div class="card-body" id="act-body-{{action.id}}" flag="0">
+                                                            <p class="desc-label">{{action.desc}}</p>
+                                                        </div>
+                                                    </div>
+                                                {% endfor %}
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block script %}
+    {% include 'common/datatable.html' %}
+    {% include 'logic_build/logic_control_modal.html' %}
+    {% include 'common/logicbuild.html' %}
+    {% include 'logic_build/logic_cond_modal.html' %}
+    {% include 'logic_build/logic_action_modal.html' %}
+    {% include 'common/alarm_modal.html' %}
+    {% include 'common/variable_modal.html' %}
+    {% include 'common/condition_modal.html' %}
+    {% include 'common/control_action_modal.html' %}
+    {% include 'logic_setting/control_logic.html' %}
+    {% include 'logic_setting/actgroup_modal.html' %}
+    {% include 'logic_setting/condgroup_modal.html' %}
+    {% include 'logic_build/logic_actgroup_modal.html' %}
+    {% include 'logic_build/logic_condgroup_modal.html' %}
+    <script>
+        const controlTbl = "#logic-control-table";
+        const controlLimit = parseInt("{{control_limit}}");
+        let controlCnt = 0, controlID = 0, logicControlTbl;
+        function showControlModal(selID = 0) {
+            const controlSelect = $("#control-select-modal");
+            controlSelect.attr('before', selID);
+            updateVariable(logicControlTbl);
+            controlSelect.modal('show');
+        }
+
+        function selectCondition(condgroup, condID = '0') {
+            if(parseInt(condgroup) > 0) {
+                condGroupID = condgroup;
+                const condModal = $("#logic-condition-modal");
+                condModal.attr('before', condID);
+                updateVariable(logicCondTbl);
+                condModal.modal('show');
+            } else {
+                alert('먼저 조건그룹을 선택하세요');
+            }
+        }
+
+        function selectAction(actgroup, actID = '0') {
+            if(parseInt(actgroup) > 0) {
+                actGroupID = actgroup;
+                const actionModal = $("#logic-action-modal");
+                actionModal.attr('before', actID);
+                updateVariable(logicActTbl);
+                actionModal.modal('show');
+            } else {
+                alert('먼저 동작그룹을 선택하세요');
+            }
+        }
+
+        function selectCondGroup(control, condgroup) {
+            controlID = control;
+            $("#condgroup-name").attr('condgroup', condgroup);
+            updateVariable(logicCondGroupTbl);
+            $("#condgroup-modal").modal('show');
+        }
+
+        function selectActGroup(control, actgroup) {
+            controlID = control;
+            $("#actgroup-name").attr('actgroup', actgroup);
+            updateVariable(logicActGroupTbl);
+            $("#actgroup-modal").modal('show');
+        }
+
+        $(document).ready(function () {
+            if(curMode === "stop" && curAuth) {
+                const sortPanel =$("#logic-panel .card-body")[0];
+                new Sortable(sortPanel, {
+                    animation: 150,
+                    ghostClass: 'blue-background-class',
+                    onEnd: function (evt) {
+                        saveBuildOrder(evt);
+                    }
+                });
+
+                const sortItems = $(".sortable-panel");
+                for(let ii = 0; ii < sortItems.length; ii++) {
+                    const sortItem = $(sortItems[ii])[0];
+                    new Sortable(sortItem, {
+                        animation: 150,
+                        ghostClass: 'blue-background-class',
+                        onEnd: function (evt) {
+                            saveBuildOrder(evt);
+                        }
+                    });
+                }
+            }
+
+            $(".hide-tables").addClass('no-context');
+            initLogicIcons();
+
+            const cardArr = $(".logic-build-modal div.card");
+            for(let ii = 0; ii < cardArr.length; ii++) {
+                const cardItem = $(cardArr[ii]);
+                const optStr = cardItem.attr('options');
+                const optArr = optStr.length > 0 ? JSON.parse(optStr) : {};
+                initCardStyle(optArr, "#" + cardItem.attr('id'));
+            }
+        });
+    </script>
+{% endblock %}

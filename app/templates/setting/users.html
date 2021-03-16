@@ -1,0 +1,250 @@
+{% extends "layout.html" %}
+
+{% block content %}
+    <div class="card shadow mb-4">
+        <div class="card-header py-3">
+            <h6 class="m-0 font-weight-bold text-primary">사용자관리</h6>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-bordered datatable-tbl" id="user-table">
+                    <thead>
+                        <tr>
+                            <th class="text-center">
+                                <div class="form-check">
+                                    <input type="checkbox" class="form-check-input check-all">
+                                    <label class="form-check-label"></label>
+                                </div>
+                            </th>
+                            <th>번호</th>
+                            <th>아이디</th>
+                            <th>사용자타입</th>
+                        </tr>
+                    </thead>
+                </table>
+            </div>
+            <div class="btn-panel">
+                <button class="btn btn-primary btn-icon-split" onclick="addUser();">
+                    <span class="icon text-white-50">
+                        <i class="fas fa-plus"></i>
+                    </span>
+                    <span class="text">추가</span>
+                </button>
+                <button class="btn btn-success btn-icon-split" onclick="editUser();">
+                    <span class="icon text-white-50">
+                        <i class="fas fa-edit"></i>
+                    </span>
+                    <span class="text">편집</span>
+                </button>
+                <button class="btn btn-danger btn-icon-split" onclick="removeUser();">
+                    <span class="icon text-white-50">
+                        <i class="fas fa-trash"></i>
+                    </span>
+                    <span class="text">삭제</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="user-register" tabindex="-1" role="dialog">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">유저등록</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <form class="modal-body" action="" id="user-form" method="post">
+                    <input type="hidden" name="userid" id="userid" value="0"/>
+                    <div class="form-group">
+                        <div class="alert alert-danger display-none" id="user-alert" role="alert">
+                            아이디를 입력하세요
+                        </div>
+                        <label for="user-id">아이디</label>
+                        <input type="text" class="form-control" id="user-id">
+                    </div>
+                    <div class="form-group">
+                        <label for="user-type">유저타입선택</label>
+                        <select class="form-control" id="user-type">
+                            <option value="user">유저</option>
+                            <option value="admin">관리자</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="user-passwd" id="user-passwd-label">암호</label>
+                        <input type="password" class="form-control" id="user-passwd">
+                    </div>
+                    <div class="form-group">
+                        <label for="pass-conf" id="user-conf-label">암호확인</label>
+                        <input type="password" class="form-control" id="pass-conf">
+                    </div>
+                    <div class="form-group" id="new-pass-div">
+                        <label for="new-pass-conf">새 암호 확인</label>
+                        <input type="password" class="form-control" id="new-pass-conf">
+                    </div>
+                </form>
+                <div class="modal-footer">
+                    <button class="btn btn-secondary btn-icon-split" data-dismiss="modal">
+                        <span class="icon text-white-50">
+                            <i class="fas fa-times"></i>
+                        </span>
+                        <span class="text">취소</span>
+                    </button>
+                    <button class="btn btn-primary btn-icon-split" onclick="userRegister();">
+                        <span class="icon text-white-50">
+                            <i class="fas fa-check"></i>
+                        </span>
+                        <span class="text">확인</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block script %}
+    {% include 'common/datatable.html' %}
+    <script>
+        let userTbl;
+        function userAct(flag) {
+            if(flag === "plus") {
+                addUser();
+            } else if(flag === "edit") {
+                const selRow = $("#contextmenu").attr("selrow");
+                showEditModal($("#user-table input[id='check-row-" + selRow + "']"));
+            } else if(flag === "del") {
+                removeAction("#user-table", "{{url_for('userbp.remove_user')}}", '', false);
+                updateVariable(userTbl);
+            }
+        }
+
+        function showAlert() {
+            $("#user-form .form-control").removeClass('border-danger');
+            $("#user-alert").addClass('display-none');
+        }
+
+        function addUser() {
+            showAlert();
+            initPasswords();
+            $("#new-pass-div").hide();
+            $("#user-passwd-label").text('암호');
+            $("#user-conf-label").text('암호확인');
+            $("#user-id").val('');
+            $("#userid").val('0');
+            $("#user-type").val('user');
+            $("#user-register").modal('show');
+        }
+
+        function initPasswords() {
+            $("#user-form input[type='password']").val('');
+        }
+
+        function showEditModal(selChk) {
+            showAlert();
+
+            initPasswords();
+
+            $("#new-pass-div").show();
+            $("#user-conf-label").text('새 암호');
+            $("#user-passwd-label").text('이전암호');
+
+            $("#user-id").val(selChk.attr('userid'));
+            $("#user-type").val(selChk.attr('usertype'));
+            $("#userid").val(selChk.attr('id').replace('check-row-', ''));
+
+            $("#user-register").modal('show');
+        }
+
+        function editUser() {
+            const inputChk = $("#user-table input.check-row").filter(':checked');
+            if(inputChk.length === 1) {
+                showEditModal($(inputChk[0]));
+            } else {
+                alert("편집할 유저를 선택하세요");
+            }
+        }
+
+        function userRegister() {
+            showAlert();
+
+            const passConf = $("#pass-conf");
+            const newConf = $("#new-pass-conf");
+            const userIDInput = $("#user-id");
+            const userAlert = $("#user-alert");
+            const userPasswd = $("#user-passwd");
+
+            const user_id = userIDInput.val().trim();
+            const user_pw = userPasswd.val().trim();
+            const conf_pw = passConf.val().trim();
+            const conf_pw1 = newConf.val().trim();
+            const userid = parseInt($("#userid").val().trim());
+            if(user_id.length > 0 && (
+                (userid > 0 && conf_pw === conf_pw1 && ((user_pw.length > 0 && conf_pw.length > 0) || (user_pw.length === 0 && conf_pw.length === 0))) ||
+                (userid === 0 && user_pw.length > 0 && conf_pw === user_pw))) {
+                let user_type = $("#user-type").val();
+                sendAjax("{{url_for('userbp.doregister')}}", {user_id, user_pw, userid, user_type, conf_pw}, false);
+                updateVariable(userTbl);
+                $("#user-register").modal('hide');
+            } else if(user_id.length === 0) {
+                userIDInput.addClass('border-danger');
+                userAlert.text('아이디를 입력하세요').removeClass('display-none');
+            } else if(user_pw.length === 0 && userid === 0) {
+                userPasswd.addClass('border-danger');
+                const suffixStr = userid > 0 ? '이전' : '';
+                userAlert.text(suffixStr + '암호를 입력하세요').removeClass('display-none');
+            } else if(conf_pw.length === 0 && userid === 0) {
+                passConf.addClass('border-danger');
+                const suffixStr = userid > 0 ? '새 암호를' : '암호확인을';
+                userAlert.text(suffixStr + ' 입력하세요').removeClass('display-none');
+            } else if(user_pw !== conf_pw && userid === 0) {
+                userPasswd.addClass('border-danger');
+                passConf.addClass('border-danger');
+                userAlert.text('암호가 일치하지 않습니다').removeClass('display-none');
+            } else if(conf_pw !== conf_pw1) {
+                newConf.addClass('border-danger');
+                passConf.addClass('border-danger');
+                userAlert.text('새 암호가 일치하지 않습니다').removeClass('display-none');
+            } else if(user_pw.length === 0 && conf_pw.length > 0) {
+                userPasswd.addClass('border-danger');
+                userAlert.text('이전암호를 입력하세요').removeClass('display-none');
+            } else if(user_pw.length > 0 && conf_pw.length === 0) {
+                passConf.addClass('border-danger');
+                userAlert.text('새 암호를 입력하세요').removeClass('display-none');
+            }
+        }
+
+        function removeUser() {
+            removeAction("#user-table", "{{url_for('userbp.remove_user')}}", '', false);
+            updateVariable(userTbl);
+        }
+
+        $(document).ready(function() {
+            userTbl = $("#user-table").DataTable({
+                ...dataTableLang,
+                ...dataTableObj,
+                "columnDefs": columnDef,
+                'ajax': {
+                    'url': "{{url_for('userbp.user_list')}}",
+                    'headers': { "X-CSRFToken": csrf_token }
+                },
+                "columns": [
+                    {
+                        render: function (data, type, row) {
+                            return checkForm.replaceAll('data.id', row.id).replaceAll('data.attr', "userid='" + row.userid + "' usertype='" + row.type + "'");
+                        }
+                    },
+                    {"data": "ind"},
+                    {"data": "userid"},
+                    {"data": "type_str"}
+                ],
+                "createdRow": function(row, data) {
+                    $(row).attr('data-row', data.id);
+                },
+                "drawCallback": function(oSettings) {
+                    setDataTblPage($("#user-table"), oSettings._iDisplayLength);
+                }
+            });
+        });
+    </script>
+{% endblock %}

@@ -1,0 +1,187 @@
+<div class="modal fade logic-build-modal" id="logic-condition-modal" tabindex="-1" role="dialog" style="z-index: 1060">
+    <div class="modal-dialog" role="document" style="max-width: 1200px !important;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">조건선택</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="table-responsive">
+                    <table class="table table-bordered datatable-tbl hide-tables" id="logic-cond-modal">
+                        <thead>
+                            <tr>
+                                <th class="text-center">
+                                    <div class="form-check">
+                                        <input type="checkbox" class="form-check-input check-all">
+                                        <label class="form-check-label"></label>
+                                    </div>
+                                </th>
+                                <th>번호</th>
+                                <th>사용</th>
+                                <th>이름</th>
+                                <th>조건</th>
+                                <th>할당</th>
+                            </tr>
+                        </thead>
+                    </table>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-primary btn-icon-split" onclick="doCondCreate();">
+                    <span class="icon text-white-50">
+                        <i class="fas fa-plus"></i>
+                    </span>
+                    <span class="text">추가</span>
+                </button>
+                <button class="btn btn-success btn-icon-split" onclick="doCondEdit('#logic-cond-modal');">
+                    <span class="icon text-white-50">
+                        <i class="fas fa-edit"></i>
+                    </span>
+                    <span class="text">편집</span>
+                </button>
+                <button class="btn btn-danger btn-icon-split" onclick="doCondDelete('#logic-cond-modal');">
+                    <span class="icon text-white-50">
+                        <i class="fas fa-trash"></i>
+                    </span>
+                    <span class="text">삭제</span>
+                </button>
+            </div>
+            <div class="btn-panel">
+                <button class="btn btn-info btn-icon-split" onclick="condSelect();">
+                    <span class="icon text-white-50">
+                        <i class="fas fa-check"></i>
+                    </span>
+                    <span class="text">선택</span>
+                </button>
+                <button class="btn btn-secondary btn-icon-split" data-dismiss="modal">
+                    <span class="icon text-white-50">
+                        <i class="fas fa-times"></i>
+                    </span>
+                    <span class="text">취소</span>
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    const condRemoveUrl = "{{url_for('logic_build.remove_cond')}}";
+    const logicCondPanel = `
+        <div class="card condition-individual" id="cond-palette-data.id" style="card-style">
+            <div class="card-header" style="header-style">
+                <div class="row">
+                    <div class="col-2">
+                        <span>data.name(data.type)</span>
+                    </div>
+                    <div class="col-4">
+                        <span>data.useflag</span><br/>
+                        <span>유효함</span>
+                    </div>
+                    <div class="col-6">
+                        <div class="header-badge" data-id="data.id">
+                            <i class="fas fa-chevron-circle-up mr-4" type="#cond-body-"></i>
+                            <i class="fas fa-chevron-circle-down mr-4" type="#cond-body-"></i>
+                            <i class="fas fa-palette mr-4" onclick="showPalette('#cond-palette-data.id');"></i>
+                            <i class="fas fa-edit mr-4" onclick="addCondGroup('data.id');"></i>
+                            <i class="fas fa-trash" url="${condRemoveUrl}"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="card-body" id="cond-body-data.id" flag="0" style="body-style">
+                <p class="desc-label">data.desc</p>
+            </div>
+        </div>
+    `, logicCondModal = $("#logic-condition-modal");
+    let logicCondTbl;
+
+    function updateBuildPanel() {
+        $.ajax({
+            url: "{{url_for('logic_build.cond_group')}}",
+            data: {condGroupID},
+            dataType: 'json',
+            type: 'post',
+            headers: { "X-CSRFToken": csrf_token },
+            success: function (resp) {
+                if(resp.status) {
+                    drawLogicCond(resp.page_list);
+                } else {
+                    alert(resp.message);
+                }
+            },
+            error: function() {
+                alert(refreshMsg);
+            }
+        });
+    }
+
+    function condSelect() {
+        const selIDs = getTblChk("#logic-cond-modal");
+        if(selIDs.length > 0) {
+            if(condGroupID > 0) {
+                const condgroupName = $("#condgroup-name");
+                const beforeID = condgroupName && condgroupName.attr('condgroup') ? condgroupName.attr('condgroup') : logicCondModal.attr('before');
+                const isLogic = typeof logicID === 'undefined';
+                sendAjax("{{url_for('logic_build.add_cond')}}", {condGroupID, beforeID, condID: selIDs}, !isLogic);
+                if(isLogic) {
+                    logicCondModal.modal('hide');
+                    updateBuildPanel();
+                }
+            } else {
+                alert('조건그룹을 입력하세요');
+            }
+        } else {
+            alert('조건을 선택하세요');
+        }
+    }
+
+    function addCondGroup(selid = '0') {
+        logicCondModal.attr('before', selid);
+        updateVariable(logicCondTbl);
+        logicCondModal.modal('show');
+    }
+
+    $(document).ready(function() {
+        logicCondTbl = $("#logic-cond-modal").DataTable({
+            ...dataTableLang,
+            ...dataTableObj,
+            "columnDefs": columnDef,
+            "order": [[ 1, "asc" ]],
+            "drawCallback": function(oSettings) {
+                setDataTblPage($("#logic-cond-modal"), oSettings._iDisplayLength);
+            },
+            'ajax': {
+                'url': "{{url_for('logic_setting.condition_list')}}",
+                'headers': { "X-CSRFToken": csrf_token },
+                'data': function(data) {
+                    return {
+                        ...data,
+                        beforeID: logicCondModal.attr('before')
+                    };
+                }
+            },
+            "columns": [
+                {
+                    render: function (data, type, row) {
+                        const propStr = parseInt(logicCondModal.attr('before')) === row.id ? 'checked' : '';
+                        return checkForm.replaceAll('data.id', row.id).replaceAll('data.attr', propStr);
+                    }
+                },
+                {"data": "ind"},
+                {"data": "use_flag"},
+                {"data": "name"},
+                {
+                    render: function (data, type, row) {
+                        return "[" + row.type + "] " + row.desc;
+                    }
+                },
+                {"data": "condgroup_name"}
+            ],
+            "createdRow": function(row, data) {
+                $(row).attr('data-row', data.id);
+            }
+        });
+    });
+</script>

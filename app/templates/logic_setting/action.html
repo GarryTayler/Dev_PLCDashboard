@@ -1,0 +1,123 @@
+{% extends "layout.html" %}
+
+{% block content %}
+    <div class="card shadow mb-4">
+        <div class="card-header py-3">
+            <h6 class="m-0 font-weight-bold text-primary">로직설정 > 동작</h6>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-bordered datatable-tbl {%if selmode == 'run' or not edit_auth%}no-context{%endif%}" id="action-table">
+                    <thead>
+                        <tr>
+                            <th class="text-center">
+                                <div class="form-check">
+                                    <input type="checkbox" class="form-check-input check-all">
+                                    <label class="form-check-label"></label>
+                                </div>
+                            </th>
+                            <th>번호</th>
+                            <th>사용</th>
+                            <th>이름</th>
+                            <th>타입</th>
+                            <th>동작</th>
+                            <th>실행순서</th>
+                            <th>할당</th>
+                            {% if selmode == "run" %}
+                                <th>상태</th>
+                            {% endif %}
+                        </tr>
+                    </thead>
+                </table>
+            </div>
+            {% if selmode == "stop" and edit_auth %}
+                <div class="btn-panel">
+                    <button class="btn btn-primary btn-icon-split" onclick="doActCreate();">
+                        <span class="icon text-white-50">
+                            <i class="fas fa-plus"></i>
+                        </span>
+                        <span class="text">추가</span>
+                    </button>
+                    <button class="btn btn-success btn-icon-split" onclick="doActEdit();">
+                        <span class="icon text-white-50">
+                            <i class="fas fa-edit"></i>
+                        </span>
+                        <span class="text">편집</span>
+                    </button>
+                    <button class="btn btn-danger btn-icon-split" onclick="doActDelete();">
+                        <span class="icon text-white-50">
+                            <i class="fas fa-trash"></i>
+                        </span>
+                        <span class="text">삭제</span>
+                    </button>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+{% endblock %}
+
+{% block script %}
+    <script src="{{ url_for('static', filename='js/datetimepicker.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/jquery.inputmask.min.js') }}"></script>
+    {% include 'common/datatable.html' %}
+    {% include 'common/variable_modal.html' %}
+    {% include 'common/action_modal.html' %}
+    {% include 'communicate/custom_js.html' %}
+    {% include 'logic_setting/recipe_js.html' %}
+    <script>
+        $(document).ready(function () {
+            const fieldArr = [
+                {
+                    render: function (data, type, row) {
+                        return checkForm.replaceAll('data.id', row.id);
+                    }
+                },
+                {"data": "ind"},
+                {"data": "use_flag"},
+                {"data": "name"},
+                {"data": "type"},
+                {"data": "desc"},
+                {"data": "order"},
+                {"data": "actgroup_name"}
+            ];
+
+            if(curMode === "run") {
+                fieldArr.push({
+                    render: function (data, type, row) {
+                        return row.shm.status;
+                    }
+                });
+
+                columnDef.push({
+                    'targets': 8,
+                    'defaultContent': '',
+                    'createdCell': function(td, cellData, rowData) {
+                        if(rowData.shm.busy) {
+                            $(td).addClass('bg-warning');
+                        } else if(rowData.shm.done) {
+                            $(td).addClass('bg-success');
+                        } else if(rowData.shm.err) {
+                            $(td).addClass('bg-danger');
+                        }
+                    }
+                });
+            }
+            dataTables = $("#action-table").DataTable({
+                ...dataTableLang,
+                ...dataTableObj,
+                "columnDefs": columnDef,
+                "drawCallback": function(oSettings) {
+                    setDataTblPage($("#action-table"), oSettings._iDisplayLength);
+                },
+                'ajax': {
+                    'url': "{{url_for('logic_setting.action_list')}}",
+                    'headers': { "X-CSRFToken": csrf_token }
+                },
+                "columns": fieldArr,
+                "createdRow": function(row, data) {
+                    $(row).attr('data-row', data.id);
+                }
+            });
+        });
+    </script>
+{% endblock %}

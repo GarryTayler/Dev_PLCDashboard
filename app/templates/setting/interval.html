@@ -1,0 +1,72 @@
+{% extends "layout.html" %}
+
+{% block content %}
+    <div class="card shadow mb-4">
+        <div class="card-header py-3">
+            <h6 class="m-0 font-weight-bold text-primary">시스템모니터</h6>
+        </div>
+        <div class="card-body">
+            <label class="form-check-label mb-3">Task Interval설정</label>
+            <div class="row">
+                <div class="col-4">
+                    <div class="table-responsive">
+                        <table class="table table-bordered no-context" id="interval-tbl">
+                            <thead>
+                                <tr>
+                                    <th style="width: 40%">Task</th>
+                                    <th style="width: 60%">Interval (㎲)</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for key, val in intervals.items() %}
+                                    <tr>
+                                        <td>{{key}}</td>
+                                        <td>
+                                            <input type="text" class="form-control" value="{{val}}" id="{{key}}" />
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="btn-panel">
+                        <button class="btn btn-primary btn-icon-split" onclick="saveInterval();">
+                            <span class="icon text-white-50">
+                                <i class="fas fa-save"></i>
+                            </span>
+                            <span class="text">저장</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block script %}
+    <script>
+        function saveInterval() {
+            let postData = {}, isValid = true;
+            const inputArr = $("#interval-tbl tbody input[type='text']");
+            inputArr.removeClass('border-danger');
+            for(let ii = 0; ii < inputArr.length; ii++) {
+                const inputItem = $(inputArr[ii]);
+                const inputVal = inputItem.val().trim();
+                if(inputVal.length === 0) {
+                    isValid = false;
+                    inputItem.addClass('border-danger');
+                    break;
+                } else {
+                    postData[inputItem.attr('id')] = inputVal;
+                }
+            }
+
+            if(isValid) {
+                sendAjax("{{url_for('userbp.save_interval')}}", postData, false);
+                alert(saveMsg);
+            } else {
+                alert('값을 입력하세요');
+            }
+        }
+    </script>
+{% endblock %}

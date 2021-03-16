@@ -1,0 +1,117 @@
+<nav class="navbar navbar-expand navbar-light bg-white topbar mb-4 static-top shadow">
+    <button id="sidebarToggleTop" class="btn btn-link d-md-none rounded-circle mr-3">
+        <i class="fa fa-bars"></i>
+    </button>
+
+    <div class="d-none d-sm-inline-block form-inline mr-auto ml-md-3 my-2 my-md-0 mw-100">
+        <ul class="navbar-nav header-label">
+            {% if control_name|length > 0 %}
+                {{control_name}}
+            {% else %}
+                컨트롤러 이름
+            {% endif %}
+        </ul>
+    </div>
+    <ul class="navbar-nav ml-auto">
+        <div class="topbar-divider d-none d-sm-block"></div>
+        <li class="nav-item mx-1">
+            <a class="nav-link" href="javascript:void(0);" onclick="changeMode();">
+                {% if selmode == "run" %}
+                    <span class="text-success header-label">RUN모드</span> <img src="{{url_for('static', filename='img/icon/stop.png')}}" class="header-img" mode="{{selmode}}" url="{{url_for('userbp.change_mode')}}" edit="{{edit_auth}}"/>
+                {% else %}
+                    <span class="text-danger header-label">STOP모드</span> <img src="{{url_for('static', filename='img/icon/play.png')}}" class="header-img" mode="{{selmode}}" url="{{url_for('userbp.change_mode')}}" edit="{{edit_auth}}"/>
+                {% endif %}
+            </a>
+        </li>
+        <div class="topbar-divider d-none d-sm-block"></div>
+
+        <li class="nav-item mx-1">
+            <a class="nav-link header-alarm" href="javascript:void(0);">
+                <i class="fas fa-exclamation-triangle fa-fw"></i>
+                <span class="badge badge-success badge-counter">+999</span>
+            </a>
+        </li>
+        <li class="nav-item mx-1">
+            <a class="nav-link header-alarm" href="javascript:void(0);">
+                <i class="fas fa-bell fa-fw"></i>
+                <span class="badge badge-warning badge-counter">+999</span>
+            </a>
+        </li>
+        <li class="nav-item mx-1">
+            <a class="nav-link header-alarm" href="javascript:void(0);">
+                <i class="fas fa-info-circle fa-fw"></i>
+                <span class="badge badge-info badge-counter">750</span>
+            </a>
+        </li>
+        <li class="nav-item dropdown no-arrow">
+            <a class="nav-link dropdown-toggle" href="#" id="settingDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" style="margin-left: 2rem">
+                <i class="fas fa-cog"></i>
+                <span class="badge badge-primary badge-counter" data-toggle="tooltip" data-placement="bottom" title="시스템 에러가 없습니다.">0</span>
+            </a>
+            <div class="dropdown-menu dropdown-menu-right shadow animated--grow-in" aria-labelledby="settingDropdown">
+                <a class="dropdown-item" href="{{url_for('userbp.setting')}}">
+                    <i class="fas fa-cogs fa-sm fa-fw mr-2 text-gray-400"></i> 기본설정
+                </a>
+                <a class="dropdown-item" href="{{url_for('userbp.interval')}}">
+                    <i class="fas fa-info-circle fa-sm fa-fw mr-2 text-gray-400"></i> 시스템정보
+                </a>
+                <a class="dropdown-item" href="#">
+                    <i class="fas fa-exclamation-triangle fa-sm fa-fw mr-2 text-gray-400"></i>
+                    에러 <span class="badge badge-pill badge-primary header-badge">0</span>
+                </a>
+                <a class="dropdown-item" href="{{url_for('userbp.export_setting')}}">
+                    <i class="fas fa-file-export fa-sm fa-fw mr-2 text-gray-400"></i> 설정내보내기
+                </a>
+                <a class="dropdown-item" href="{{url_for('userbp.import_setting')}}">
+                    <i class="fas fa-file-import fa-sm fa-fw mr-2 text-gray-400"></i> 설정불러오기
+                </a>
+                <a class="dropdown-item" href="{{url_for('userbp.user_help')}}">
+                    <i class="fas fa-question-circle fa-sm fa-fw mr-2 text-gray-400"></i> 도움말
+                </a>
+            </div>
+        </li>
+
+        <div class="topbar-divider d-none d-sm-block"></div>
+        <li class="nav-item dropdown no-arrow">
+            <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                <span class="mr-2 d-none d-lg-inline text-gray-600 small">{{session['userid']}}</span>
+                <img class="img-profile rounded-circle" src="{{url_for('static', filename='img/icon/avatar.png')}}">
+            </a>
+            <div class="dropdown-menu dropdown-menu-right shadow animated--grow-in" aria-labelledby="userDropdown">
+                {% if session['usertype'] == 'admin' %}
+                    <a class="dropdown-item" href="{{url_for('userbp.users')}}">
+                        <i class="fas fa-users fa-sm fa-fw mr-2 text-gray-400"></i>
+                        사용자관리
+                    </a>
+                    <a class="dropdown-item" href="{{url_for('userbp.authority')}}">
+                        <i class="fas fa-thumbs-up fa-sm fa-fw mr-2 text-gray-400"></i>
+                        권한설정
+                    </a>
+                {% endif %}
+                <div class="dropdown-divider"></div>
+                <a class="dropdown-item" href="{{url_for('userbp.logout')}}">
+                    <i class="fas fa-sign-out-alt fa-sm fa-fw mr-2 text-gray-400"></i>
+                    로그아웃
+                </a>
+            </div>
+        </li>
+
+        <div class="topbar-divider d-none d-sm-block"></div>
+        <li class="nav-item">
+            <div class="header-str">
+                <span id="current-date">{{current_date}}</span><br/>
+                <span id="current-time">{{current_time}}</span>
+            </div>
+        </li>
+    </ul>
+</nav>
+
+<div id="alarmMenu" class="contextmenu">
+    <ul>
+        <li>
+            <a href="{{url_for('userbp.alarms')}}">
+                <i class="fas fa-info"></i>알람테이블
+            </a>
+        </li>
+    </ul>
+</div>

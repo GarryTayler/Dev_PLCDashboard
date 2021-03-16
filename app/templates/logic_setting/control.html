@@ -1,0 +1,267 @@
+{% extends "layout.html" %}
+
+{% block style %}
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/logbuild.css') }}">
+{% endblock %}
+
+{% block content %}
+    <div class="card shadow mb-4">
+        <div class="card-header py-3">
+            <h6 class="m-0 font-weight-bold text-primary">로직설정 > 제어</h6>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-bordered datatable-tbl {%if selmode == 'run' or not edit_auth%}no-context{%endif%}" id="control-table" build="1">
+                    <thead>
+                        <tr>
+                            <th class="text-center">
+                                <div class="form-check">
+                                    <input type="checkbox" class="form-check-input check-all">
+                                    <label class="form-check-label"></label>
+                                </div>
+                            </th>
+                            <th>번호</th>
+                            <th>사용</th>
+                            <th>이름</th>
+                            <th>우선순위</th>
+                            <th>우선모드적용</th>
+                            <th>할당</th>
+                            {% if selmode == "run" %}
+                                <th>유효</th>
+                            {% endif %}
+                        </tr>
+                    </thead>
+                </table>
+            </div>
+            {% if selmode == "stop" and edit_auth %}
+                <div class="btn-panel">
+                    <button class="btn btn-warning btn-icon-split" onclick="controlBuild();">
+                        <span class="icon text-white-50">
+                            <i class="fas fa-layer-group"></i>
+                        </span>
+                        <span class="text">구성</span>
+                    </button>
+                    <button class="btn btn-primary btn-icon-split" onclick="controlCreate();">
+                        <span class="icon text-white-50">
+                            <i class="fas fa-plus"></i>
+                        </span>
+                        <span class="text">추가</span>
+                    </button>
+                    <button class="btn btn-success btn-icon-split" onclick="editControl();">
+                        <span class="icon text-white-50">
+                            <i class="fas fa-edit"></i>
+                        </span>
+                        <span class="text">편집</span>
+                    </button>
+                    <button class="btn btn-danger btn-icon-split" onclick="controlRemove();">
+                        <span class="icon text-white-50">
+                            <i class="fas fa-trash"></i>
+                        </span>
+                        <span class="text">삭제</span>
+                    </button>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <div class="modal fade logic-build-modal" id="logic-control-modal" tabindex="-1" role="dialog">
+        <div class="modal-dialog" role="document" style="max-width: 1600px !important;">
+            <div class="modal-content">
+                <div class="card control-card" id="control-palette">
+                    <div class="card-header">
+                        <div class="row">
+                            <div class="col-3">
+                                <span id="selcontrol-name"></span>
+                            </div>
+                            <div class="col-3">
+                                <span id="selcontrol-useflag"></span><br />
+                                <span>유효함</span><br />
+                                <span id="selcontrol-priority">우선순위: </span>
+                            </div>
+                            <div class="col-6">
+                                <div class="header-badge">
+                                    <i class="fas fa-palette" onclick="showPalette('#control-palette')"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-6">
+                                <div class="card cond-group" id="cond-group-palette">
+                                    <div class="card-header">
+                                        <div class="row">
+                                            <div class="col-3">
+                                                <span id="condgroup-name"></span>
+                                            </div>
+                                            <div class="col-3">
+                                                <span id="condgroup-useflag">유효함</span>
+                                            </div>
+                                            <div class="col-6">
+                                                <div class="header-badge">
+                                                    <i class="fas fa-plus-circle mr-4" onclick="selectCondition();"></i>
+                                                    <i class="fas fa-palette mr-4" onclick="showPalette('#cond-group-palette')"></i>
+                                                    <i class="fas fa-edit" onclick="selectCondGroup();"></i>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="card-body"></div>
+                                </div>
+                            </div>
+                            <div class="col-6">
+                                <div class="card action-group" id="act-group-palette">
+                                    <div class="card-header">
+                                        <div class="row">
+                                            <div class="col-3">
+                                                <span id="actgroup-name"></span>
+                                            </div>
+                                            <div class="col-3">
+                                                <span id="actgroup-mode"></span><br/>
+                                                <span>실행중...</span>
+                                            </div>
+                                            <div class="col-6">
+                                                <div class="header-badge">
+                                                    <i class="fas fa-plus-circle mr-4" onclick="selectAction();"></i>
+                                                    <i class="fas fa-palette mr-4" onclick="showPalette('#act-group-palette');"></i>
+                                                    <i class="fas fa-edit" onclick="selectActGroup();"></i>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="card-body"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block script %}
+    <script src="{{ url_for('static', filename='js/datetimepicker.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/jquery.inputmask.min.js') }}"></script>
+    {% include 'common/datatable.html' %}
+    {% include 'common/logicbuild.html' %}
+    {% include 'logic_build/logic_cond_modal.html' %}
+    {% include 'logic_build/logic_action_modal.html' %}
+    {% include 'common/alarm_modal.html' %}
+    {% include 'common/variable_modal.html' %}
+    {% include 'common/condition_modal.html' %}
+    {% include 'common/control_action_modal.html' %}
+    {% include 'logic_setting/control_logic.html' %}
+    {% include 'logic_setting/actgroup_modal.html' %}
+    {% include 'logic_setting/condgroup_modal.html' %}
+    {% include 'logic_build/logic_actgroup_modal.html' %}
+    {% include 'logic_build/logic_condgroup_modal.html' %}
+    <script>
+        const controlTbl = "#control-table";
+        const controlLimit = parseInt("{{control_limit}}");
+        let controlCnt = 0, controlID = 0, logicControlTbl;
+
+        function selectActGroup() {
+            updateActGroupTbl();
+            $("#actgroup-modal").modal('show');
+        }
+
+        function selectCondGroup() {
+            updateVariable(logicCondGroupTbl);
+            $("#condgroup-modal").modal('show');
+        }
+
+        function selectCondition() {
+            if(condGroupID > 0) {
+                const condModal = $("#logic-condition-modal");
+                condModal.attr('before', '0');
+                updateVariable(logicCondTbl);
+                condModal.modal('show');
+            } else {
+                alert('먼저 조건그룹을 선택하세요');
+            }
+        }
+
+        function selectAction() {
+            if(actGroupID > 0) {
+                const actionModal = $("#logic-action-modal");
+                actionModal.attr('before', '0');
+                updateVariable(logicActTbl);
+                actionModal.modal('show');
+            } else {
+                alert('먼저 동작그룹을 선택하세요');
+            }
+        }
+
+        $(document).ready(function() {
+            const sortPanel1 =$("#cond-group-palette .card-body")[0];
+            new Sortable(sortPanel1, {
+                animation: 150,
+                ghostClass: 'blue-background-class',
+                onEnd: function (evt) {
+                    saveBuildOrder(evt);
+                }
+            });
+
+            const sortPanel2 = $("#act-group-palette .card-body")[0];
+            new Sortable(sortPanel2, {
+                animation: 150,
+                ghostClass: 'blue-background-class',
+                onEnd: function (evt) {
+                    saveBuildOrder(evt);
+                }
+            });
+
+            const fieldArr = [
+                {
+                    render: function (data, type, row) {
+                        const attrStr = "data-name='" + row.name + "' priority='" + row.priority + "' mode='" + row.mode + "' useflag='" + row.use_flag + "'"
+                        return checkForm.replaceAll('data.id', row.id).replaceAll('data.attr', attrStr);
+                    }
+                },
+                {"data": "ind"},
+                {"data": "useflag"},
+                {"data": "name"},
+                {"data": "priority"},
+                {"data": "mode1"},
+                {"data": "logic_name"}
+            ];
+            if(curMode === "run") {
+                fieldArr.push({
+                    render: function(data, type, row) {
+                        return row.shm.valid ? "YES" : "NO";
+                    }
+                });
+
+                columnDef.push({
+                    'targets': 7,
+                    'defaultContent': '',
+                    'createdCell': function(td, cellData, rowData) {
+                        if(rowData.shm.valid) {
+                            $(td).addClass('bg-success');
+                        } else {
+                            $(td).addClass('bg-secondary');
+                        }
+                    }
+                })
+            }
+            logicControlTbl = $(controlTbl).DataTable({
+                ...dataTableLang,
+                ...dataTableObj,
+                "columnDefs": columnDef,
+                "drawCallback": function(oSettings) {
+                    controlCnt = oSettings._iRecordsTotal;
+                    setDataTblPage($(controlTbl), oSettings._iDisplayLength);
+                },
+                'ajax': {
+                    'url': "{{url_for('logic_setting.control_list')}}",
+                    'headers': { "X-CSRFToken": csrf_token }
+                },
+                "columns": fieldArr,
+                "createdRow": function(row, data) {
+                    $(row).attr('data-row', data.id);
+                }
+            });
+        });
+    </script>
+{% endblock %}

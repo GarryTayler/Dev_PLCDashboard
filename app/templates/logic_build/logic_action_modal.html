@@ -1,0 +1,188 @@
+<div class="modal fade" id="logic-action-modal" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document" style="max-width: 1200px !important;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">동작선택</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="table-responsive">
+                    <table class="table table-bordered datatable-tbl hide-tables" id="logic-act-modal">
+                        <thead>
+                            <tr>
+                                <th class="text-center">
+                                    <div class="form-check">
+                                        <input type="checkbox" class="form-check-input check-all">
+                                        <label class="form-check-label"></label>
+                                    </div>
+                                </th>
+                                <th>번호</th>
+                                <th>사용</th>
+                                <th>이름</th>
+                                <th>동작</th>
+                                <th>실행순서</th>
+                                <th>할당</th>
+                            </tr>
+                        </thead>
+                    </table>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-primary btn-icon-split" onclick="doActCreate();">
+                    <span class="icon text-white-50">
+                        <i class="fas fa-plus"></i>
+                    </span>
+                    <span class="text">추가</span>
+                </button>
+                <button class="btn btn-success btn-icon-split" onclick="doActEdit('#logic-act-modal');">
+                    <span class="icon text-white-50">
+                        <i class="fas fa-edit"></i>
+                    </span>
+                    <span class="text">편집</span>
+                </button>
+                <button class="btn btn-danger btn-icon-split" onclick="doActDelete('#logic-act-modal');">
+                    <span class="icon text-white-50">
+                        <i class="fas fa-trash"></i>
+                    </span>
+                    <span class="text">삭제</span>
+                </button>
+            </div>
+            <div class="btn-panel">
+                <button class="btn btn-info btn-icon-split" onclick="actionSelect();">
+                    <span class="icon text-white-50">
+                        <i class="fas fa-check"></i>
+                    </span>
+                    <span class="text">선택</span>
+                </button>
+                <button class="btn btn-secondary btn-icon-split" data-dismiss="modal">
+                    <span class="icon text-white-50">
+                        <i class="fas fa-times"></i>
+                    </span>
+                    <span class="text">취소</span>
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    const actRemoveUrl = "{{url_for('logic_build.remove_action')}}";
+    const logicActionPanel = `
+        <div class="card action-individual" id="act-palette-data.id" style="card-style">
+            <div class="card-header" style="header-style">
+                <div class="row">
+                    <div class="col-3">
+                        <span>data.name(data.type)</span>
+                    </div>
+                    <div class="col-3">
+                        <span>data.useflag</span><br/>
+                        <span>유효함</span>
+                    </div>
+                    <div class="col-6">
+                        <div class="header-badge" data-id="data.id">
+                            <i class="fas fa-chevron-circle-up mr-4" type="#act-body-"></i>
+                            <i class="fas fa-chevron-circle-down mr-4" type="#act-body-"></i>
+                            <i class="fas fa-palette mr-4" onclick="showPalette('#act-palette-data.id')"></i>
+                            <i class="fas fa-edit mr-4" onclick="addActGroup('data.id');"></i>
+                            <i class="fas fa-trash" url="${actRemoveUrl}"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="card-body" id="act-body-data.id" flag="0" style="body-style">
+                <p class="desc-label">data.desc</p>
+            </div>
+        </div>
+    `, logicActionModal = $("#logic-action-modal");
+    let logicActTbl;
+
+    function updateBuildPanel1() {
+        $.ajax({
+            url: "{{url_for('logic_build.action_group')}}",
+            data: {actGroupID},
+            dataType: 'json',
+            type: 'post',
+            headers: {"X-CSRFToken": csrf_token},
+            success: function (resp) {
+                if (resp.status) {
+                    drawLogicAction(resp.page_list);
+                } else {
+                    alert(resp.message);
+                }
+            },
+            error: function() {
+                alert(refreshMsg);
+            }
+        });
+    }
+
+    function actionSelect() {
+        const selIDs = getTblChk("#logic-action-modal");
+        if(selIDs.length > 0) {
+            if(actGroupID > 0) {
+                const beforeID = logicActionModal.attr('before');
+                const isLogic = typeof logicID === 'undefined';
+                sendAjax("{{url_for('logic_build.add_act')}}", {actGroupID, beforeID, actID: selIDs}, !isLogic);
+                if(isLogic) {
+                    logicActionModal.modal('hide');
+                    updateBuildPanel1();
+                }
+            } else {
+                alert('동작그룹을 입력하세요');
+            }
+        } else {
+            alert('동작을 선택하세요');
+        }
+    }
+
+    function addActGroup(selid = '0') {
+        logicActionModal.attr('before', selid);
+        updateVariable(logicActTbl);
+        logicActionModal.modal('show');
+    }
+
+    $(document).ready(function() {
+        logicActTbl = $("#logic-act-modal").DataTable({
+            ...dataTableLang,
+            ...dataTableObj,
+            "columnDefs": columnDef,
+            "order": [[ 1, "asc" ]],
+            "drawCallback": function(oSettings) {
+                setDataTblPage($("#logic-act-modal"), oSettings._iDisplayLength);
+            },
+            'ajax': {
+                'url': "{{url_for('logic_setting.action_list')}}",
+                'headers': { "X-CSRFToken": csrf_token },
+                'data': function(data) {
+                    return {
+                        ...data,
+                        beforeID: logicActionModal.attr('before')
+                    };
+                }
+            },
+            "columns": [
+                {
+                    render: function (data, type, row) {
+                        const propStr = parseInt(logicActionModal.attr('before')) === row.id ? 'checked' : '';
+                        return checkForm.replaceAll('data.id', row.id).replaceAll('data.attr', propStr);
+                    }
+                },
+                {"data": "ind"},
+                {"data": "use_flag"},
+                {"data": "name"},
+                {
+                    render: function (data, type, row) {
+                        return "[" + row.type + "] " + row.desc;
+                    }
+                },
+                {"data": "order"},
+                {"data": "actgroup_name"}
+            ],
+            "createdRow": function(row, data) {
+                $(row).attr('data-row', data.id);
+            }
+        });
+    });
+</script>

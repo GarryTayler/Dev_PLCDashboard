@@ -1,0 +1,196 @@
+{% extends "layout.html" %}
+
+{% block style %}
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/logbuild.css') }}">
+{% endblock %}
+
+{% block content %}
+    <div class="card shadow mb-4">
+        <div class="card-header py-3">
+            <h6 class="m-0 font-weight-bold text-primary">로직설정 > 조건그룹</h6>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-bordered datatable-tbl {%if selmode == 'run' or not edit_auth%}no-context{%endif%}" id="condgroup-table" build="1">
+                    <thead>
+                        <tr>
+                            <th class="text-center">
+                                <div class="form-check">
+                                    <input type="checkbox" class="form-check-input check-all">
+                                    <label class="form-check-label"></label>
+                                </div>
+                            </th>
+                            <th>번호</th>
+                            <th>이름</th>
+                            <th>연산자</th>
+                            <th>결과 반전</th>
+                            <th>할당</th>
+                            {% if selmode == "run" %}
+                                <th>유효</th>
+                            {% endif %}
+                        </tr>
+                    </thead>
+                </table>
+            </div>
+            {% if selmode == "stop" and edit_auth %}
+                <div class="btn-panel">
+                    <button class="btn btn-warning btn-icon-split" onclick="doCondGroupBuild();">
+                        <span class="icon text-white-50">
+                            <i class="fas fa-layer-group"></i>
+                        </span>
+                        <span class="text">구성</span>
+                    </button>
+                    <button class="btn btn-primary btn-icon-split" onclick="doCondGroupCreate();">
+                        <span class="icon text-white-50">
+                            <i class="fas fa-plus"></i>
+                        </span>
+                        <span class="text">추가</span>
+                    </button>
+                    <button class="btn btn-success btn-icon-split" onclick="doCondGroupEdit();">
+                        <span class="icon text-white-50">
+                            <i class="fas fa-edit"></i>
+                        </span>
+                        <span class="text">편집</span>
+                    </button>
+                    <button class="btn btn-danger btn-icon-split" onclick="doCondGroupRemove();">
+                        <span class="icon text-white-50">
+                            <i class="fas fa-trash"></i>
+                        </span>
+                        <span class="text">삭제</span>
+                    </button>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <div class="modal fade logic-build-modal" id="cond-group-build" tabindex="-1" role="dialog">
+        <div class="modal-dialog" role="document" style="max-width: 900px !important;">
+            <div class="modal-content">
+                <div class="card cond-group" id="cond-group-palette">
+                    <div class="card-header">
+                        <div class="row">
+                            <div class="col-3">
+                                <span id="condgroup-name"></span>
+                            </div>
+                            <div class="col-3">
+                                <span>유효함</span>
+                            </div>
+                            <div class="col-6">
+                                <div class="header-badge">
+                                    <i class="fas fa-plus-circle mr-4" onclick="addCondGroup();"></i>
+                                    <i class="fas fa-palette" onclick="showPalette('#cond-group-palette')"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block script %}
+    <script src="{{ url_for('static', filename='js/datetimepicker.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/jquery.inputmask.min.js') }}"></script>
+    {% include 'common/datatable.html' %}
+    {% include 'common/logicbuild.html' %}
+    {% include 'logic_build/logic_cond_modal.html' %}
+    {% include 'common/variable_modal.html' %}
+    {% include 'common/alarm_modal.html' %}
+    {% include 'common/condition_modal.html' %}
+    {% include 'logic_setting/condgroup_modal.html' %}
+    <script>
+        function doCondGroupBuild(selRow = '') {
+            const selChk = selRow.length > 0 ? [selRow] : getTblChk("#condgroup-table", "condgroup-").split(',');
+            if(selChk.length > 0 && selChk[0].length > 0) {
+                condGroupID = selChk[0];
+                $.ajax({
+                    url: "{{url_for('logic_build.cond_group')}}",
+                    data: {condGroupID},
+                    dataType: 'json',
+                    type: 'post',
+                    headers: { "X-CSRFToken": csrf_token },
+                    success: function (resp) {
+                        if(resp.status) {
+                            const selCondGroup = resp.condgroup;
+                            $("#condgroup-name").text(selCondGroup.name);
+
+                            const condGroupOpt = selCondGroup.options.length > 0 ? JSON.parse(selCondGroup.options) : {};
+                            initCardStyle(condGroupOpt, "#cond-group-palette");
+
+                            drawLogicCond(resp.page_list);
+
+                            $("#cond-group-build").modal('show');
+                            initLogicIcons();
+                        } else {
+                            alert(resp.message);
+                        }
+                    },
+                    error: function() {
+                        alert(refreshMsg);
+                    }
+                });
+            } else {
+                alert('구성할 행을 선택하세요');
+            }
+        }
+
+        $(document).ready(function() {
+            const sortPanel =$("#cond-group-palette .card-body")[0];
+            new Sortable(sortPanel, {
+                animation: 150,
+                ghostClass: 'blue-background-class',
+                onEnd: function (evt) {
+                    saveBuildOrder(evt);
+                }
+            });
+
+            const fieldArr = [
+                {
+                    render: function (data, type, row) {
+                        const attrStr = "data-name='" + row.name + "' operator='" + row.operator + "' reverse='" + row.reverse + "'";
+                        return checkForm.replaceAll('data.id', "condgroup-" + row.id).replaceAll('data.attr', attrStr);
+                    }
+                },
+                {"data": "ind"},
+                {"data": "name"},
+                {"data": "operator"},
+                {"data": "reverse"},
+                {"data": "control_name"}
+            ];
+            if(curMode === "run") {
+                fieldArr.push({"data": "valid"});
+                columnDef.push({
+                    'targets': 6,
+                    'defaultContent': '',
+                    'createdCell': function(td, cellData, rowData) {
+                        if(rowData.valid === "TRUE") {
+                            $(td).addClass('bg-success');
+                        } else {
+                            $(td).addClass('bg-secondary');
+                        }
+                    }
+                });
+            }
+            dataTables = $("#condgroup-table").DataTable({
+                ...dataTableLang,
+                ...dataTableObj,
+                "columnDefs": columnDef,
+                "drawCallback": function(oSettings) {
+                    condGroupCnt = oSettings._iRecordsTotal;
+                    setDataTblPage($("#condgroup-table"), oSettings._iDisplayLength);
+                },
+                'ajax': {
+                    'url': "{{url_for('logic_setting.condgroup_list')}}",
+                    'headers': { "X-CSRFToken": csrf_token }
+                },
+                "columns": fieldArr,
+                "createdRow": function(row, data) {
+                    $(row).attr('data-row', "condgroup-" + data.id);
+                }
+            })
+        });
+    </script>
+{% endblock %}

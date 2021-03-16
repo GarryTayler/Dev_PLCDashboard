@@ -1,0 +1,404 @@
+<script>
+    const defLimit = parseInt("{{defLimit}}");
+    const varLimit = parseInt("{{recipeVarLimit}}");
+    const recipeLimit = parseInt("{{recipeLimit}}");
+    const attrArr = ['selid', 'sellocstr', 'seltype'];
+    const recipeTbl = $("#recipe-table");
+    const clsArr = {
+        'time': 'mask-time',
+        'date': 'date-picker'
+    }
+    let recipeDefID = 0, defCnt = 0, varCnt = 0, recipeCnt = 0, recipeDefTbl;
+
+    const trHtml = `
+        <th class="recipe-td">
+            <div class="form-check">
+                <input type="checkbox" class="form-check-input" id="data.id">
+                <label class="form-check-label" for="data.id">
+                    <input disabled type="text" class="form-control" value="name.name" origin="name.name" data-id="name.id">
+                </label>
+            </div>
+        </th>
+    `;
+    const altHead = `
+        <td class="recipe-td">
+            <div class="value-radio">
+                <div class="form-check mb-2">
+                    <input type="checkbox" class="form-check-input" id="recipe-val-data.id-radio" chkStr>
+                    <label class="form-check-label" for="recipe-val-data.id-radio">변수</label>
+                </div>
+    `;
+
+    const altSelect = `
+        <select class="form-control alt-input" style="style.str" val.attr>
+            <option value="0">FALSE</option>
+            <option value="1">TRUE</option>
+        </select>
+    `;
+
+    const altInput = `
+        <input type="text.str" style="style.str" class="form-control alt-input cls.attr" val.attr>
+    `;
+
+    const altFoot = `
+                <div class="input-group" style="style.str">
+                    <input disabled type="text" class="form-control" id.str readonly data.attr >
+                    <span class="input-group-append dropdown">
+                        <button disabled class="btn btn-primary dropdown-toggle" data-toggle="dropdown"></button>
+                        <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                            <a class="dropdown-item" href="#" onclick="showFixed('recipe-val-data.id', 'data.type');">고정변수</a>
+                            <a class="dropdown-item" href="#" onclick="showFluid('recipe-val-data.id', 'data.type');">가변변수</a>
+                        </div>
+                    </span>
+                </div>
+            </div>
+        </td>
+    `;
+    const tdChk = `
+        <td class='recipe-td'>
+            <div class="form-check">
+                <input type="checkbox" class="form-check-input" id="data.id">
+                <label class="form-check-label" for="data.id">name</label>
+            </div>
+        </td>
+    `;
+
+    function addDef() {
+        if(defLimit > defCnt) {
+            recipeDefID = 0;
+            $("#recipe-name").val('');
+            $("#def-modal").modal('show');
+        } else {
+            alert(limitMsg);
+        }
+    }
+
+    function showEdit(selID) {
+        const selChk = $("#check-row-" + selID);
+        $("#recipe-name").val(selChk.attr('data-name').trim());
+        $("#def-modal").modal('show');
+    }
+
+    function removeDef() {
+        removeAction("#recipe-table", "{{url_for('logic_setting.remove_recipe')}}", '', false);
+        updateVariable(recipeDefTbl);
+    }
+
+    function recipeAct(flag) {
+        if(flag === "plus") {
+            addDef();
+        } else if(flag === "del") {
+            const selRow = $("#contextmenu").attr("selrow");
+            if(selRow && confirm('삭제하시겠습니까?')) {
+                sendAjax("{{url_for('logic_setting.remove_recipe')}}", {selRow}, false);
+                updateVariable(recipeDefTbl);
+            }
+        } else if(flag === "edit") {
+            recipeDefID = parseInt($("#contextmenu").attr("selrow"));
+            showEdit(recipeDefID);
+        }
+    }
+
+    function editDef() {
+        setRecipeID();
+        if(recipeDefID > 0) {
+            showEdit(recipeDefID);
+        } else {
+            alert('편집할 행을 선택하세요');
+        }
+    }
+
+    function doDefSave() {
+        const inputName = $("#recipe-name").val().trim();
+        if(inputName.length > 0) {
+            sendAjax("{{url_for('logic_setting.new_def')}}", {inputName, recipeDefID}, false);
+            updateVariable(recipeDefTbl);
+            $("#def-modal").modal('hide');
+        } else {
+            alert('레시피정의명을 입력하세요');
+        }
+    }
+
+    function addVariable() {
+        setRecipeID();
+        if(recipeDefID > 0) {
+            if(varCnt < varLimit) {
+                $("#variable-name").val('').removeAttr('selid').removeAttr('seltype').removeAttr('sellocstr');
+                $("#var-modal").modal('show');
+            } else {
+                alert(limitMsg);
+            }
+        } else {
+            alert('레시피정의를 선택하세요');
+        }
+    }
+
+    function doVarSave() {
+        const varInput = $("#variable-name");
+        const inputVal = varInput.val().trim();
+        if(inputVal.length > 0) {
+            const postData = {
+                inputVal,
+                recipeDefID,
+                selid: varInput.attr('selid'),
+                seltype: varInput.attr('seltype'),
+                sellocstr: varInput.attr('sellocstr')
+            };
+
+            sendAjax("{{url_for('logic_setting.recipe_variable')}}", postData, false);
+            recipeDetail();
+            $("#var-modal").modal('hide');
+        } else {
+            alert('변수를 선택하세요');
+        }
+    }
+
+    function setRecipeID() {
+        const selChk = $("#recipe-table input.check-row").filter(':checked');
+        if(selChk.length > 0) {
+            recipeDefID = parseInt($(selChk[0]).attr('id').replace('check-row-', ''));
+        } else {
+            recipeDefID = 0;
+        }
+    }
+
+    function addRecipe() {
+        setRecipeID();
+        if(recipeDefID > 0) {
+            if(recipeCnt < recipeLimit) {
+                $("#recipe-title").val('');
+                $("#recipe-modal").modal('show');
+            } else {
+                alert(limitMsg);
+            }
+        } else {
+            alert('레시피정의를 선택하세요');
+        }
+    }
+
+    function doRecipeSave() {
+        const inputName = $("#recipe-title").val().trim();
+        if(inputName.length > 0) {
+            sendAjax("{{url_for('logic_setting.recipe_name')}}", {inputName, selid: 0, recipeDefID}, false);
+            recipeDetail();
+            $("#recipe-modal").modal('hide');
+        } else {
+            alert('이름을 입력하세요');
+        }
+    }
+
+    function removeVariable() {
+        const selChk = $("#recipe-val-table tbody input[type='checkbox']").filter(':checked');
+        if(selChk.length > 0) {
+            let selIDs = [];
+            for(let ii = 0; ii < selChk.length; ii++) {
+                selIDs.push($(selChk[ii]).attr('id').replace('recipe-var-', ''));
+            }
+
+            if(confirm('삭제하시겠습니까?')) {
+                sendAjax("{{url_for('logic_setting.remove_recipe')}}", {selRow: selIDs.join(','), selType: 'var', recipeDefID}, false);
+                recipeDetail();
+            }
+        } else {
+            alert('삭제할 변수를 선택하세요');
+        }
+    }
+
+    function removeRecipe() {
+        const selChk = $("#variable-tr input[type='checkbox']").filter(':checked');
+        if(selChk.length > 0) {
+            let selIDs = [];
+            for(let ii = 0; ii < selChk.length; ii++) {
+                selIDs.push($(selChk[ii]).attr('id').replace('recipe-name-', ''));
+            }
+
+            if(confirm('삭제하시겠습니까?')) {
+                sendAjax("{{url_for('logic_setting.remove_recipe')}}", {selRow: selIDs.join(','), selType: 'name', recipeDefID}, false);
+                recipeDetail();
+            }
+        } else {
+            alert('삭제할 레시피를 선택하세요');
+        }
+    }
+
+    function recipeDetail() {
+        setRecipeID();
+        if(recipeDefID > 0) {
+            $.ajax({
+                url: "{{url_for('logic_setting.recipe_detail')}}",
+                dataType: 'json',
+                data: {recipeDefID},
+                type: 'post',
+                headers: { "X-CSRFToken": csrf_token },
+                success: function(resp) {
+                    if(resp.status) {
+                        const varList = resp.var_list;
+                        const nameList = resp.name_list;
+                        const valueList = resp.value_list;
+
+                        varCnt = varList.length;
+                        recipeCnt = nameList.length;
+
+                        let html = '<th>변수</th>';
+                        const nameLen = nameList.length;
+                        if(nameLen > 0) {
+                            for(let ii = 0; ii < nameLen; ii++) {
+                                const nameItem = nameList[ii];
+                                html += trHtml.replace('name.id', nameItem.id)
+                                    .replaceAll('name.name', nameItem.name)
+                                    .replaceAll('data.id', 'recipe-name-' + nameItem.id);
+                            }
+                        }
+                        $("#variable-tr").html(removeDisable(html));
+
+                        html = '';
+                        if(varList.length > 0) {
+                            for(let ii = 0; ii < varList.length; ii++) {
+                                const varItem = varList[ii];
+                                const selType = varItem.type.split('-')[0];
+                                html += "<tr>";
+                                html += tdChk.replace('name', varItem.name)
+                                    .replaceAll("data.id", 'recipe-var-' + varItem.id);
+                                if(nameLen > 0) {
+                                    for(let jj = 0; jj < nameLen; jj++) {
+                                        const nameItem = nameList[jj];
+                                        let selAttr = '', hasOpt = false, itemVal = '';
+                                        for(let kk = 0; kk < valueList.length; kk++) {
+                                            const valItem = valueList[kk];
+                                            if(valItem.var_id === varItem.id &&
+                                                valItem.name_id === nameItem.id.toString()) {
+                                                itemVal = valItem.value;
+                                                selAttr = "value='" + valItem.value + "' origin='" + valItem.value + "'";
+                                                const valOpts = valItem.options.length > 0 ? JSON.parse(valItem.options) : {};
+                                                hasOpt = valOpts.hasOwnProperty(attrArr[0]);
+                                                for(let ll = 0; ll < attrArr.length; ll++) {
+                                                    const attrItem = attrArr[ll];
+                                                    if(valOpts.hasOwnProperty(attrItem)) {
+                                                        selAttr += " " + attrItem + "='" + valOpts[attrItem] + "'";
+                                                    }
+                                                }
+
+                                                valueList.splice(kk, 1);
+                                                break;
+                                            }
+                                        }
+
+                                        const inputID = varItem.id + "-" + nameItem.id;
+                                        const nameBool = itemVal.length === 0;
+                                        html += altHead.replace('chkStr', hasOpt || nameBool ? 'checked' : '').replaceAll('data.id', inputID);
+                                        html += selType === "digital" ?
+                                            altSelect.replace('style.str', hasOpt || nameBool ? '' : 'display: block')
+                                                    .replace('val.attr', hasOpt ? '' : selAttr + " id='recipe-val-'" + inputID + "'")
+                                            :
+                                            altInput.replace('cls.attr', clsArr[selType] ? clsArr[selType] : '')
+                                                    .replace('style.str', hasOpt || nameBool ? '' : 'display: block')
+                                                    .replace('text.str', selType === "analog" ? "number" : "text")
+                                                    .replace('val.attr', hasOpt ? '' : selAttr + " id='recipe-val-'" + inputID + "'");
+
+                                        html += altFoot.replace('style.str', hasOpt || nameBool ? '' : 'display: none')
+                                            .replace('data.attr', hasOpt ? selAttr : '')
+                                            .replace('id.str', hasOpt || nameBool ? "id='recipe-val-'" + inputID + "'" : '')
+                                            .replaceAll('data.id', inputID)
+                                            .replaceAll('data.type', selType);
+                                    }
+                                }
+
+                                html += "</tr>";
+                            }
+                        }
+
+                        $("#variable-tbody").html(removeDisable(html));
+                        initTimeMask("#variable-tbody");
+                        $("#detail-panel").show();
+                    } else {
+                        alert(resp.message);
+                    }
+                },
+                error: function() {
+                    alert(refreshMsg);
+                }
+            })
+        } else {
+            $("#detail-panel").hide();
+            varCnt = 0;
+            recipeCnt = 0;
+        }
+    }
+
+    $(document).ready(function () {
+        recipeTbl.on('click', 'tbody tr', function() {
+            recipeDetail();
+        });
+
+        $("#recipe-val-table").on('click', 'td, th', function(e) {
+            if($(this).hasClass('recipe-td') && !$(e.target).is('input') &&
+                !$(e.target).is('label') && !$(e.target).is('select')) {
+                const selChk = $(this).find('input[type="checkbox"]');
+                selChk.prop('checked', !selChk.prop('checked'));
+            }
+        });
+
+        $("#variable-tr").on('blur', 'input[type="text"]', function() {
+            const origin = $(this).attr('origin').trim();
+            const inputName = $(this).val().trim();
+            if(inputName !== origin) {
+                const selid = $(this).attr('data-id');
+                $(this).attr('origin', inputName);
+                sendAjax("{{url_for('logic_setting.recipe_name')}}", {inputName, recipeDefID, selid}, false);
+            }
+        });
+
+        $("#variable-tbody").on('change', 'input[type="text"], .alt-input', function() {
+            if(curMode === "stop" && curAuth) {
+                const inputName = $(this).val().trim();
+                const idStr = $(this).attr('id') ? $(this).attr('id') : $(this).attr('name').replaceAll('_', '-');
+                const selID = idStr.replace('recipe-val-', '').split('-');
+                const postData = {
+                    inputName,
+                    recipeDefID,
+                    var_id: selID[0],
+                    name_id: selID[1]
+                };
+
+                for(let ii = 0; ii < attrArr.length; ii++) {
+                    const attrItem = attrArr[ii];
+                    if($(this).attr(attrItem)) {
+                        postData[attrItem] = $(this).attr(attrItem);
+                    }
+                }
+
+                sendAjax("{{url_for('logic_setting.recipe_val')}}", postData, false);
+            }
+        });
+
+        recipeDefTbl = recipeTbl.DataTable({
+            ...dataTableLang,
+            ...dataTableObj,
+            "columnDefs": columnDef,
+            "drawCallback": function(oSettings) {
+                defCnt = oSettings._iRecordsTotal;
+                setDataTblPage(recipeTbl, oSettings._iDisplayLength);
+            },
+            'ajax': {
+                'url': "{{url_for('logic_setting.recipe_list')}}",
+                'headers': { "X-CSRFToken": csrf_token }
+            },
+            "columns": [
+                {
+                    render: function (data, type, row) {
+                        let attrStr = "data-name='" + row.name + "'";
+                        return checkForm.replaceAll('data.id', row.id).replaceAll('data.attr', attrStr);
+                    }
+                },
+                {"data": "ind"},
+                {"data": "name"}
+            ],
+            "initComplete": function(setting, resp) {
+                $("#recipe-table tbody input[type='checkbox']:first").trigger('click');
+            },
+            "createdRow": function(row, data) {
+                $(row).attr('data-row', data.id);
+            }
+        });
+    });
+</script>
