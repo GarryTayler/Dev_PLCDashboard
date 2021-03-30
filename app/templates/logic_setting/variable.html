@@ -182,7 +182,7 @@
                         dataTables.page(0);
                         updateVariable();
                     } else {
-                        setDataTblPage($("#variable-table"), oSettings._iDisplayLength);
+                        setDataVariableTblPage($("#variable-table"), oSettings._iDisplayLength);
                     }
                 },
                 'ajax': {
@@ -191,7 +191,8 @@
                     'data': function(data){
                         if(pageLoad) {
                             pageLoad = false;
-                            let curPage = localStorage.getItem('cur-page');
+                            let curPage = localStorage.getItem('variable-cur-page');
+                            console.log("cur page====", curPage);
                             curPage = curPage ? curPage : 0;
                             data = {
                                 ...data,
@@ -298,6 +299,12 @@
 
             variableTbl.on('change', "tbody .write-input", function() {
                 updateWrite($(this));
+            });
+
+            $(window).bind("beforeunload", function() {
+                if(dataTables) {
+                    localStorage.setItem('variable-cur-page', dataTables.page.info().page);
+                }
             });
         });
     </script>

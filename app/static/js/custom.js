@@ -302,6 +302,19 @@ function setDataTblPage(tblInst, dispLen) {
     }
 }
 
+function setDataVariableTblPage(tblInst, dispLen) {
+
+    tblInst.attr('before_clicked', '0');
+    localStorage.setItem('page-cnt', dispLen);
+
+    const curPage = localStorage.getItem('variable-cur-page');
+    if(dataTables && curPage && curPage > 0) {
+        localStorage.removeItem('variable-cur-page');
+        dataTables.page(parseInt(curPage));
+        updateVariable();
+    }
+}
+
 function initTimeMask(parentDiv = '') {
     const maskArr = $(parentDiv + " .mask-time");
     for(let ii = 0; ii < maskArr.length; ii++) {
