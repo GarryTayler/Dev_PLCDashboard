@@ -59,7 +59,7 @@ def load_user(email):
     return User.query.filter(User.email == email).first()
 
 
-from flask_wtf.csrf import CsrfProtect
-CsrfProtect(app)
+from flask_wtf.csrf import CSRFProtect
+CSRFProtect(app)
 
 from app import admin
