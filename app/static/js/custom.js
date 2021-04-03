@@ -117,7 +117,8 @@ function sendAjax(url, data, refresh = true, isFile = false, respFunc = null) {
                 }
             }
         },
-        error: function() {
+        error: function(err) {
+            console.log("error=====", err);
             alert(refreshMsg);
         }
     });

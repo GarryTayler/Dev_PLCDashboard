@@ -290,7 +290,10 @@
                             }
                         }
                     }
-                ]
+                ],
+                "createdRow": function(row, data) {
+                    $(row).attr('data-row', $("#type-select").val() + "-" + data.id);
+                }
             });
 
             variableTbl.on('change', "tbody .default-input", function() {

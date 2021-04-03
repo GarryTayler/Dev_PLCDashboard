@@ -571,8 +571,11 @@ def update_variable():
     postData = request.form.to_dict()
     trVal = postData.get('trVal')
     remote = postData.get('remote')
+
+    print (trVal, remote)
+
     if check_null(trVal) and check_null(remote):
-        selVariable = models.Variable.query.filter_by(ype=trVal).filter_by(remote=remote).first()
+        selVariable = models.Variable.query.filter_by(type=trVal).filter_by(remote=remote).first()
         if selVariable:
             if 'inputName' in postData:
                 selVariable.name = postData.get('inputName')
