@@ -35,7 +35,7 @@ LOG_FILENAME = "activity.log"
 LOG_MAXBYTES = 1024
 LOG_BACKUPS = 2
 
-CONFIG_PATH = r'F:\work\khd\plc-dashboard\plc\app\helper'
+CONFIG_PATH = r'F:\kcg_data\wsk\PLC\Dev_PLCDashboard\app\helper'
 
 V_DIGITAL = "DIGITAL"
 V_ANALOG = "ANALOG"
