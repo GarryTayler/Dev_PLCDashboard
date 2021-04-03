@@ -1,4 +1,7 @@
 *.xml
 *.iml
 *.pyc
-.idea/.gitignore
+.idea
+*.log
+*.log.*
+
