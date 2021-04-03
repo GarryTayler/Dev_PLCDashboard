@@ -184,15 +184,26 @@ def add_element():
             else:
                 response = {'status': False, 'message': 'No element exists'}
         else:
-            newElement = models.MonitorElement(
-                ind='1000',
-                type=selType,
-                name=elemName,
-                elemoptions='',
-                sizeoptions='',
-                monitorid=monitorID,
-                options=json.dumps(postData)
-            )
+            if selType == 'set_val':
+                newElement = models.MonitorElement(
+                    ind='1000',
+                    type=selType,
+                    name=elemName,
+                    elemoptions='{"bool_file": "0", "header_back": "#f8f9fc", "font_color": "black", "font_size": "13.6px", "font_family": "Nunito", "body_back": "white", "body_size": "16px", "body_color": "black", "body_family": "Nunito"}',
+                    sizeoptions='',
+                    monitorid=monitorID,
+                    options=json.dumps(postData)
+                )
+            else:
+                newElement = models.MonitorElement(
+                    ind='1000',
+                    type=selType,
+                    name=elemName,
+                    elemoptions='',
+                    sizeoptions='',
+                    monitorid=monitorID,
+                    options=json.dumps(postData)
+                )
 
             db.session.add(newElement)
             db.session.commit()
