@@ -13,6 +13,26 @@
                                     <h1 class="h4 text-gray-900 mb-4">PLC DASHBOARD</h1>
                                 </div>
 
+                                <button class="btn btn-primary" style="display: none;" type="button" onclick="modalShow();">Launch Demo Modal</button>
+
+                                <div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                                    <div class="modal-dialog" role="document">
+                                        <div class="modal-content">
+                                            <div class="modal-header">
+                                                <h5 class="modal-title" id="exampleModalLabel">사용권계약</h5>
+                                                <button class="close" type="button" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button>
+                                            </div>
+                                            <div class="modal-body">
+                                                사용권계약 사용권계약 사용권계약 사용권계약 사용권계약 사용권계약 사용권계약 사용권계약 사용권계약 사용권계약 사용권계약 사용권계약 사용권계약 
+                                            </div>
+                                            <div class="modal-footer">
+                                                <button class="btn btn-primary" id="agree-btn" type="button" data-dismiss="modal">동의</button>
+                                                <button class="btn btn-secondary" type="button" data-dismiss="modal">동의안함</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
                                 {% include 'common/flash.html' %}
 
                                 <form class="user" action="{{url_for('userbp.dologin')}}" method="post">
@@ -30,7 +50,7 @@
                                         </div>
                                     </div>
                                     <hr>
-                                    <button class="btn btn-primary btn-user btn-block">로그인</button>
+                                    <button class="btn btn-primary btn-user btn-block login-btn">로그인</button>
                                 </form>
                             </div>
                         </div>
@@ -39,4 +59,32 @@
             </div>
         </div>
     </div>
+    <script>
+        function modalShow() {
+            $('#exampleModal').modal("show")
+        }
+        if("{{session['accept']}}" == "0") {
+            modalShow()
+        } else if("{{session['is_login']}}" && "{{session['accept']}}" == 1) {
+            window.location.href = '/'
+        }
+        
+        $('#agree-btn').on('click', function () {
+            $.ajax({
+                url: "{{url_for('userbp.updateaccept')}}",
+                type: 'POST',
+                dataType: 'json',
+                headers: { "X-CSRFToken": "{{csrf_token()}}" },
+                data: {id: "{{session['user_id']}}"},
+                success: function(resp) {
+                    if("{{session['setting']}}" == 0) {
+                        window.location.href = '/user/setting'
+                    } else {
+                        window.location.href = '/'
+                    }
+                }
+            });
+        });
+    </script>
 {% endblock %}
+

@@ -37,6 +37,70 @@
 				</footer>
 			</div>
 
+			<!--button class="btn btn-primary" style="display: none;" type="button" onclick="modalShow();"></button>
+
+			<div class="modal fade" id="settingModal" tabindex="-1" role="dialog" aria-labelledby="settingModalLabel" aria-hidden="true">
+				<div class="modal-dialog" role="document">
+					<div class="modal-content">
+						<div class="modal-header">
+							<h5 class="modal-title" id="settingModalLabel">기본설정</h5>
+							<button class="close" type="button" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button>
+						</div>
+						<div class="modal-body">
+							<form class="user" action="{{url_for('userbp.dologin')}}" method="post">
+								<input type="hidden" name="csrf_token" value="{{csrf_token()}}"/>
+								<div class="form-group">
+									<label>컨트롤러 이름</label>
+									<input type="text" class="form-control" id="controlName" name="controlName" placeholder="내용을 입력해주세요">
+								</div>
+								<div class="form-group">
+									<label>로고이미지</label>
+									<div class="custom-file">
+										<input type="file" class="custom-file-input" id="inputGroupFile01">
+										<label class="custom-file-label" for="inputGroupFile01" accept="image/*">내용을 입력해주세요</label>
+									</div>
+								</div>
+								<div class="form-group">
+									<label>표준시간대</label>
+									<select class="form-control" id="timezone" name="timezone">
+										<option value="1">(UTC-12:00)날짜 변경선 서쪽</option>
+										<option value="2">(UTC-11:00)	미드웨이 제도</option>
+										<option value="3">(UTC-10:00)	하와이</option>
+										<option value="4">(UTC-09:00)	알래스카</option>
+										<option value="5">(UTC-08:00)	티후아나, 바하 캘리포니아, 태평양 표준시(미국과 캐나다)</option>
+										<option value="6">(UTC-07:00)	애리조나, 치와와, 라파스, 마사틀란, 산지 표준시(미국과 캐나다)</option>
+										<option value="7">(UTC-06:00)	과달라하라, 멕시코시티, 몬테레이, 서스캐처원, 중앙 아메리카, 중부 표준시(미국과 캐나다)</option>
+										<option value="8">(UTC-05:00)	인디애나(동부), 보고타, 리마, 키토, 동부 표준시(미국과 캐나다), 카라카스</option>
+										<option value="9">(UTC-04:00)	아순시온, 산티아고, 조지타운, 라파스, 산후안, 마노스, 대서양 표준시(캐나다), 뉴펀들랜드</option>
+										<option value="10">(UTC-03:00)	카옌, 그린란드, 부에노스아이레스, 브라질리아, 몬테비디오</option>
+										<option value="11">(UTC-02:00)	중부-대서양</option>
+										<option value="12">(UTC-01:00)	아조레스, 카보베르데 제도</option>
+										<option value="13">(UTC+00:00)	카사블랑카, 더블린, 에든버러, 리스본, 런던, 몬로비아, 레이캬비크, 협정 세계시</option>
+										<option value="14">(UTC+01:00)	암스테르담, 베를린, 베른, 로마, 스톡홀름, 빈, 사라예보, 스코페, 바르샤바, 자그레브, 브뤼셀, 코펜하겐, 마드리드, 파리, 베오그라드, 브라티슬라바, 부다페스트, 류블랴나, 프라하, 서중앙 아프리카</option>
+										<option value="15">(UTC+02:00)	아테네, 부카레스트, 이스탄불, 암만, 빈트후크, 예루살렘, 카이로, 하라레, 프리토리아, 베이루트, 헬싱키, 키예프, 리가, 소피아, 탈린, 빌뉴스, 민스크</option>
+										<option value="16">(UTC+03:00)	쿠웨이트, 리야드, 트빌리시, 나이로비, 바그다드, 모스크바, 상트페테르부르크, 볼고그라드, 테헤란</option>
+										<option value="17">(UTC+04:00)	아부다비, 무스카트, 예레반, 바쿠, 포트루이스, 카불</option>
+										<option value="18">(UTC+05:00)	이슬라마바드, 카라치, 예카테린부르크, 타슈켄트, 스리자야와르데네푸라, 첸나이, 콜카타, 뭄바이, 뉴델리, 카트만두</option>
+										<option value="19">(UTC+06:00)	아스타나, 다카, 알마티, 노보시비르스크, 양곤</option>
+										<option value="20">(UTC+07:00)	크라스노야르스크, 방콕, 하노이, 자카르타</option>
+										<option value="21">(UTC+08:00)	이르쿠츠크, 울란바토르, 콸라룸푸르, 싱가포르, 퍼스, 타이베이, 베이징, 충칭, 홍콩 특별 행정구, 우루무치</option>
+										<option value="22" selected>(UTC+09:00)	서울, 야쿠츠크, 오사카, 삿포로, 도쿄, 애들레이드, 다윈</option>
+										<option value="23">(UTC+10:00)	블라디보스토크, 캔버라, 멜버른, 시드니, 괌, 포트모르즈비, 브리즈번, 호바트</option>
+										<option value="24">(UTC+11:00)	마가단, 솔로몬 제도, 뉴칼레도니아</option>
+										<option value="25">(UTC+12:00)	오클랜드, 웰링턴, 피지, 마셜 제도, 페트로파블로프스크-캄차스키</option>
+										<option value="26">(UTC+13:00)	사모아, 누쿠알로파</option>
+									</select>
+								</div>
+							</form>
+						</div>
+						<div class="modal-footer">
+							<button class="btn btn-secondary" type="button" data-dismiss="modal">Cancel</button>
+							<button class="btn btn-primary" id="agree-btn" type="button" data-dismiss="modal">OK</button>
+						</div>
+					</div>
+				</div>
+			</div-->
+
 			<a class="scroll-to-top rounded" href="#page-top">
 				<i class="fas fa-angle-up"></i>
 			</a>
@@ -47,5 +111,11 @@
 		<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js"></script>
 		<script src="{{ url_for('static', filename='js/custom.js') }}"></script>
 		{% block script %}{% endblock %}
+		<script>
+			function modalShow() {
+				$('#settingModal').modal("show")
+			}
+			
+		</script>
 	</body>
 </html>
