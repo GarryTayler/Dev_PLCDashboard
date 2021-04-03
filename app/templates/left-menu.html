@@ -1,7 +1,7 @@
 <ul class="navbar-nav bg-gradient-primary sidebar sidebar-dark accordion" id="accordionSidebar">
     <a class="sidebar-brand d-flex align-items-center justify-content-center" href="/">
         {% if control_logo|length > 0 %}
-            <img src="{{url_for('static', filename='upload/' + control_logo)}}" alt="logo-img" class="logo-img" style="width: 50px;" />
+            <img src="{{url_for('static', filename='upload/' + control_logo)}}" alt="logo-img" class="logo-img" />
         {% else %}
             <div class="sidebar-brand-icon rotate-n-15">
                 <i class="fas fa-laugh-wink"></i>

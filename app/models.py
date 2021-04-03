@@ -11,8 +11,6 @@ class User(db.Model, UserMixin):
     userid = db.Column(db.String)
     usertype = db.Column(db.String)
     _password = db.Column(db.String)
-    accept = db.Column(db.Integer)
-    setting = db.Column(db.Integer)
 
     @hybrid_property
     def password(self):
@@ -402,7 +400,6 @@ class Settings(db.Model, UserMixin):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String)
     value = db.Column(db.Text)
-    userid = db.Column(db.Integer)
 
 
 class CollectSet(db.Model, UserMixin):

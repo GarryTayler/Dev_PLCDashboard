@@ -77,14 +77,7 @@ def dologin():
             session['user_id'] = sel_user.id
             session['userid'] = sel_user.userid
             session['usertype'] = sel_user.usertype
-            session['accept'] = sel_user.accept
-            session['setting'] = sel_user.setting
-            if sel_user.accept == 0:
-                return redirect(url_for('userbp.login'))
-            elif sel_user.setting == 1:
-                return redirect('/')
-            else:
-                return redirect(url_for('userbp.setting'))
+            return redirect('/')
         else:
             flash("로그인 정보가 정확하지 않습니다")
             return redirect(url_for('userbp.login'))
@@ -97,8 +90,6 @@ def dologin():
 @login_required
 def logout():
     session.pop('is_login')
-    session.pop('accept')
-    session.pop('setting')
     return redirect('/')
 
 
@@ -791,61 +782,28 @@ def get_auth():
 
 @userbp.route('/setting')
 def setting():
-    userid=session['user_id']
-    if userid:
-        name = ''
-        zone = '22'
-        logo = ''
-        control_name = models.Settings.query.filter_by(name='control_name').filter_by(userid=userid).first()
-        if control_name is not None:
-            name=control_name.value
-        control_zone = models.Settings.query.filter_by(name='control_zone').filter_by(userid=userid).first()
-        if control_zone is not None:
-            zone=control_zone.value
-        control_logo = models.Settings.query.filter_by(name='control_logo').filter_by(userid=userid).first()
-        if control_logo is not None:
-            logo=control_logo.value
-        timezones = models.Timezone.query.all()
-        return render_template('user/setting.html', zone=zone, setting=name, logo=logo, timezones=timezones)
-    else :
-        return redirect(url_for('userbp.login'))
-    
+    cur_setting = models.Settings.query.filter_by(name='control_zone').first()
+    timezones = models.Timezone.query.all()
+    return render_template('user/setting.html', zone=cur_setting.value, timezones=timezones)
 
 
 @userbp.route('/update_setting', methods=['POST'])
 def update_setting():
     postData = request.values
     controlName = postData.get('control')
-    zone = postData.get('timezone')
     if check_null(controlName):
-        userid = session['user_id']
-        selName = models.Settings.query.filter_by(name='control_name').filter_by(userid=userid).first()
-
+        selName = models.Settings.query.filter_by(name='control_name').first()
         if selName:
             selName.value = controlName
         else:
             newName = models.Settings(
                 name='control_name',
-                value=controlName,
-                userid=userid
+                value=controlName
             )
             db.session.add(newName)
 
-        selZone = models.Settings.query.filter_by(name='control_zone').filter_by(userid=userid).first()
-
-        if selZone:
-            selZone.value = zone
-        else:
-            newZone = models.Settings(
-                name='control_zone',
-                value=zone,
-                userid=userid
-            )
-            db.session.add(newZone)
-        
-
         if postData.get('bool_file') == "1":
-            selLogo = models.Settings.query.filter_by(name='control_logo').filter_by(userid=userid).first()
+            selLogo = models.Settings.query.filter_by(name='control_logo').first()
             if postData.get('new_file') == '1':
                 selFile = request.files['file']
                 chkPath = config.UPLOAD_FOLDER + "logo/"
@@ -860,23 +818,13 @@ def update_setting():
                 else:
                     newLogo = models.Settings(
                         name='control_logo',
-                        value=uploadPath,
-                        userid=userid
+                        value=uploadPath
                     )
                     db.session.add(newLogo)
             else:
                 selLogo.value = ""
 
         db.session.commit()
-
-        
-        userModel = models.User
-        userSet = userModel.query.filter_by(id=userid).first()
-        if(userSet) :
-            userSet.setting = 1
-            session['setting'] = 1
-            db.session.commit()
-
         response = {'status': True}
     else:
         response = {'status': False, 'message': 'Invalid request'}
@@ -908,19 +856,3 @@ def save_interval():
 @userbp.route('/user_help')
 def user_help():
     return render_template('user/help.html')
-
-@userbp.route('/updateaccept', methods=['POST'])
-def updateaccept():
-    postData = request.values
-    userid = postData.get('id')
-    userModel = models.User
-    userSet = userModel.query.filter_by(id=userid).first()
-    if(userSet) :
-        userSet.accept = 1
-        session['accept'] = 1
-        db.session.commit()
-    
-    # db.session.add(userSet)
-    
-
-    return json.dumps({'status': True})
