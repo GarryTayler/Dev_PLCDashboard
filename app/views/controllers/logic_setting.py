@@ -311,7 +311,7 @@ def condgroup():
                            alarms=alarms, remotes=get_remotes())
 
 
-@logic_setting.route('/condgroup_list', methods=['POSt'])
+@logic_setting.route('/condgroup_list', methods=['POST'])
 @login_required
 def condgroup_list():
     postData = request.values
@@ -347,8 +347,7 @@ def condgroup_list():
 
     return json.dumps(datatable_list(data_list, totalCount, draw))
 
-
-@logic_setting.route('/actgroup_list', methods=['POSt'])
+@logic_setting.route('/actgroup_list', methods=['POST'])
 @login_required
 def actgroup_list():
     postData = request.values

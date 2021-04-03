@@ -15,7 +15,7 @@
                     <label class="input-label" for="control-name">컨트롤러 이름</label>
                 </div>
                 <div class="col-3">
-                    <input type="text" class="form-control" id="control-name" value="{{control_name}}" placeholder="컨트롤러 이름" />
+                    <input type="text" class="form-control" id="control-name" value="{{setting}}" placeholder="컨트롤러 이름" />
                 </div>
             </div>
             <div class="form-group row">
@@ -23,9 +23,9 @@
                     <label class="input-label" for="file-demo">로고</label>
                 </div>
                 <div class="col-3">
-                    {% if control_logo|length > 0 %}
+                    {% if logo|length > 0 %}
                         <div id="logo-img">
-                            <img src="{{url_for('static', filename='upload/' + control_logo)}}" alt="logo-img" class="logo-img" />
+                            <img src="{{url_for('static', filename='upload/' + logo)}}" alt="logo-img" class="logo-img" />
                             <div class="btn-panel">
                                 <button class="btn btn-danger btn-icon-split mb-2" onclick="removeImg();">
                                     <span class="icon text-white-50">
@@ -36,7 +36,7 @@
                             </div>
                         </div>
                     {% endif %}
-                    <div id="file-select" {%if control_logo|length > 0%}style="display: none;"{%endif%}>
+                    <div id="file-select" {%if logo|length > 0%}style="display: none;"{%endif%}>
                         <label class="text-danger">로고사이즈: 192 X 60</label>
                         <input id="file-demo" type="file" accept="image/*" onchange="fileChange();">
                     </div>
@@ -99,7 +99,7 @@
             formData.append("timezone", $("#control-zone").val());
             formData.append("control", $("#control-name").val().trim());
 
-            sendAjax("{{url_for('userbp.update_setting')}}", formData);
+            sendAjax("{{url_for('userbp.update_setting')}}", formData, true, true);
         }
 
         $(document).ready(function() {

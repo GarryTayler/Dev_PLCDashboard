@@ -281,6 +281,7 @@
         const remLimit = parseInt("{{remote_limit}}");
         const removeCliTbl = $("#remote-client-table");
         let remoteTbl, remCnt = 0, chkArr = [];
+        let pageLoad = true;
 
         function addClient() {
             if(remCnt < remLimit) {
@@ -400,15 +401,30 @@
                     'url': "{{url_for('logic_setting.variable_list')}}",
                     'headers': { "X-CSRFToken": csrf_token },
                     'data': function(data){
-                        let curPage = localStorage.getItem('cur-page');
-                        curPage = curPage ? curPage : 0;
-                        return {
-                            ...data,
-                            start: curPage * parseInt(data.length),
-                            variable: varSelect.val(),
-                            variable_type: remoteType.val(),
-                            variable_id: varSelect.find(':selected').attr('remote-id')
-                        };
+                        if(pageLoad) {
+                            pageLoad = false;
+                            let curPage = localStorage.getItem('remote-vcur-page');
+
+                            data = {
+                                ...data,
+                                start: curPage * parseInt(data.length),
+                                variable: varSelect.val(),
+                                variable_type: remoteType.val(),
+                                variable_id: varSelect.find(':selected').attr('remote-id')
+                            }
+
+                            return data;
+                        }
+                        else {
+                            data = {
+                                ...data,
+                                variable: varSelect.val(),
+                                variable_type: remoteType.val(),
+                                variable_id: varSelect.find(':selected').attr('remote-id')
+                            }
+
+                            return data;
+                        }
                     }
                 },
                 "columns": [
@@ -452,15 +468,17 @@
                     if(parseInt(pageInfo.length) * pageInfo.page > pageInfo.recordsTotal) {
                         dataTables.page(0);
                         updateVariable();
-                    } else {
-                        setDataTblPage(variableTbl, oSettings._iDisplayLength);
-                        const trArr = $("#variable-table tbody tr");
-                        const prefixStr = varSelect.find(':selected').attr('remote-id') + ';';
-                        for(let ii = 0; ii < trArr.length; ii++) {
-                            const trItem = $(trArr[ii]);
-                            const trID = prefixStr + trItem.find("input[type='checkbox']").attr('id').replace('check-row-', '');
-                            trItem.find("input[type='checkbox']").prop('checked', chkArr.indexOf(trID) >= 0);
-                        }
+                    }
+                    else {
+                        setDataRemoteVariableTblPage(variableTbl, oSettings._iDisplayLength);
+                    }
+
+                    const trArr = $("#variable-table tbody tr");
+                    const prefixStr = varSelect.find(':selected').attr('remote-id') + ';';
+                    for(let ii = 0; ii < trArr.length; ii++) {
+                        const trItem = $(trArr[ii]);
+                        const trID = prefixStr + trItem.find("input[type='checkbox']").attr('id').replace('check-row-', '');
+                        trItem.find("input[type='checkbox']").prop('checked', chkArr.indexOf(trID) >= 0);
                     }
                 }
             });
@@ -503,7 +521,7 @@
                 "order": [[ 1, "asc" ]],
                 "drawCallback": function(oSettings) {
                     remCnt = oSettings._iRecordsTotal;
-                    setDataTblPage(removeCliTbl, oSettings._iDisplayLength);
+                    // setDataTblPage(removeCliTbl, oSettings._iDisplayLength);
                 },
                 'ajax': {
                     'url': "{{url_for('communicate.client_list')}}",
@@ -529,6 +547,13 @@
                     } else if(selInd < 0 && selChk1) {
                         chkArr.push(selID);
                     }
+                }
+            });
+
+
+            $(window).bind("beforeunload", function() {
+                if(dataTables) {
+                    localStorage.setItem('remote-vcur-page', dataTables.page.info().page);
                 }
             });
         });

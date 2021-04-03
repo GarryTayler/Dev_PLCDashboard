@@ -30,8 +30,8 @@ def index():
 def current_time():
     selModel = models.Authority
     userID = session.get('user_id')
-    auths = selModel.query.filter_by(userid=userID).with_entities(selModel.edit, selModel.menu, selModel.read).all()
-    auth_list = [auth.menu for auth in auths if auth.edit == "0" and auth.read == "0"]
+    auths = selModel.query.filter_by(userid=userID).with_entities(selModel.edit, selModel.menu, selModel.read).all() if userID is not None else []
+    auth_list = [auth.menu for auth in auths if auth.edit == "0" and auth.read == "0"] if userID is not None else []
 
     edit_auth = False
     noExist = True
@@ -55,6 +55,18 @@ def current_time():
     # mode = "run" if u2p_shm.get_run_mode() == 1 else "stop"
     mode = "stop"
 
+    userid=''
+    print(session)
+    if session and session.get('user_id'):
+        userid = session['user_id']
+    if userid:
+        selSet = models.Settings.query.filter_by(name='control_name').filter_by(userid=userid).first()
+        selName = selSet.value if selSet else ""
+        selSet = models.Settings.query.filter_by(name='control_logo').filter_by(userid=userid).first()
+        selLogo = selSet.value if selSet else ""
+    else:
+        selName = ""
+        selLogo = ""
     selSet = models.Settings.query.filter_by(name='control_name').first()
     selName = selSet.value if selSet else ""
     selSet = models.Settings.query.filter_by(name='control_logo').first()
