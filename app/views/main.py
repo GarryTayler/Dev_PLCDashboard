@@ -56,7 +56,6 @@ def current_time():
     mode = "stop"
 
     userid=''
-    print(session)
     if session and session.get('user_id'):
         userid = session['user_id']
     if userid:
@@ -64,16 +63,20 @@ def current_time():
         selName = selSet.value if selSet else ""
         selSet = models.Settings.query.filter_by(name='control_logo').filter_by(userid=userid).first()
         selLogo = selSet.value if selSet else ""
+        selSet = models.Settings.query.filter_by(name='mode').filter_by(userid=userid).first()
+        selMode = selSet.value if selSet else "stop"
     else:
         selName = ""
         selLogo = ""
+        selMode = "stop"
+    
     selSet = models.Settings.query.filter_by(name='control_name').first()
     selName = selSet.value if selSet else ""
     selSet = models.Settings.query.filter_by(name='control_logo').first()
     selLogo = selSet.value if selSet else ""
 
     return {'current_date': now.strftime('%Y-%m-%d'), 'current_time': now.strftime('%H:%M:%S'), "logic_list": logic,
-            'monitors': monitors, 'selmode': mode, 'auth_list': auth_list, 'edit_auth': edit_auth,
+            'monitors': monitors, 'selmode': selMode, 'auth_list': auth_list, 'edit_auth': edit_auth,
             'control_name': selName, 'control_logo': selLogo}
 
 
