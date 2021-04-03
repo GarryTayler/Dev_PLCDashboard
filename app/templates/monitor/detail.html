@@ -578,8 +578,9 @@
                                 <select class="form-control" id="set-digital-type">
                                     <option value="combobox">콤보박스</option>
                                     <option value="pushbtn">푸시버튼</option>
-                                    <option value="locus">락커스위치</option>
-                                    <option value="lottery">로터리스위치</option>
+                                    <option value="switch">스위치</option>
+{#                                    <option value="locus">락커스위치</option>#}
+{#                                    <option value="lottery">로터리스위치</option>#}
                                 </select>
                             </div>
                         </div>
@@ -1299,7 +1300,7 @@
                 const selVal = $(this).val();
                 const locusPanel = $("#locus-panel");
                 const comboPanel = $("#combobox-panel");
-                if(["pushbtn", "lottery", "locus"].indexOf(selVal) >= 0) {
+                if(["pushbtn", "lottery", "locus", "switch"].indexOf(selVal) >= 0) {
                     locusPanel.show();
                     if(selVal === "pushbtn") {
                         comboPanel.show();
@@ -1652,6 +1653,15 @@
                 $(this).find('.header-badge').show();
             }, function() {
                 $(this).find('.header-badge').hide();
+            });
+
+            $("input[type=checkbox].set-val-input").on('change', function() {
+                if (this.checked === true) {
+                    const color = $(this).attr('color');
+                    $(this).parent().children('label.tgl-btn').first().css('background', color);
+                } else {
+                    $(this).parent().children('label.tgl-btn').first().css('background', '#4d4d4d');
+                }
             });
         });
     </script>
