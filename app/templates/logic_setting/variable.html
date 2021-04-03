@@ -65,6 +65,7 @@
         const variableTbl = $("#variable-table");
         const varSelect = $("#variable-select");
         const typeSelect = $("#type-select");
+        let pageLoad = true;
 
         function updateDefault(inputItem) {
             const inputOrigin = inputItem.attr('origin');
@@ -176,28 +177,41 @@
                 "columnDefs": columnDef,
                 "drawCallback": function(oSettings) {
                     const pageInfo = dataTables.page.info();
+
                     if(parseInt(pageInfo.length) * pageInfo.page > pageInfo.recordsTotal) {
                         dataTables.page(0);
                         updateVariable();
                     } else {
-                        setDataTblPage($("#variable-table"), oSettings._iDisplayLength);
+                        setDataVariableTblPage($("#variable-table"), oSettings._iDisplayLength);
                     }
                 },
                 'ajax': {
                     'url': "{{url_for('logic_setting.variable_list')}}",
                     'headers': { "X-CSRFToken": csrf_token },
                     'data': function(data){
-                        let curPage = localStorage.getItem('cur-page');
-                        curPage = curPage ? curPage : 0;
-                        data = {
-                            ...data,
-                            start: curPage * parseInt(data.length),
-                            variable: varSelect.val(),
-                            variable_type: typeSelect.val(),
-                            variable_id: varSelect.find(':selected').attr('remote-id')
+                        if(pageLoad) {
+                            pageLoad = false;
+                            let curPage = localStorage.getItem('variable-cur-page');
+                            console.log("cur page====", curPage);
+                            curPage = curPage ? curPage : 0;
+                            data = {
+                                ...data,
+                                start: curPage * parseInt(data.length),
+                                variable: varSelect.val(),
+                                variable_type: typeSelect.val(),
+                                variable_id: varSelect.find(':selected').attr('remote-id')
+                            }
+                            return data;
                         }
-
-                        return data;
+                        else {
+                            data = {
+                                ...data,
+                                variable: varSelect.val(),
+                                variable_type: typeSelect.val(),
+                                variable_id: varSelect.find(':selected').attr('remote-id')
+                            }
+                            return data;
+                        }
                     }
                 },
                 "columns": [
@@ -285,6 +299,12 @@
 
             variableTbl.on('change', "tbody .write-input", function() {
                 updateWrite($(this));
+            });
+
+            $(window).bind("beforeunload", function() {
+                if(dataTables) {
+                    localStorage.setItem('variable-cur-page', dataTables.page.info().page);
+                }
             });
         });
     </script>
