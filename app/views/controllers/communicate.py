@@ -1,7 +1,7 @@
 from flask import render_template, Blueprint, request
 from app.views.controllers.user import login_required
 from app import models, db, config
-from sqlalchemy import cast, Integer
+from sqlalchemy import cast, Integer, func
 from app.helper.common import check_null, get_remotes, datatable_list, datatable_head, get_ethercat
 from app.helper.const import uiSizeModbusMasterChannel, uiSizeUserDefComm, uiSizeUserDefCommFrame, uiSizeRemoteConn, \
     uiSizeModbus
@@ -418,6 +418,8 @@ def update_local():
 def add_client():
     postData = request.values
     client_id = postData.get('selid')
+
+    
     if check_null(client_id):
         if int(client_id) > 0:
             selClient = models.RemoteClient.query.filter_by(id=client_id).first()
@@ -426,11 +428,14 @@ def add_client():
             selClient.ip = postData.get('client_ip')
             selClient.port = postData.get('client_port')
         else:
+            orderObj = models.RemoteClient.remote_id.desc()
+            remoteInfo = models.RemoteClient.query.order_by(orderObj).first()
             newClient = models.RemoteClient(
                 ip=postData.get('client_ip'),
                 name=postData.get('client_name'),
                 port=postData.get('client_port'),
-                use_flag=postData.get('use_flag')
+                use_flag=postData.get('use_flag'),
+                remote_id=remoteInfo.remote_id+1
             )
 
             db.session.add(newClient)

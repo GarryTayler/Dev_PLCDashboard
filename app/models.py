@@ -362,6 +362,7 @@ class RemoteClient(db.Model, UserMixin):
     name = db.Column(db.String)
     ip = db.Column(db.String)
     port = db.Column(db.String)
+    remote_id = db.Column(db.Integer)
 
 
 class EthercatDevice(db.Model, UserMixin):
