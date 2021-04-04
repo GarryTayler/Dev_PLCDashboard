@@ -643,22 +643,39 @@ def variable_list():
     elif end < 0:
         end = 0
 
-    data_list_count = models.Variable.query.filter_by(remote=remoteID).filter_by(use_flag="1").filter(models.Variable.type.ilike('%'+variable_type+'%')).all()
-    totalCount = len(data_list_count)
-
+    if remoteID != '0':
+        data_list_count = models.Variable.query.filter_by(remote=remoteID).filter_by(use_flag="1").filter(models.Variable.type.ilike('%'+variable_type+'%')).all()
+        totalCount = len(data_list_count)
+    
     orderObj = models.Variable.addr_id.asc()
     data_list = models.Variable.query.filter_by(remote=remoteID).filter_by(use_flag="1").filter(models.Variable.type.ilike('%'+variable_type+'%')).order_by(orderObj).offset(start).limit(length).all()
     
-    for i in range(len(data_list)):
-        itemStr = variable_type + "-" + str(i)
+    if remoteID != '0':
+        for i in range(len(data_list)):
+            itemStr = variable_type + "-" + str(i)
 
-        itemName = data_list[i].name if data_list[i] and len(data_list[i].name) > 0 else config.VARIABLE_TYPE[variable_type.upper()] + str(data_list[i].addr_id) if data_list[i].addr_id else str(i)
+            nameEnd =  str(data_list[i].addr_id) if data_list[i].addr_id is not None else str(i)
+            itemName = data_list[i].name if data_list[i] and len(data_list[i].name) > 0 else config.VARIABLE_TYPE[variable_type.upper()] +nameEnd
 
-        itemUnit = data_list[i].unit if data_list[i] else ''
-        itemChk = data_list[i].use_flag if data_list[i] else '0'
-        itemDefault = data_list[i].defaults if data_list[i] else ''
-        selList.append({'id': i, 'address': variableStr + str(data_list[i].addr_id) if data_list[i].addr_id else str(i), 'name': itemName, 'chk': itemChk, 'unit': itemUnit, 'default': itemDefault})
-    
+            itemUnit = data_list[i].unit if data_list[i] else ''
+            itemChk = data_list[i].use_flag if data_list[i] else '0'
+            itemDefault = data_list[i].defaults if data_list[i] else ''
+            
+            adressEnd = str(data_list[i].addr_id) if data_list[i].addr_id is not None  else str(i)
+            selList.append({'id': i, 'address': variableStr +adressEnd , 'name': itemName, 'chk': itemChk, 'unit': itemUnit, 'default': itemDefault})
+    else:
+        for i in range(start, end, step):
+            itemStr = variable_type + "-" + str(i)
+            selVar = models.Variable.query.filter_by(remote=remoteID).filter_by(type=itemStr).first()
+
+            itemName = selVar.name if selVar and len(selVar.name) > 0 else config.VARIABLE_TYPE[
+                                                                            variable_type.upper()] + str(i)
+            itemUnit = selVar.unit if selVar else ''
+            itemChk = selVar.use_flag if selVar else '0'
+            itemDefault = selVar.defaults if selVar else ''
+            selList.append({'id': i, 'address': variableStr + str(i), 'name': itemName, 'chk': itemChk, 'unit': itemUnit,
+                            'default': itemDefault})
+    print(selList)
     return json.dumps(datatable_list(selList, totalCount, draw))
 
 
