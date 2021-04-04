@@ -449,20 +449,26 @@ def update_variable():
     selModel = models.Variable
     for key, val in postData.items():
         keyArr = key.split(';')
-        selVar = selModel.query.filter_by(remote=keyArr[0]).filter_by(type=keyArr[1]).first()
-        if selVar:
-            selVar.use_flag = val
-        else:
-            newVar = selModel(
-                ind='',
-                name='',
-                unit='',
-                type=keyArr[1],
-                defaults='',
-                use_flag=val,
-                remote=keyArr[0]
-            )
-            db.session.add(newVar)
+        addrVal = keyArr[1].split('-')
+        if val == '0':
+            selVar = selModel.query.filter_by(remote=keyArr[0]).filter_by(type=keyArr[1]).delete()
+        else :
+            selVar = selModel.query.filter_by(remote=keyArr[0]).filter_by(type=keyArr[1]).first()
+            if selVar:
+                selVar.use_flag = val
+                selVar.addr_id = int(addrVal[1])
+            else:
+                newVar = selModel(
+                    ind='',
+                    name='',
+                    unit='',
+                    type=keyArr[1],
+                    defaults='',
+                    use_flag=val,
+                    remote=keyArr[0],
+                    addr_id=int(addrVal[1])
+                )
+                db.session.add(newVar)
 
     db.session.commit()
     return json.dumps({'status': True})

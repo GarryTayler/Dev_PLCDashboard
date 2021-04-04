@@ -234,6 +234,7 @@ class Variable(db.Model, UserMixin):
     use_flag = db.Column(db.String)
     defaults = db.Column(db.String)
     unit = db.Column(db.String)
+    addr_id = db.Column(db.Integer)
 
 
 class Monitor(db.Model, UserMixin):

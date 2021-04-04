@@ -379,7 +379,7 @@
                     postData[prefixStr + rowItem.attr('id').replace('check-row-', '')] = rowItem.prop('checked') ? '1' : '0';
                 }
             }
-
+            
             sendAjax("{{url_for('communicate.update_variable')}}", postData, false);
             alert(saveMsg);
         }
@@ -398,7 +398,7 @@
                 ...dataTableObj,
                 "columnDefs": columnDef,
                 'ajax': {
-                    'url': "{{url_for('logic_setting.variable_list')}}",
+                    'url': "{{url_for('logic_setting.remote_list')}}",
                     'headers': { "X-CSRFToken": csrf_token },
                     'data': function(data){
                         if(pageLoad) {
@@ -432,7 +432,7 @@
                         render: function (data, type, row) {
                             const prefixStr = varSelect.find(':selected').attr('remote-id') + ';';
                             const selID = remoteType.val() + "-" + row.id
-                            if(chkArr.indexOf(prefixStr + selID) >= 0) {
+                            if(chkArr.indexOf(prefixStr + selID) >= 0 || row.chk == "1") {
                                 chkArr.push(prefixStr + selID);
                             }
 
