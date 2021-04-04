@@ -57,6 +57,25 @@ def detail(selid=0):
                     element.pop('sizeoptions')
                     options = json.loads(element['options'])
 
+                    element['unit'] = ""
+
+                    if element['type'] in ['read_val', 'set_val']:
+                        if ('set_val_variable_seltype' in options or 'read_val_variable_seltype' in options):
+                            if('set_val_variable_seltype' in options):
+                                variable_type = options['set_val_variable_selid'].split('-')[0]
+                                _key_value = 'set_val'
+                            else:
+                                variable_type = options['read_val_variable_selid'].split('-')[0]
+                                _key_value = 'read_val'
+                            if(variable_type == 'analog'):
+                                variable_remote = options[_key_value + '_variable_seltype'].split('-')[1]
+                                print(variable_remote, options[_key_value + '_variable_selid'])
+                                unit_row = models.Variable.query.filter(models.Variable.remote == variable_remote, models.Variable.type == options[_key_value + '_variable_selid']).first()
+                                if(unit_row is not None):
+                                    element['unit'] = unit_row.unit
+                                else:
+                                    element['unit'] = ''
+
                     if len(size_options) > 0:
                         optArr = json.loads(size_options)
                         element['width'] = str(optArr['selWidth'])
@@ -89,7 +108,6 @@ def detail(selid=0):
                         # element['unit'] = unit_val
 
                         element['shm_val'] = '21.5'
-                        element['unit'] = "°C"
                     elif element['type'] == 'table':
                         for key, val in options.items():
                             if 'row-' in key or 'column-' in key:
