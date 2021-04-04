@@ -22,7 +22,7 @@
                     <select class="form-control" id="variable-select" onchange="updateVariable();">
                         <option value="local-0" remote-id="0">로컬</option>
                         {% for remote in remotes %}
-                            <option value="remote-{{loop.index}}" remote-id="{{remote.id}}">{{remote.name}}</option>
+                            <option value="remote-{{loop.index}}" remote-id="{{remote.remote_id}}">{{remote.name}}</option>
                         {% endfor %}
                     </select>
                 </div>

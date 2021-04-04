@@ -29,7 +29,7 @@ def datatable_list(data_list, totalCount, draw):
 
 
 def get_remotes():
-    return models.RemoteClient.query.with_entities(models.RemoteClient.id, models.RemoteClient.name).all()
+    return models.RemoteClient.query.with_entities(models.RemoteClient.id, models.RemoteClient.name, models.RemoteClient.remote_id).all()
 
 
 def check_null(input_val=None):

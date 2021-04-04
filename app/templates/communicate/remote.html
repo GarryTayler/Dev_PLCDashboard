@@ -154,7 +154,7 @@
                             <label class="input-label" for="variable-select">위치</label>
                             <select class="form-control" id="variable-select" onchange="updateVariable();">
                                 {% for remote in remotes %}
-                                    <option value="remote-{{loop.index}}" remote-id="{{remote.id}}">{{remote.name}}</option>
+                                    <option value="remote-{{loop.index}}" remote-id="{{remote.remote_id}}">{{remote.name}}</option>
                                 {% endfor %}
                             </select>
                         </div>
@@ -305,7 +305,7 @@
         function removeClient() {
             const url = '{{url_for("communicate.remove_modbus")}}';
             const customData = {selType: 'remote'};
-            removeCustom(removeCliTbl, url, "", customData);
+            removeCustom('remote-client-table', url, "", customData);
         }
 
         function doClientAdd() {
