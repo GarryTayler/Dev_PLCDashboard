@@ -79,7 +79,7 @@ def dologin():
             session['usertype'] = sel_user.usertype
             session['accept'] = sel_user.accept
             session['setting'] = sel_user.setting
-            if sel_user.accept == 0:
+            if sel_user.accept == 0 or sel_user.accept is None:
                 return redirect(url_for('userbp.login'))
             elif sel_user.setting == 1:
                 return redirect('/')

@@ -63,7 +63,8 @@
         function modalShow() {
             $('#exampleModal').modal("show")
         }
-        if("{{session['accept']}}" == "0") {
+        
+        if("{{session['accept']}}" == "0" || "{{session['accept']}}" == "None") {
             modalShow()
         } else if("{{session['is_login']}}" && "{{session['accept']}}" == 1) {
             window.location.href = '/'

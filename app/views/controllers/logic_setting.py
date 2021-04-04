@@ -614,7 +614,7 @@ def variable_list():
     variable_type = postData.get('variable_type')
     variable1 = postData.get('variable').split('-')
     variableStr = "LOCAL." if variable1[0] == "local" else "REMOTE." + variable1[1] + "."
-
+    
     totalCount = 0
     variable_type1 = config.VARIABLE_MATCH[variable_type]
     variableStr += variable_type1 + "."
@@ -643,6 +643,65 @@ def variable_list():
     elif end < 0:
         end = 0
 
+    data_list_count = models.Variable.query.filter_by(remote=remoteID).filter_by(use_flag="1").filter(models.Variable.type.ilike('%'+variable_type+'%')).all()
+    totalCount = len(data_list_count)
+
+    orderObj = models.Variable.addr_id.asc()
+    data_list = models.Variable.query.filter_by(remote=remoteID).filter_by(use_flag="1").filter(models.Variable.type.ilike('%'+variable_type+'%')).order_by(orderObj).offset(start).limit(length).all()
+    
+    for i in range(len(data_list)):
+        itemStr = variable_type + "-" + str(i)
+
+        itemName = data_list[i].name if data_list[i] and len(data_list[i].name) > 0 else config.VARIABLE_TYPE[variable_type.upper()] + str(data_list[i].addr_id) if data_list[i].addr_id else str(i)
+
+        itemUnit = data_list[i].unit if data_list[i] else ''
+        itemChk = data_list[i].use_flag if data_list[i] else '0'
+        itemDefault = data_list[i].defaults if data_list[i] else ''
+        selList.append({'id': i, 'address': variableStr + str(data_list[i].addr_id) if data_list[i].addr_id else str(i), 'name': itemName, 'chk': itemChk, 'unit': itemUnit, 'default': itemDefault})
+    
+    return json.dumps(datatable_list(selList, totalCount, draw))
+
+
+@logic_setting.route('/remote_list', methods=['POST'])
+@login_required
+def remote_list():
+    postData = request.values
+    draw, start, length, columnIndex, columnName, sortOrder = datatable_head(postData)
+    # searchValue = postData.get('search[value]')
+
+    remoteID = postData.get('variable_id')
+    variable_type = postData.get('variable_type')
+    variable1 = postData.get('variable').split('-')
+    variableStr = "LOCAL." if variable1[0] == "local" else "REMOTE." + variable1[1] + "."
+    
+    totalCount = 0
+    variable_type1 = config.VARIABLE_MATCH[variable_type]
+    variableStr += variable_type1 + "."
+    if variable_type1 == "DG":
+        totalCount = const.uiSizeDigital
+    elif variable_type1 == "AN":
+        totalCount = const.uiSizeAnalog
+    elif variable_type1 == "ST":
+        totalCount = const.uiSizeString
+    elif variable_type1 == "DT":
+        totalCount = const.uiSizeDate
+    elif variable_type1 == "TM":
+        totalCount = const.uiSizeTime
+
+    if start > totalCount:
+        start = 0
+
+    selList = []
+    sortOrder = "asc"
+    step = 1 if sortOrder == "asc" else -1
+    end = start + length if sortOrder == "asc" else totalCount - start - length
+    start = start if sortOrder == "asc" else totalCount - start - 1
+
+    if end >= totalCount:
+        end = totalCount
+    elif end < 0:
+        end = 0
+    
     for i in range(start, end, step):
         itemStr = variable_type + "-" + str(i)
         selVar = models.Variable.query.filter_by(remote=remoteID).filter_by(type=itemStr).first()
@@ -655,13 +714,14 @@ def variable_list():
         selList.append({'id': i, 'address': variableStr + str(i), 'name': itemName, 'chk': itemChk, 'unit': itemUnit,
                         'default': itemDefault})
 
+    
     return json.dumps(datatable_list(selList, totalCount, draw))
 
 
 @logic_setting.route('/remove_recipe', methods=['POST'])
 @login_required
 def remove_recipe():
-    postData = request.values
+    postData = request.values 
     selIDs = postData.get('selRow')
     if check_null(selIDs):
         selType = postData.get('selType')
