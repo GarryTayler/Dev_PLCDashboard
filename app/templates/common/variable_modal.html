@@ -17,7 +17,7 @@
                         <select class="form-control" id="modal-fluid-type">
                             <option value="local-0" remote-id="0">로컬</option>
                             {% for remote in remotes %}
-                                <option value="remote-{{loop.index}}" remote-id="{{remote.id}}">{{remote.name}}</option>
+                                <option value="remote-{{loop.index}}" remote-id="{{remote.remote_id}}">{{remote.name}}</option>
                             {% endfor %}
                         </select>
                     </div>
@@ -86,7 +86,7 @@
                             <select class="form-control" id="modal-variable-type" onchange="updateVariable(variableInst);">
                                 <option value="local-0" remote-id="0">로컬</option>
                                 {% for remote in remotes %}
-                                    <option value="remote-{{loop.index}}" remote-id="{{remote.id}}">{{remote.name}}</option>
+                                    <option value="remote-{{loop.index}}" remote-id="{{remote.remote_id}}">{{remote.name}}</option>
                                 {% endfor %}
                             </select>
                         </div>
@@ -306,8 +306,10 @@
                     const suffixStr = ';' + varSelect.val();
                     for (let ii = 0; ii < trArr.length; ii++) {
                         const trItem = $(trArr[ii]);
-                        const trID = prefixStr + trItem.find("input[type='checkbox']").attr('id').replace('check-row-', '') + suffixStr;
-                        trItem.find("input[type='checkbox']").prop('checked', chkArr.indexOf(trID) >= 0);
+                        if(trItem.find("input[type='checkbox']").attr('id')) {
+                            const trID = prefixStr + trItem.find("input[type='checkbox']").attr('id').replace('check-row-', '') + suffixStr;
+                            trItem.find("input[type='checkbox']").prop('checked', chkArr.indexOf(trID) >= 0);
+                        }
                     }
                 }
             }
