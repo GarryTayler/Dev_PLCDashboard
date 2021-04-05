@@ -672,7 +672,7 @@ def variable_list():
             itemDefault = selVar.defaults if selVar else ''
             selList.append({'id': i, 'address': variableStr + str(i), 'name': itemName, 'chk': itemChk, 'unit': itemUnit,
                             'default': itemDefault})
-    print(selList)
+    
     return json.dumps(datatable_list(selList, totalCount, draw))
 
 
