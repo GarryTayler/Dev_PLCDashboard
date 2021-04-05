@@ -79,7 +79,7 @@ class SharedMem_LocalVar: # shared memory에서 변수 읽기 / 쓰기
         self._WriteMem = "_SharedMem_UI_Write"
 
     def set_buff(self, var_address, var_type, var_val):
-        write_shm = shared_memory.SharedMemory(self._WriteMem)  #Attach _SharedMem_UI_Write
+        write_shm = shared_memory.SharedMemory(self._WriteMem)  #Attach _SharedMem_UI_Write (_SharedMem_UI_Write 에 접근)
         uiCnt = int(struct.unpack('H', bytes(write_shm.buf[0:2]))[0])
         if uiCnt < uiSizeUIWrite:
             exist_flag = False

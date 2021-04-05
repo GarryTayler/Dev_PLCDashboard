@@ -662,7 +662,7 @@ def variable_list():
             itemDefault = data_list[i].defaults if data_list[i] else ''
             
             adressEnd = str(data_list[i].addr_id) if data_list[i].addr_id is not None  else str(i)
-            selList.append({'id': i, 'address': variableStr +adressEnd , 'name': itemName, 'chk': itemChk, 'unit': itemUnit, 'default': itemDefault})
+            selList.append({'id': i, 'address': variableStr +adressEnd , 'name': itemName, 'chk': itemChk, 'unit': itemUnit, 'default': itemDefault, 'addr_id': data_list[i].addr_id, 'remote_id': remoteID})
     else:
         for i in range(start, end, step):
             itemStr = variable_type + "-" + str(i)
@@ -674,7 +674,7 @@ def variable_list():
             itemChk = selVar.use_flag if selVar else '0'
             itemDefault = selVar.defaults if selVar else ''
             selList.append({'id': i, 'address': variableStr + str(i), 'name': itemName, 'chk': itemChk, 'unit': itemUnit,
-                            'default': itemDefault})
+                            'default': itemDefault, 'remote_id': remoteID})
 
     return json.dumps(datatable_list(selList, totalCount, draw))
 

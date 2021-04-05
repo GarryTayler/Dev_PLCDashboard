@@ -22,7 +22,7 @@
                     <select class="form-control" id="variable-select" onchange="updateVariable();">
                         <option value="local-0" remote-id="0">로컬</option>
                         {% for remote in remotes %}
-                            <option value="remote-{{loop.index}}" remote-id="{{remote.remote_id}}">{{remote.name}}</option>
+                            <option value="remote-{{loop.index - 1}}" remote-id="{{remote.remote_id}}">{{remote.name}}</option>
                         {% endfor %}
                     </select>
                 </div>
@@ -292,7 +292,10 @@
                     }
                 ],
                 "createdRow": function(row, data) {
-                    $(row).attr('data-row', $("#type-select").val() + "-" + data.id);
+                    if(data.remote_id != '0')
+                        $(row).attr('data-row', $("#type-select").val() + "-" + data.addr_id);
+                    else
+                        $(row).attr('data-row', $("#type-select").val() + "-" + data.id);
                 }
             });
 
