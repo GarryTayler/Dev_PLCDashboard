@@ -363,7 +363,7 @@
                                     {% if element.set_digital_icon_img|length > 0 %}
                                         <img src="{{url_for('static', filename='upload/' + element.set_digital_icon_img)}}" alt="icon-img" class="icon-img" />
                                     {% endif %}
-                                    <div class="element-detail" selid="{{element.set_val_variable_selid}}" seladdress="{{element.set_val_variable_selid}}">
+                                    <div class="element-detail" selid="{{element.set_val_variable_selid}}" seladdress="{{element.set_val_variable_sellocstr}}">
                                         {% if 'digital-' in element.set_val_variable_selid %}
                                             {% if element.set_digital_type == 'combobox' %}
                                                 <select class="form-control set-val-input combobox-input">
