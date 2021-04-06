@@ -363,7 +363,7 @@
                                     {% if element.set_digital_icon_img|length > 0 %}
                                         <img src="{{url_for('static', filename='upload/' + element.set_digital_icon_img)}}" alt="icon-img" class="icon-img" />
                                     {% endif %}
-                                    <div class="element-detail" selid="{{element.set_val_variable_selid}}">
+                                    <div class="element-detail" selid="{{element.set_val_variable_selid}}" seladdress="{{element.set_val_variable_selid}}">
                                         {% if 'digital-' in element.set_val_variable_selid %}
                                             {% if element.set_digital_type == 'combobox' %}
                                                 <select class="form-control set-val-input combobox-input">
@@ -1583,7 +1583,8 @@
                 }
             }).on('slideStop', function(e) {
                 const selID = $(this).closest('div.element-detail').attr('selid');
-                sendAjax("{{url_for('logic_setting.write_variable')}}", {writeValue: e.value, varAdd: selID, varType: selID.split('-')[0]}, false);
+                const selAddr = $(this).closest('div.element-detail').attr('seladdress');
+                sendAjax("{{url_for('logic_setting.write_variable')}}", {writeValue: e.value, varAdd: selAddr, varType: selID.split('-')[0]}, false);
             });
 
             if(curMode === 'stop') {
@@ -1609,6 +1610,7 @@
                         }
 
                         const selID = $(this).closest('div.element-detail').attr('selid');
+                        const selAddr = $(this).closest('div.element-detail').attr('seladdress');
                         const selVal = $(this).attr('type') === "checkbox" ? ($(this).prop('checked') ? '1' : '0') : $(this).val();
                         let isValid = true;
                         if($(this).attr('min')) {
@@ -1633,7 +1635,7 @@
                         }
 
                         if(isValid) {
-                            sendAjax("{{url_for('logic_setting.write_variable')}}", {writeValue: selVal, varAdd: selID, varType: selID.split('-')[0]}, false);
+                            sendAjax("{{url_for('logic_setting.write_variable')}}", {writeValue: selVal, varAdd: selAddr, varType: selID.split('-')[0]}, false);
                         }
                     }
                 });
