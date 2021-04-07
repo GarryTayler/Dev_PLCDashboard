@@ -152,7 +152,31 @@
             top: 50%;
             left: 50%;
             width: 70%;
-            height: 30%;
+            height: 25%;
+            position: absolute;
+            transform: translate(-50%, -50%);
+        }
+        .string-input {
+            top: 50%;
+            left: 50%;
+            width: 70%;
+            height: 25%;
+            position: absolute;
+            transform: translate(-50%, -50%);
+        }
+        .date-picker {
+            top: 50%;
+            left: 50%;
+            width: 70%;
+            height: 25%;
+            position: absolute;
+            transform: translate(-50%, -50%);
+        }
+        .time-picker {
+            top: 50%;
+            left: 50%;
+            width: 70%;
+            height: 25%;
             position: absolute;
             transform: translate(-50%, -50%);
         }
@@ -385,7 +409,7 @@
                                                 <input type="number" class="form-control set-val-input manual-input" origin="{{element.shm_val}}" value="{{element.shm_val}}" min="{{element.set_analog_min}}" max="{{element.set_analog_max}}" />
                                             {% endif %}
                                         {% elif 'string-' in element.set_val_variable_selid %}
-                                            <input type="text" class="form-control set-val-input" origin="{{element.shm_val}}" value="{{element.shm_val}}" str="1" />
+                                            <input type="text" class="form-control set-val-input string-input" origin="{{element.shm_val}}" value="{{element.shm_val}}" str="1" />
                                         {% elif 'date-' in element.set_val_variable_selid %}
                                             <input type="text" class="form-control set-val-input date-picker" data-val="{{element.shm_val}}" />
                                         {% elif 'time-' in element.set_val_variable_selid %}
