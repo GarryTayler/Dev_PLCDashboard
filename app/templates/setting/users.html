@@ -223,6 +223,7 @@
             userTbl = $("#user-table").DataTable({
                 ...dataTableLang,
                 ...dataTableObj,
+                "infoCallback": infoCallback,
                 "columnDefs": columnDef,
                 'ajax': {
                     'url': "{{url_for('userbp.user_list')}}",

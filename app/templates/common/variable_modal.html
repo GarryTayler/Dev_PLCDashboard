@@ -246,6 +246,7 @@
         variableInst = variableTbl.DataTable({
             ...dataTableLang,
             ...dataTableObj,
+            "infoCallback": infoCallback,
             "columnDefs": columnDef,
             "order": [[ 1, "asc" ]],
             'ajax': {

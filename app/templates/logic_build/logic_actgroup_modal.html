@@ -81,6 +81,7 @@
         logicActGroupTbl = $("#logic-actgroup-table").DataTable({
             ...dataTableLang,
             ...dataTableObj,
+            "infoCallback": infoCallback,
             "columnDefs": columnDef,
             "order": [[ 1, "asc" ]],
             "drawCallback": function(oSettings) {

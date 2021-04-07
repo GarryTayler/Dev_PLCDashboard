@@ -2028,6 +2028,7 @@
         funcTbl.DataTable({
             ...dataTableLang,
             ...dataTableObj,
+            "infoCallback": infoCallback,
             "columnDefs": columnDef,
             'ajax': {
                 'url': "{{url_for('logic_setting.func_list')}}",
@@ -2055,6 +2056,7 @@
         $("#logic-control-table").DataTable({
             ...dataTableLang,
             ...dataTableObj,
+            "infoCallback": infoCallback,
             "columnDefs": columnDef,
             "order": [[ 1, "asc" ]],
             "drawCallback": function(oSettings) {
@@ -2093,6 +2095,7 @@
         $("#logic-actgroup-table").DataTable({
             ...dataTableLang,
             ...dataTableObj,
+            "infoCallback": infoCallback,
             "columnDefs": columnDef,
             "order": [[ 1, "asc" ]],
             "drawCallback": function(oSettings) {

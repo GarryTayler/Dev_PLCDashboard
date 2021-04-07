@@ -1161,6 +1161,7 @@
             modbusTbl = modbusTable.DataTable({
                 ...dataTableLang,
                 ...dataTableObj,
+                "infoCallback": infoCallback,
                 "columnDefs": columnDef,
                 "drawCallback": function(oSettings) {
                     modbusLen = oSettings._iRecordsTotal;
@@ -1245,6 +1246,7 @@
             modbusChlTbl = $("#modbus-channel-tbl").DataTable({
                 ...dataTableLang,
                 ...dataTableObj,
+                "infoCallback": infoCallback,
                 "columnDefs": columnDef,
                 "drawCallback": function(oSettings) {
                     chlCnt = oSettings._iRecordsTotal;
@@ -1334,6 +1336,7 @@
             rtuChlTbl = $("#rtu-channel-tbl").DataTable({
                 ...dataTableLang,
                 ...dataTableObj,
+                "infoCallback": infoCallback,
                 "columnDefs": columnDef,
                 "drawCallback": function(oSettings) {
                     chlCnt = oSettings._iRecordsTotal;

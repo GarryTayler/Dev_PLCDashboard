@@ -248,6 +248,7 @@
             logicControlTbl = $(controlTbl).DataTable({
                 ...dataTableLang,
                 ...dataTableObj,
+                "infoCallback": infoCallback,
                 "columnDefs": columnDef,
                 "drawCallback": function(oSettings) {
                     controlCnt = oSettings._iRecordsTotal;

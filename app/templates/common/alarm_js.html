@@ -42,6 +42,7 @@
         alarmTbl = alarmTable.DataTable({
             ...dataTableLang,
             ...dataTableObj,
+            "infoCallback": infoCallback,
             "columnDefs": columnDef,
             "drawCallback": function(oSettings) {
                 alarmCnt = oSettings._iRecordsTotal;

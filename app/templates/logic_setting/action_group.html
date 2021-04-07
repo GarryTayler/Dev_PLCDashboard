@@ -186,6 +186,7 @@
             dataTables = $("#actiongroup-table").DataTable({
                 ...dataTableLang,
                 ...dataTableObj,
+                "infoCallback": infoCallback,
                 "columnDefs": columnDef,
                 "drawCallback": function(oSettings) {
                     actGroupCnt = oSettings._iRecordsTotal;

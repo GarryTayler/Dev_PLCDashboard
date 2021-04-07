@@ -105,6 +105,7 @@
             dataTables = $("#action-table").DataTable({
                 ...dataTableLang,
                 ...dataTableObj,
+                "infoCallback": infoCallback,
                 "columnDefs": columnDef,
                 "drawCallback": function(oSettings) {
                     setDataTblPage($("#action-table"), oSettings._iDisplayLength);

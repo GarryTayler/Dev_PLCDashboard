@@ -374,6 +374,7 @@
         recipeDefTbl = recipeTbl.DataTable({
             ...dataTableLang,
             ...dataTableObj,
+            "infoCallback": infoCallback,
             "columnDefs": columnDef,
             "drawCallback": function(oSettings) {
                 defCnt = oSettings._iRecordsTotal;

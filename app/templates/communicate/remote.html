@@ -396,6 +396,7 @@
             dataTables = variableTbl.DataTable({
                 ...dataTableLang,
                 ...dataTableObj,
+                "infoCallback": infoCallback,
                 "columnDefs": columnDef,
                 'ajax': {
                     'url': "{{url_for('logic_setting.remote_list')}}",
@@ -517,6 +518,7 @@
             remoteTbl = removeCliTbl.DataTable({
                 ...dataTableLang,
                 ...dataTableObj,
+                "infoCallback": infoCallback,
                 "columnDefs": columnDef,
                 "order": [[ 1, "asc" ]],
                 "drawCallback": function(oSettings) {
