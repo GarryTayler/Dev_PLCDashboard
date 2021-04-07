@@ -1,9 +1,11 @@
-from flask import render_template, Blueprint, request, send_file
+from flask import render_template, Blueprint, request, send_file, jsonify
 from app.views.controllers.user import login_required
 from app.helper.common import check_null, get_remotes, datatable_list, datatable_head
 from app import models, db, config
 from app.helper.const import uiSizeAlarm
-import json, csv
+import json
+import csv
+from datetime import datetime
 
 data_set = Blueprint('data_set', __name__, url_prefix='/data_set')
 
@@ -27,12 +29,14 @@ def add_variable():
             selArr1 = selArr[1].split('-')
 
             selArr2 = selArr[2].split('-')
-            variableStr = "LOCAL." if 'local-' in selArr[2] else "REMOTE." + selArr2[1] + "."
+            variableStr = "LOCAL." if 'local-' in selArr[2] else "REMOTE." + \
+                selArr2[1] + "."
             variableStr += config.VARIABLE_MATCH[selArr1[0]] + "." + selArr1[1]
 
-            selVar = models.Variable.query.filter_by(remote=selArr[0]).filter_by(type=selArr[1]).first()
+            selVar = models.Variable.query.filter_by(
+                remote=selArr[0]).filter_by(type=selArr[1]).first()
             itemName = selVar.name if selVar and len(selVar.name) > 0 else config.VARIABLE_TYPE[selArr1[0].upper()] + \
-                                                                           selArr1[1] + '(' + variableStr + ')'
+                selArr1[1] + '(' + variableStr + ')'
 
             newVariable = models.DataCollect(
                 width="1",
@@ -40,7 +44,8 @@ def add_variable():
                 use_flag="0",
                 name=itemName,
                 color="#ffffff",
-                options=json.dumps({'selid': selArr[1], 'seltype': selArr[2], 'sellocstr': variableStr})
+                options=json.dumps(
+                    {'selid': selArr[1], 'seltype': selArr[2], 'sellocstr': variableStr})
             )
 
             db.session.add(newVariable)
@@ -185,7 +190,8 @@ def remove_alarm():
 
 @data_set.route('/collect_list', methods=['POST'])
 def collect_list():
-    draw, start, length, columnIndex, columnName, sortOrder = datatable_head(request.values)
+    draw, start, length, columnIndex, columnName, sortOrder = datatable_head(
+        request.values)
 
     chlModel = models.DataCollect
     data_list = chlModel.query
@@ -212,7 +218,8 @@ def alarm_item(alarm, ind):
 
 @data_set.route('/alarm_list', methods=['POST'])
 def alarm_list():
-    draw, start, length, columnIndex, columnName, sortOrder = datatable_head(request.values)
+    draw, start, length, columnIndex, columnName, sortOrder = datatable_head(
+        request.values)
 
     chlModel = models.Alarm
     data_list = chlModel.query
@@ -231,7 +238,8 @@ def alarm_list():
 
     orderObj = chlModel.id.asc()
     data_list = data_list.order_by(orderObj).offset(start).limit(length).all()
-    selList = [alarm_item(data_list[ind], start + ind + 1) for ind in range(len(data_list))]
+    selList = [alarm_item(data_list[ind], start + ind + 1)
+               for ind in range(len(data_list))]
 
     return json.dumps(datatable_list(selList, totalCount, draw))
 
@@ -252,7 +260,8 @@ def csv_export(csvType='collect'):
     chlModel = models.DataCollect if csvType == "collect" else models.Alarm
     data_list = chlModel.query.all()
     data_list = [
-        (make_collect(ind + 1, data_list[ind]) if csvType == "collect" else make_alarm(ind + 1, data_list[ind]))
+        (make_collect(ind + 1, data_list[ind]) if csvType ==
+         "collect" else make_alarm(ind + 1, data_list[ind]))
         for ind in range(len(data_list))]
     with open(config.CONFIG_PATH + '\export.csv', "w", encoding='utf-8-sig', newline='') as csv_file:
         writer = csv.writer(csv_file)
@@ -267,3 +276,53 @@ def csv_export(csvType='collect'):
     fileName = '데이터수집.csv' if csvType == "collect" else '알람.csv'
     return send_file(config.CONFIG_PATH + '\export.csv', mimetype='text/csv', attachment_filename=fileName,
                      as_attachment=True)
+
+
+@data_set.route('/graph')
+@login_required
+def graph():
+    setting = models.CollectSet.query.filter_by(name='data_set').first()
+    return render_template('data_set/graph.html')
+
+
+@data_set.route('/get_data')
+@login_required
+def get_data():
+
+    cols = [
+        {
+            'id': 't', 'label': 'Time', 'type': 'date'
+        },
+        {
+            'id': 'v1', 'label': 'High Price', 'type': 'number'
+        },
+        {
+            'id': 'v2', 'label': 'Low Price', 'type': 'number'
+        }
+    ]
+
+    rows = []
+    with open('sample.csv') as f:
+        lines = f.readlines()
+        for line in lines[1:]:
+            _segs = line.split(',')
+            rows.append({
+            'c': [
+                {
+                    'v': datetime.strptime(_segs[0], '%Y-%m-%d').strftime('Date(%Y,%m,%d,%H,%M,%S)')
+                },
+                {
+                    'v': _segs[2]
+                },
+                {
+                    'v': _segs[3]
+                }
+            ]})
+
+
+    data = {
+        'cols': cols,
+        'rows': rows
+    }
+
+    return jsonify(data)
