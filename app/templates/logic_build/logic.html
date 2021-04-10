@@ -25,9 +25,10 @@
                         <div class="col-6">
                             {% if selmode == "stop" and edit_auth %}
                                 <div class="header-badge">
-                                    <i class="fas fa-plus-circle mr-4" onclick="showControlModal();"></i>
-                                    <i class="fas fa-palette mr-4" onclick="showPalette('#logic-panel')"></i>
-                                    <i class="fas fa-edit" id="logic-item-{{logic.id}}" onclick="showAddLogic({{logic.id}});" mode="{{logic.mode}}" useflag="{{logic.use_flag}}" data-name="{{logic.name}}"></i>
+                                    <i class="fas fa-plus-circle mr-4" onclick="showControlModal();" data-toggle="tooltip" data-placement="bottom" title="추가"></i>
+                                    <i class="fas fa-palette mr-4" onclick="showPalette('#logic-panel')" data-toggle="tooltip" data-placement="bottom" title="색상"></i>
+                                    <i class="fas fa-edit mr-4" id="logic-item-{{logic.id}}" onclick="showAddLogic({{logic.id}});" mode="{{logic.mode}}" useflag="{{logic.use_flag}}" data-name="{{logic.name}}" data-toggle="tooltip" data-placement="bottom" title="편집"></i>
+                                    <i class="fas fa-trash build-remove-icon" data-toggle="tooltip" data-placement="bottom" title="삭제"></i>
                                 </div>
                             {% endif %}
                         </div>
@@ -49,11 +50,11 @@
                                     <div class="col-6">
                                         {% if selmode == "stop" and edit_auth %}
                                             <div class="header-badge" data-id="{{control.control.id}}">
-                                                <i class="fas fa-chevron-circle-up mr-4" type="#control-body-"></i>
-                                                <i class="fas fa-chevron-circle-down mr-4" type="#control-body-"></i>
-                                                <i class="fas fa-palette mr-4" onclick="showPalette('#control-palette-{{control.control.id}}')"></i>
-                                                <i class="fas fa-edit mr-4" onclick="showControlModal('{{control.control.id}}')"></i>
-                                                <i class="fas fa-trash" url="{{url_for('logic_build.del_control')}}"></i>
+                                                <i class="fas fa-chevron-circle-up mr-4" type="#control-body-" data-toggle="tooltip" data-placement="bottom" title="접기"></i>
+                                                <i class="fas fa-chevron-circle-down mr-4" type="#control-body-" data-toggle="tooltip" data-placement="bottom" title="펼치기"></i>
+                                                <i class="fas fa-palette mr-4" onclick="showPalette('#control-palette-{{control.control.id}}')" data-toggle="tooltip" data-placement="bottom" title="색상"></i>
+                                                <i class="fas fa-edit mr-4" onclick="showControlModal('{{control.control.id}}')" data-toggle="tooltip" data-placement="bottom" title="편집"></i>
+                                                <i class="fas fa-trash" url="{{url_for('logic_build.del_control')}}" data-toggle="tooltip" data-placement="bottom" title="삭제"></i>
                                             </div>
                                         {% endif %}
                                     </div>
@@ -74,9 +75,9 @@
                                                     <div class="col-6">
                                                         {% if selmode == "stop" and edit_auth %}
                                                             <div class="header-badge">
-                                                                <i class="fas fa-plus-circle mr-4" onclick="selectCondition('{{control.condgroup.id}}');"></i>
-                                                                <i class="fas fa-palette mr-4" onclick="showPalette('#cond-group-palette-{{control.condgroup.id}}')"></i>
-                                                                <i class="fas fa-edit" onclick="selectCondGroup('{{control.control.id}}', '{{control.condgroup.id}}');"></i>
+                                                                <i class="fas fa-plus-circle mr-4" onclick="selectCondition('{{control.condgroup.id}}');" data-toggle="tooltip" data-placement="bottom" title="추가"></i>
+                                                                <i class="fas fa-palette mr-4" onclick="showPalette('#cond-group-palette-{{control.condgroup.id}}')" data-toggle="tooltip" data-placement="bottom" title="색상"></i>
+                                                                <i class="fas fa-edit" onclick="selectCondGroup('{{control.control.id}}', '{{control.condgroup.id}}');" data-toggle="tooltip" data-placement="bottom" title="편집"></i>
                                                             </div>
                                                         {% endif %}
                                                     </div>
@@ -96,11 +97,11 @@
                                                                 </div>
                                                                 <div class="col-6">
                                                                     <div class="header-badge" data-id="{{cond.id}}">
-                                                                        <i class="fas fa-chevron-circle-up mr-4" type="#cond-body-"></i>
-                                                                        <i class="fas fa-chevron-circle-down mr-4" type="#cond-body-"></i>
-                                                                        <i class="fas fa-palette mr-4" onclick="showPalette('#cond-palette-{{cond.id}}');"></i>
-                                                                        <i class="fas fa-edit mr-4" onclick="selectCondition('{{control.condgroup.id}}', '{{cond.id}}');"></i>
-                                                                        <i class="fas fa-trash" url="{{url_for('logic_build.remove_cond')}}"></i>
+                                                                        <i class="fas fa-chevron-circle-up mr-4" type="#cond-body-" data-toggle="tooltip" data-placement="bottom" title="접기"></i>
+                                                                        <i class="fas fa-chevron-circle-down mr-4" type="#cond-body-" data-toggle="tooltip" data-placement="bottom" title="펼치기"></i>
+                                                                        <i class="fas fa-palette mr-4" onclick="showPalette('#cond-palette-{{cond.id}}');" data-toggle="tooltip" data-placement="bottom" title="색상"></i>
+                                                                        <i class="fas fa-edit mr-4" onclick="selectCondition('{{control.condgroup.id}}', '{{cond.id}}');" data-toggle="tooltip" data-placement="bottom" title="편집"></i>
+                                                                        <i class="fas fa-trash" url="{{url_for('logic_build.remove_cond')}}" data-toggle="tooltip" data-placement="bottom" title="삭제"></i>
                                                                     </div>
                                                                 </div>
                                                             </div>
@@ -127,9 +128,9 @@
                                                     <div class="col-6">
                                                         {% if selmode == "stop" and edit_auth %}
                                                             <div class="header-badge">
-                                                                <i class="fas fa-plus-circle mr-4" onclick="selectAction('{{control.actgroup.id}}');"></i>
-                                                                <i class="fas fa-palette mr-4" onclick="showPalette('#act-group-palette-{{control.actgroup.id}}');"></i>
-                                                                <i class="fas fa-edit" onclick="selectActGroup('{{control.control.id}}', '{{control.actgroup.id}}');"></i>
+                                                                <i class="fas fa-plus-circle mr-4" onclick="selectAction('{{control.actgroup.id}}');" data-toggle="tooltip" data-placement="bottom" title="추가"></i>
+                                                                <i class="fas fa-palette mr-4" onclick="showPalette('#act-group-palette-{{control.actgroup.id}}');" data-toggle="tooltip" data-placement="bottom" title="색상"></i>
+                                                                <i class="fas fa-edit" onclick="selectActGroup('{{control.control.id}}', '{{control.actgroup.id}}');" data-toggle="tooltip" data-placement="bottom" title="편집"></i>
                                                             </div>
                                                         {% endif %}
                                                     </div>
@@ -149,11 +150,11 @@
                                                                 </div>
                                                                 <div class="col-6">
                                                                     <div class="header-badge" data-id="{{action.id}}">
-                                                                        <i class="fas fa-chevron-circle-up mr-4" type="#act-body-"></i>
-                                                                        <i class="fas fa-chevron-circle-down mr-4" type="#act-body-"></i>
-                                                                        <i class="fas fa-palette mr-4" onclick="showPalette('#act-palette-{{action.id}}')"></i>
-                                                                        <i class="fas fa-edit mr-4" onclick="selectAction('{{control.actgroup.id}}', '{{action.id}}');"></i>
-                                                                        <i class="fas fa-trash" url="{{url_for('logic_build.remove_action')}}"></i>
+                                                                        <i class="fas fa-chevron-circle-up mr-4" type="#act-body-" data-toggle="tooltip" data-placement="bottom" title="접기"></i>
+                                                                        <i class="fas fa-chevron-circle-down mr-4" type="#act-body-" data-toggle="tooltip" data-placement="bottom" title="펼치기"></i>
+                                                                        <i class="fas fa-palette mr-4" onclick="showPalette('#act-palette-{{action.id}}')" data-toggle="tooltip" data-placement="bottom" title="색상"></i>
+                                                                        <i class="fas fa-edit mr-4" onclick="selectAction('{{control.actgroup.id}}', '{{action.id}}');" data-toggle="tooltip" data-placement="bottom" title="편집"></i>
+                                                                        <i class="fas fa-trash" url="{{url_for('logic_build.remove_action')}}" data-toggle="tooltip" data-placement="bottom" title="삭제"></i>
                                                                     </div>
                                                                 </div>
                                                             </div>
