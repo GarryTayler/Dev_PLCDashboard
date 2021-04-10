@@ -253,6 +253,22 @@
             circleUp.on('click', function() {
                 const selType = $(this).attr('type');
                 const selID = selType + $(this).closest('div').data('id');
+                let tempStr = localStorage.getItem("logic_build");
+                if(tempStr) {
+                    let tempId = tempStr.split(",");
+                    let exist= false;
+                    for(var i = 0;i<tempId.length;i++) {
+                        if(tempId[i] == $(this).closest('div').data('id')){
+                            exist = true;
+                            break;
+                        }
+                    }
+                    if(!exist) {
+                        localStorage.setItem("logic_build", tempStr+$(this).closest('div').data('id')+",");
+                    }
+                } else {
+                    localStorage.setItem("logic_build", $(this).closest('div').data('id')+",");
+                }
                 slideFunc(selID, '1');
                 $(this).hide();
                 $(this).closest('div.header-badge').find('i.fa-chevron-circle-down:first').show();
@@ -261,6 +277,18 @@
             circleDown.on('click', function() {
                 const selType = $(this).attr('type');
                 const selID = selType + $(this).closest('div').data('id');
+                let tempStr = localStorage.getItem("logic_build");
+                if(tempStr) {
+                    let tempId = tempStr.split(",");
+                    let exist= -1;
+                    for(var i = 0;i<tempId.length;i++) {
+                        if(tempId[i] == $(this).closest('div').data('id')){
+                            tempId.splice(i, 1);
+                            break;
+                        }
+                    }
+                    localStorage.setItem("logic_build", tempId.join(","))
+                }
                 slideFunc(selID, '0');
                 $(this).hide();
                 $(this).closest('div.header-badge').find('i.fa-chevron-circle-up:first').show();

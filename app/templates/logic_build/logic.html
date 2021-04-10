@@ -241,6 +241,23 @@
             $("#actgroup-modal").modal('show');
         }
 
+        function setChevronIcons() {
+            let upIcons = $('#content-wrapper').children().find("i.fa-chevron-circle-up");
+            let tempStr = localStorage.getItem("logic_build")
+            if(tempStr) {
+                let tempId = tempStr.split(",")
+                for(var i = 0;i<upIcons.length;i++) {
+                    if(tempId.length > 0) {
+                        for(var j = 0;j<tempId.length;j++) {
+                            if(tempId[j] == $(upIcons[i]).closest('div').data('id')) {
+                                $(upIcons[i]).trigger("click")
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
         $(document).ready(function () {
             if(curMode === "stop" && curAuth) {
                 const sortPanel =$("#logic-panel .card-body")[0];
@@ -267,6 +284,7 @@
 
             $(".hide-tables").addClass('no-context');
             initLogicIcons();
+            setChevronIcons();
 
             const cardArr = $(".logic-build-modal div.card");
             for(let ii = 0; ii < cardArr.length; ii++) {
