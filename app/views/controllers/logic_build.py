@@ -206,9 +206,9 @@ def edit_logic():
 @login_required
 def del_control():
     postData = request.values
-    control_id = postData.get('controlID')
+    control_id = postData.get('actID')
     if check_null(control_id):
-        selControl = models.Action.query.filter_by(id=control_id).first()
+        selControl = models.Control.query.filter_by(id=control_id).first()
         if selControl:
             selControl.logicid = '0'
             selControl.options = ''

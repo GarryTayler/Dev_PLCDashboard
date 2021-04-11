@@ -68,6 +68,7 @@
 
 <script>
     const controlModal = $("#control-modal");
+    let controlList = null;
 
     function controlCreate() {
         if(controlCnt < controlLimit) {
@@ -122,6 +123,16 @@
         }
     }
 
+    function addPalette() {
+        if(controlList.status) {
+            if(controlList.act_page_list && controlList.act_page_list.length == 0) {
+                selectAction(controlList.condgroup.id);
+            } else if(controlList.cond_page_list && controlList.cond_page_list.length == 0) {
+                selectCondition(controlList.actgroup.id);
+            }
+        }
+    }
+
     function controlBuild(selRow = '') {
         const selChk = selRow.length > 0 ? [selRow] : getTblChk(controlTbl).split(",");
         if(selChk.length > 0 && selChk[0].length > 0) {
@@ -133,6 +144,7 @@
                 type: 'post',
                 headers: {"X-CSRFToken": csrf_token},
                 success: function (resp) {
+                    controlList = resp;
                     if(resp.status) {
                         const selControl = resp.selControl;
                         $("#selcontrol-name").text(selControl.name);
@@ -141,23 +153,38 @@
                         const controlOpt = selControl.options.length > 0 ? JSON.parse(selControl.options) : {};
                         initCardStyle(controlOpt, "#control-palette");
 
-                        const selActGroup = resp.actgroup;
-                        actGroupID = selActGroup.id;
-                        const actgroupName = $("#actgroup-name");
-                        actgroupName.text(selActGroup.name);
-                        actgroupName.attr('actgroup', selActGroup.id);
-                        $("#actgroup-mode").text(selActGroup.mode);
-                        const actGroupOpt = selActGroup.options.length > 0 ? JSON.parse(selActGroup.options) : {};
-                        initCardStyle(actGroupOpt, "#act-group-palette");
+                        if(resp.act_page_list && resp.act_page_list.length == 0 || resp.cond_page_list && resp.cond_page_list.length == 0) {
+                            $('#addPalette').show();
+                        } else {
+                            $('#addPalette').hide();
+                        }
 
-                        const selCondGroup = resp.condgroup;
-                        condGroupID = selCondGroup.id;
-                        const condgroupName = $("#condgroup-name");
-                        condgroupName.text(selCondGroup.name);
-                        condgroupName.attr('condgroup', selCondGroup.id);
-                        const condGroupOpt = selCondGroup.options.length > 0 ? JSON.parse(selCondGroup.options) : {};
+                        if(resp.act_page_list && resp.act_page_list.length > 0) {
+                            $('#act-group-palette').show();
+                            const selActGroup = resp.actgroup;
+                            actGroupID = selActGroup.id;
+                            const actgroupName = $("#actgroup-name");
+                            actgroupName.text(selActGroup.name);
+                            actgroupName.attr('actgroup', selActGroup.id);
+                            $("#actgroup-mode").text(selActGroup.mode);
+                            const actGroupOpt = selActGroup.options.length > 0 ? JSON.parse(selActGroup.options) : {};
+                            initCardStyle(actGroupOpt, "#act-group-palette");
+                        } else {
+                            $('#act-group-palette').hide();
+                        }
 
-                        initCardStyle(condGroupOpt, "#cond-group-palette");
+                        if(resp.cond_page_list && resp.cond_page_list.length > 0) {
+                            $('#cond-group-palette').show();
+                            const selCondGroup = resp.condgroup;
+                            condGroupID = selCondGroup.id;
+                            const condgroupName = $("#condgroup-name");
+                            condgroupName.text(selCondGroup.name);
+                            condgroupName.attr('condgroup', selCondGroup.id);
+                            const condGroupOpt = selCondGroup.options.length > 0 ? JSON.parse(selCondGroup.options) : {};
+                            initCardStyle(condGroupOpt, "#cond-group-palette");
+                        } else {
+                            $('#cond-group-palette').hide();
+                        }
 
                         drawLogicCond(resp.cond_page_list);
                         drawLogicAction(resp.act_page_list);

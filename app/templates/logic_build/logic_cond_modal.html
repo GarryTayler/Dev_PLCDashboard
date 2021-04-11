@@ -121,6 +121,7 @@
         const selIDs = getTblChk("#logic-cond-modal");
         if(selIDs.length > 0) {
             if(condGroupID > 0) {
+                $('#cond-group-palette').show();
                 const condgroupName = $("#condgroup-name");
                 const beforeID = condgroupName && condgroupName.attr('condgroup') ? condgroupName.attr('condgroup') : logicCondModal.attr('before');
                 const isLogic = typeof logicID === 'undefined';

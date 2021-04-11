@@ -122,6 +122,7 @@
         const selIDs = getTblChk("#logic-action-modal");
         if(selIDs.length > 0) {
             if(actGroupID > 0) {
+                $('#act-group-palette').show();
                 const beforeID = logicActionModal.attr('before');
                 const isLogic = typeof logicID === 'undefined';
                 sendAjax("{{url_for('logic_build.add_act')}}", {actGroupID, beforeID, actID: selIDs}, !isLogic);
