@@ -126,9 +126,13 @@
                 const beforeID = logicActionModal.attr('before');
                 const isLogic = typeof logicID === 'undefined';
                 sendAjax("{{url_for('logic_build.add_act')}}", {actGroupID, beforeID, actID: selIDs}, !isLogic);
-                if(isLogic) {
+                if(isAddPalette) {
                     logicActionModal.modal('hide');
-                    updateBuildPanel1();
+                } else {
+                    if(isLogic) {
+                        logicActionModal.modal('hide');
+                        updateBuildPanel1();
+                    }
                 }
             } else {
                 alert('동작그룹을 입력하세요');

@@ -126,10 +126,18 @@
                 const beforeID = condgroupName && condgroupName.attr('condgroup') ? condgroupName.attr('condgroup') : logicCondModal.attr('before');
                 const isLogic = typeof logicID === 'undefined';
                 sendAjax("{{url_for('logic_build.add_cond')}}", {condGroupID, beforeID, condID: selIDs}, !isLogic);
-                if(isLogic) {
+                if(isAddPalette) {
                     logicCondModal.modal('hide');
-                    updateBuildPanel();
+                    setTimeout(function(){
+                        selectAction();
+                    }, 500);
+                } else {
+                    if(isLogic) {
+                        logicCondModal.modal('hide');
+                        updateBuildPanel();
+                    }
                 }
+                
             } else {
                 alert('조건그룹을 입력하세요');
             }

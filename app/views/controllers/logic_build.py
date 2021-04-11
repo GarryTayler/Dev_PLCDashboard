@@ -47,7 +47,7 @@ def control():
             selActGroup = {'id': 0, 'name': '동작그룹', 'mode': '', 'options': ''}
 
         response = {'status': True, 'selControl': {'name': selControl.name, 'options': selControl.options,
-                    'useflag': config.USE_FLAG_KR[int(selControl.use_flag)], 'priority': selControl.priority},
+                    'useflag': config.USE_FLAG_KR[int(selControl.use_flag)], 'priority': selControl.priority, 'id': selControl.id},
                     'actgroup': selActGroup, 'condgroup': selCondGroup, 'cond_page_list': cond_page_list,
                     'act_page_list': act_page_list}
     else:

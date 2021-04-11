@@ -69,6 +69,7 @@
 <script>
     const controlModal = $("#control-modal");
     let controlList = null;
+    let isAddPalette = false;
 
     function controlCreate() {
         if(controlCnt < controlLimit) {
@@ -124,11 +125,13 @@
     }
 
     function addPalette() {
+        isAddPalette = true;
+        console.log(controlList)
         if(controlList.status) {
-            if(controlList.act_page_list && controlList.act_page_list.length == 0) {
-                selectAction(controlList.condgroup.id);
-            } else if(controlList.cond_page_list && controlList.cond_page_list.length == 0) {
-                selectCondition(controlList.actgroup.id);
+            if(controlList.cond_page_list && controlList.cond_page_list.length == 0) {
+                selectCondition(controlList.selControl.id);
+            } else if(controlList.act_page_list && controlList.act_page_list.length == 0) {
+                selectAction(controlList.selControl.id);
             }
         }
     }
@@ -155,8 +158,10 @@
 
                         if(resp.act_page_list && resp.act_page_list.length == 0 || resp.cond_page_list && resp.cond_page_list.length == 0) {
                             $('#addPalette').show();
+                            isAddPalette = true;
                         } else {
                             $('#addPalette').hide();
+                            isAddPalette = false;
                         }
 
                         if(resp.act_page_list && resp.act_page_list.length > 0) {
@@ -170,6 +175,7 @@
                             const actGroupOpt = selActGroup.options.length > 0 ? JSON.parse(selActGroup.options) : {};
                             initCardStyle(actGroupOpt, "#act-group-palette");
                         } else {
+                            actGroupID = selControl.id;
                             $('#act-group-palette').hide();
                         }
 
@@ -183,6 +189,7 @@
                             const condGroupOpt = selCondGroup.options.length > 0 ? JSON.parse(selCondGroup.options) : {};
                             initCardStyle(condGroupOpt, "#cond-group-palette");
                         } else {
+                            condGroupID = selControl.id;
                             $('#cond-group-palette').hide();
                         }
 
