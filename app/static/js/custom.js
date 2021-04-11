@@ -2,6 +2,16 @@ const limitMsg = "더이상 등록할수 없습니다";
 const saveMsg = "저장하였습니다";
 const refreshMsg = "브라우저 리프레쉬 후 다시 시도해주세요";
 const timeFormat = "9999:99:99:999";
+
+function numberWithCommas(x) {
+    return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+}
+
+const infoCallback = function( settings, start, end, max, total, pre ) {
+                    let api = this.api();
+                    return "전체 " + numberWithCommas(total) + " 개중 " + numberWithCommas(start) + " 부터 " + numberWithCommas((  (total > start + parseInt(api.page.info().length) - 1) ? (start + parseInt(api.page.info().length) - 1) : (total)  )) + " 까지 표시";
+};
+
 const dataTableLang = {
     "language": {
         "decimal":        "",
@@ -25,7 +35,7 @@ const dataTableLang = {
     }
 };
 const dataTableObj = {
-    //'lengthMenu': [ [10, 25, 50, -1], [10, 25, 50, "모두"] ],
+    // 'lengthMenu': [ [5, 10, 25, 50], [5, 10, 25, 50] ],
     'bAutoWidth': false,
     'processing': true,
     'serverSide': true,
@@ -117,7 +127,8 @@ function sendAjax(url, data, refresh = true, isFile = false, respFunc = null) {
                 }
             }
         },
-        error: function() {
+        error: function(err) {
+            console.log("error=====", err);
             alert(refreshMsg);
         }
     });

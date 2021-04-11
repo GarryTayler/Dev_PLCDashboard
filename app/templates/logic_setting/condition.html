@@ -101,6 +101,7 @@
             dataTables = $("#condition-table").DataTable({
                 ...dataTableLang,
                 ...dataTableObj,
+                "infoCallback": infoCallback,
                 "columnDefs": columnDef,
                 'ajax': {
                     'url': "{{url_for('logic_setting.condition_list')}}",

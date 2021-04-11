@@ -4,6 +4,7 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='css/fileinput.min.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/datetimepicker.min.css') }}">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-slider/11.0.2/css/bootstrap-slider.min.css" integrity="sha512-3q8fi8M0VS+X/3n64Ndpp6Bit7oXSiyCnzmlx6IDBLGlY5euFySyJ46RUlqIVs0DPCGOypqP8IRk/EyPvU28mQ==" crossorigin="anonymous" />
+    <link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
     <style>
         .header-badge i {
             font-size: 18px;
@@ -55,21 +56,25 @@
             width: 1.5rem;
         }
         .digital-round {
-            width: 50px;
-            height: 50px;
+            top: 50%;
+            position: absolute;
+            left: 50%;
+            width: 25%;
+            height: 25%;
+            transform: translate(-50%, -50%);
             margin: 0 auto;
             border-radius: 50%;
             border: 4px solid #616161;
         }
         .element-detail {
-            top: 50%;
-            left: 50%;
-            width: 55%;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
             margin: auto;
             display: table;
             text-align: center;
             position: absolute;
-            transform: translate(-50%, -50%);
         }
         .element-image {
             width: 100%;
@@ -90,31 +95,112 @@
             vertical-align: middle;
         }
         .vertical {
-            width: 70%;
+            width: 45% !important;
             display: inline-block;
-            transform: rotate(-90deg);
-            -webkit-transform: rotate(-90deg);
+            transform: translate(-50%, -50%) rotate(-90deg) !important;
+            -webkit-transform: translate(-50%, -50%) rotate(-90deg) !important;
         }
         .progress {
-            height: 1.5rem;
+            height: 15%;
+            width: 80%;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
         }
         .progress-bar {
             height: 100%;
         }
         .progress-text {
             position: absolute;
-            transform: translateX(-50%);
+            transform: translate(-50%, -50%);
+            left: 20%;
+            top: 50%;
+        }
+        .progress-text-horizon {
+            top: 35%;
+            position: absolute;
+            transform: translate(-50%, -50%);
         }
         .d180_gauge {
             margin-top: -1rem;
-            max-width: 200px;
+            {#max-width: 200px;#}
+            min-height: 100px;
+            top: 50%;
+            width: 100% !important;
+            height: 50% !important;
+            position: absolute;
+            transform: translate(-50%, -50%);
+        }
+        .d360_gauge {
+            min-height: 100px;
+            top: 50%;
+            width: 100% !important;
+            height: 75% !important;
+            position: absolute;
+            transform: translate(-50%, -50%);
+        }
+        .combobox-input {
+            top: 50%;
+            width: 70%;
+            height: 30%;
+            position: absolute;
+            transform: translate(-50%, -50%);
+            left: 50%;
+        }
+        .manual-input {
+            top: 50%;
+            left: 50%;
+            width: 70%;
+            height: 25%;
+            position: absolute;
+            transform: translate(-50%, -50%);
+        }
+        .string-input {
+            top: 50%;
+            left: 50%;
+            width: 70%;
+            height: 25%;
+            position: absolute;
+            transform: translate(-50%, -50%);
+        }
+        .date-picker {
+            top: 50%;
+            left: 50%;
+            width: 70%;
+            height: 25%;
+            position: absolute;
+            transform: translate(-50%, -50%);
+        }
+        .time-picker {
+            top: 50%;
+            left: 50%;
+            width: 70%;
+            height: 25%;
+            position: absolute;
+            transform: translate(-50%, -50%);
+        }
+        .slider-control {
+            top: 50%;
+            left: 50%;
+            position: absolute;
+            transform: translate(-50%, -50%);
         }
         .slider.slider-horizontal {
-            width: 100%;
+            width: 80%;
+            top: 50%;
+            left: 50%;
+            position: absolute;
+            transform: translate(-50%, -50%);
         }
         .btn-pushbtn {
-            width: 70px;
+            width: 33.33%;
             box-shadow: 0 4px #999;
+            top: 50%;
+            position: absolute;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            height: 12%;
         }
         .btn-pushbtn:active {
             box-shadow: 0 5px #666;
@@ -155,7 +241,7 @@
             top: 70%;
         }
         .d360_gauge_text {
-            top: 45%;
+            top: 48%;
         }
         .remove-btn {
             margin-top: 10px;
@@ -173,11 +259,14 @@
         .tgl-btn {
             outline: 0;
             display: block;
-            width: 4em;
-            height: 2em;
-            position: relative;
+            width: 28%;
+            height: 20%;
             cursor: pointer;
             user-select: none;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
         }
         .tgl {
             display: none;
@@ -276,9 +365,9 @@
                                                 <canvas class="d180_gauge gauge-canvas" data-val="{{element.shm_val}}" data-min="{{element.read_analog_min}}" data-max="{{element.read_analog_max}}" data-color="{{element.read_analog_color}}"></canvas>
                                             {% elif element.read_analog_type == '360d_gage' %}
                                                 <span class="gauge-text d360_gauge_text">{{element.shm_val}}</span>
-                                                <canvas class="gauge-canvas" data-val="{{element.shm_val}}" data-min="{{element.read_analog_min}}" data-max="{{element.read_analog_max}}" data-color="{{element.read_analog_color}}"></canvas>
+                                                <canvas class="d360_gauge gauge-canvas" data-val="{{element.shm_val}}" data-min="{{element.read_analog_min}}" data-max="{{element.read_analog_max}}" data-color="{{element.read_analog_color}}"></canvas>
                                             {% elif element.read_analog_type == 'horizon' %}
-                                                <span>{{element.shm_val}}</span>
+                                                <span class="progress-text-horizon">{{element.shm_val}}</span>
                                                 <div class="progress">
                                                     <div class="progress-bar" role="progressbar" style="background-color: {{element.read_analog_color}}" val="{{element.shm_val}}" min="{{element.read_analog_min}}" max="{{element.read_analog_max}}"></div>
                                                 </div>
@@ -299,10 +388,10 @@
                                     {% if element.set_digital_icon_img|length > 0 %}
                                         <img src="{{url_for('static', filename='upload/' + element.set_digital_icon_img)}}" alt="icon-img" class="icon-img" />
                                     {% endif %}
-                                    <div class="element-detail" selid="{{element.set_val_variable_selid}}">
+                                    <div class="element-detail" selid="{{element.set_val_variable_selid}}" seladdress="{{element.set_val_variable_sellocstr}}">
                                         {% if 'digital-' in element.set_val_variable_selid %}
                                             {% if element.set_digital_type == 'combobox' %}
-                                                <select class="form-control set-val-input">
+                                                <select class="form-control set-val-input combobox-input">
                                                     <option value="1" {%if element.shm_val==1%}selected{%endif%}>ON</option>
                                                     <option value="0" {%if element.shm_val==0%}selected{%endif%}>OFF</option>
                                                 </select>
@@ -316,12 +405,12 @@
                                             {% endif %}
                                         {% elif 'analog-' in element.set_val_variable_selid %}
                                             {% if element.set_analog_type == 'slider' %}
-                                                <input class="set-digital-slider" data-slider-id='ex1Slider' type="text" data-slider-min="{{element.set_analog_min}}" data-slider-max="{{element.set_analog_max}}" data-slider-step=".1" data-slider-value="{{element.shm_val}}"/>
+                                                <input class="set-digital-slider slider-control" data-slider-id='ex1Slider' type="text" data-slider-min="{{element.set_analog_min}}" data-slider-max="{{element.set_analog_max}}" data-slider-step=".1" data-slider-value="{{element.shm_val}}"/>
                                             {% elif element.set_analog_type == 'manual' %}
-                                                <input type="number" class="form-control set-val-input" origin="{{element.shm_val}}" value="{{element.shm_val}}" min="{{element.set_analog_min}}" max="{{element.set_analog_max}}" />
+                                                <input type="number" class="form-control set-val-input manual-input" origin="{{element.shm_val}}" value="{{element.shm_val}}" min="{{element.set_analog_min}}" max="{{element.set_analog_max}}" />
                                             {% endif %}
                                         {% elif 'string-' in element.set_val_variable_selid %}
-                                            <input type="text" class="form-control set-val-input" origin="{{element.shm_val}}" value="{{element.shm_val}}" str="1" />
+                                            <input type="text" class="form-control set-val-input string-input" origin="{{element.shm_val}}" value="{{element.shm_val}}" str="1" />
                                         {% elif 'date-' in element.set_val_variable_selid %}
                                             <input type="text" class="form-control set-val-input date-picker" data-val="{{element.shm_val}}" />
                                         {% elif 'time-' in element.set_val_variable_selid %}
@@ -334,8 +423,8 @@
                                 {% elif element.type == 'chart' %}
                                     <canvas class="chartContainer" id="chartContainer-{{element.id}}" options="{{element.options}}"></canvas>
                                 {% elif element.type == 'table' %}
-                                    <div class="table-responsive">
-                                        <table class="table table-bordered no-context">
+                                    <div class="table-responsive" style="height: 100%;">
+                                        <table class="table table-bordered no-context" style="height: 91%;">
                                             <thead>
                                                 <tr>
                                                     <th></th>
@@ -897,6 +986,7 @@
     <script src="{{ url_for('static', filename='js/gauge.min.js') }}"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-slider/11.0.2/bootstrap-slider.min.js" integrity="sha512-f0VlzJbcEB6KiW8ZVtL+5HWPDyW1+nJEjguZ5IVnSQkvZbwBt2RfCBY0CBO1PsMAqxxrG4Di6TfsCPP3ZRwKpA==" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js@2.8.0"></script>
+{#    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>#}
 
     <script>
         let selType = "", insertID = '0';
@@ -1518,7 +1608,8 @@
                 }
             }).on('slideStop', function(e) {
                 const selID = $(this).closest('div.element-detail').attr('selid');
-                sendAjax("{{url_for('logic_setting.write_variable')}}", {writeValue: e.value, varAdd: selID, varType: selID.split('-')[0]}, false);
+                const selAddr = $(this).closest('div.element-detail').attr('seladdress');
+                sendAjax("{{url_for('logic_setting.write_variable')}}", {writeValue: e.value, varAdd: selAddr, varType: selID.split('-')[0]}, false);
             });
 
             if(curMode === 'stop') {
@@ -1544,6 +1635,7 @@
                         }
 
                         const selID = $(this).closest('div.element-detail').attr('selid');
+                        const selAddr = $(this).closest('div.element-detail').attr('seladdress');
                         const selVal = $(this).attr('type') === "checkbox" ? ($(this).prop('checked') ? '1' : '0') : $(this).val();
                         let isValid = true;
                         if($(this).attr('min')) {
@@ -1568,7 +1660,7 @@
                         }
 
                         if(isValid) {
-                            sendAjax("{{url_for('logic_setting.write_variable')}}", {writeValue: selVal, varAdd: selID, varType: selID.split('-')[0]}, false);
+                            sendAjax("{{url_for('logic_setting.write_variable')}}", {writeValue: selVal, varAdd: selAddr, varType: selID.split('-')[0]}, false);
                         }
                     }
                 });

@@ -129,6 +129,9 @@
                 {% if not 'alarm' in auth_list %}
                     <a class="collapse-item{% if '/data_set/alarm' in request.path %} logic-set-active{% endif %}" href="{{url_for('data_set.alarm')}}">알람</a>
                 {% endif %}
+                {% if not 'graph' in auth_list %}
+                    <a class="collapse-item{% if '/data_set/graph' in request.path %} logic-set-active{% endif %}" href="{{url_for('data_set.graph')}}">차트</a>
+                {% endif %}
             </div>
         </div>
     </li>

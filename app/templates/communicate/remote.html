@@ -154,7 +154,7 @@
                             <label class="input-label" for="variable-select">위치</label>
                             <select class="form-control" id="variable-select" onchange="updateVariable();">
                                 {% for remote in remotes %}
-                                    <option value="remote-{{loop.index}}" remote-id="{{remote.remote_id}}">{{remote.name}}</option>
+                                    <option value="remote-{{loop.index - 1}}" remote-id="{{remote.remote_id}}">{{remote.name}}</option>
                                 {% endfor %}
                             </select>
                         </div>
@@ -396,6 +396,7 @@
             dataTables = variableTbl.DataTable({
                 ...dataTableLang,
                 ...dataTableObj,
+                "infoCallback": infoCallback,
                 "columnDefs": columnDef,
                 'ajax': {
                     'url': "{{url_for('logic_setting.remote_list')}}",
@@ -517,6 +518,7 @@
             remoteTbl = removeCliTbl.DataTable({
                 ...dataTableLang,
                 ...dataTableObj,
+                "infoCallback": infoCallback,
                 "columnDefs": columnDef,
                 "order": [[ 1, "asc" ]],
                 "drawCallback": function(oSettings) {

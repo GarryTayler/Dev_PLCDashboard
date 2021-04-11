@@ -1,0 +1,104 @@
+{% extends "layout.html" %} {% block style %}
+
+<link rel="stylesheet" href="{{ url_for('static', filename='css/datetimepicker.min.css') }}">
+
+<style>
+    #chart_div {
+        height: 800px;
+    }
+</style>
+
+{% endblock %} {% block content %}
+<div class="card shadow mb-4">
+    <div class="card-header py-3">
+        <h6 class="m-0 font-weight-bold text-primary">데이터설정 > 그라프</h6>
+    </div>
+    <div class="card-body">
+
+        <div class="form-group row">
+
+            <div class="col-4">
+                <input type="text" class="form-control date-picker" id="range_picker">
+            </div>
+
+        </div>
+
+        <div class="form-group row">
+            <div class="col-12">
+
+                <div id="chart_div"></div>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %} {% block script %}
+
+<script src="{{ url_for('static', filename='js/datetimepicker.min.js') }}"></script>
+<script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+
+<script>
+    google.charts.load('current', {
+        packages: ['corechart', 'line']
+    });
+    google.charts.setOnLoadCallback(drawAxisTickColors);
+
+    function drawAxisTickColors() {
+        var jsonData = $.ajax({
+            url: "{{url_for('data_set.get_data')}}",
+            dataType: "json",
+            async: false
+        }).responseText;
+
+        var data = new google.visualization.DataTable(jsonData);
+
+        var options = {
+            hAxis: {
+                title: 'Time',
+                textStyle: {
+                    color: '#01579b',
+                    fontSize: 18,
+                    fontName: 'Arial',
+                    bold: true,
+                    italic: true
+                },
+                titleTextStyle: {
+                    color: '#01579b',
+                    fontSize: 16,
+                    fontName: 'Arial',
+                    bold: false,
+                    italic: true
+                },
+
+            },
+            vAxis: {
+                title: 'Popularity',
+                textStyle: {
+                    color: '#1a237e',
+                    fontSize: 18
+                },
+                titleTextStyle: {
+                    color: '#1a237e',
+                    fontSize: 24,
+                    bold: true
+                }
+            },
+            explorer: {
+                axis: 'horizontal',
+                keepInBounds: true,
+                maxZoomIn: 0.01
+            },
+            colors: ['#a52714', '#097138']
+        };
+        var chart = new google.visualization.LineChart(document.getElementById('chart_div'));
+        chart.draw(data, options);
+    }
+
+    $(document).ready(function() {
+        $('#range_picker').datetimepicker({
+            format: 'YYYY-MM-DD',
+        });
+    })
+</script>
+{% endblock %}

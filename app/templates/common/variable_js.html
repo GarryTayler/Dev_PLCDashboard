@@ -6,7 +6,7 @@
 
             if(inputOrigin !== inputName) {
                 const trVal = $(this).closest('tr').attr('data-row');
-                const remote = varSelect.val().split("-")[1];
+                const remote = varSelect.find(':selected').attr('remote-id');
                 $(this).attr('origin', inputName);
                 sendAjax("{{url_for('logic_setting.update_variable')}}", {trVal, inputName, remote}, false);
             }
@@ -18,7 +18,7 @@
 
             if(inputOrigin !== inputUnit) {
                 const trVal = $(this).closest('tr').attr('data-row');
-                const remote = varSelect.val().split("-")[1];
+                const remote = varSelect.find(':selected').attr('remote-id');
                 $(this).attr('origin', inputUnit);
                 sendAjax("{{url_for('logic_setting.update_variable')}}", {trVal, inputUnit, remote}, false);
             }

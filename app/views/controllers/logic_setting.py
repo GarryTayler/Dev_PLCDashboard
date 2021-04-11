@@ -571,8 +571,11 @@ def update_variable():
     postData = request.form.to_dict()
     trVal = postData.get('trVal')
     remote = postData.get('remote')
+
+    print (trVal, remote)
+
     if check_null(trVal) and check_null(remote):
-        selVariable = models.Variable.query.filter_by(ype=trVal).filter_by(remote=remote).first()
+        selVariable = models.Variable.query.filter_by(type=trVal).filter_by(remote=remote).first()
         if selVariable:
             if 'inputName' in postData:
                 selVariable.name = postData.get('inputName')
@@ -659,7 +662,7 @@ def variable_list():
             itemDefault = data_list[i].defaults if data_list[i] else ''
             
             adressEnd = str(data_list[i].addr_id) if data_list[i].addr_id is not None  else str(i)
-            selList.append({'id': i, 'address': variableStr +adressEnd , 'name': itemName, 'chk': itemChk, 'unit': itemUnit, 'default': itemDefault})
+            selList.append({'id': i, 'address': variableStr +adressEnd , 'name': itemName, 'chk': itemChk, 'unit': itemUnit, 'default': itemDefault, 'addr_id': data_list[i].addr_id, 'remote_id': remoteID})
     else:
         for i in range(start, end, step):
             itemStr = variable_type + "-" + str(i)
@@ -671,8 +674,8 @@ def variable_list():
             itemChk = selVar.use_flag if selVar else '0'
             itemDefault = selVar.defaults if selVar else ''
             selList.append({'id': i, 'address': variableStr + str(i), 'name': itemName, 'chk': itemChk, 'unit': itemUnit,
-                            'default': itemDefault})
-    
+                            'default': itemDefault, 'remote_id': remoteID})
+
     return json.dumps(datatable_list(selList, totalCount, draw))
 
 
