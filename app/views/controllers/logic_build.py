@@ -299,7 +299,7 @@ def edit_cond_group():
         else:
             newCondGroup = models.ConditionGroup(
                 name=condGroupName,
-                controlid="0",
+                controlid=postData.get('control_id'),
                 options="",
                 operator=postData.get('cond_group_operator'),
                 reverse=postData.get('cond_group_reverse')
@@ -374,7 +374,7 @@ def edit_action_group():
         else:
             newActionGroup = models.ActionGroup(
                 name=actionGroupName,
-                controlid="0",
+                controlid=postData.get('control_id'),
                 options="",
                 mode=postData.get('inputMode'),
                 cnt=postData.get('inputCnt')
@@ -421,11 +421,11 @@ def add_cond():
     condition_ids = postData.get('condID')
     beforeID = postData.get('beforeID')
     if check_null(cond_group_id) and check_null(condition_ids) and check_null(beforeID):
-        if int(beforeID) > 0:
-            befCondition = models.Condition.query.filter_by(id=beforeID).first()
-            befCondition.condgroup = '0'
-            befCondition.condoptions = ''
-            befCondition.ind = '1000'
+        # if int(beforeID) > 0:
+        #     befCondition = models.Condition.query.filter_by(id=beforeID).first()
+        #     befCondition.condgroup = '0'
+        #     befCondition.condoptions = ''
+        #     befCondition.ind = '1000'
 
         for condition_id in condition_ids.split(','):
             selCondition = models.Condition.query.filter_by(id=condition_id).first()
@@ -469,11 +469,11 @@ def add_act():
     action_ids = postData.get('actID')
     beforeID = postData.get('beforeID')
     if check_null(act_group_id) and check_null(action_ids) and check_null(beforeID):
-        if int(beforeID) > 0:
-            beforeAct = models.Action.query.filter_by(id=beforeID).first()
-            beforeAct.actgroup = '0'
-            beforeAct.actoptions = ''
-            beforeAct.ind = '1000'
+        # if int(beforeID) > 0:
+        #     beforeAct = models.Action.query.filter_by(id=beforeID).first()
+        #     beforeAct.actgroup = '0'
+        #     beforeAct.actoptions = ''
+        #     beforeAct.ind = '1000'
 
         for action_id in action_ids.split(','):
             selCondition = models.Action.query.filter_by(id=action_id).first()

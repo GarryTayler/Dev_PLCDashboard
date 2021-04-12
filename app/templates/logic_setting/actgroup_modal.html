@@ -120,12 +120,14 @@
                 inputName,
                 inputCnt,
                 inputMode: $("#action-group-mode").val(),
-                act_group_id: actGroupID
+                act_group_id: actGroupID,
+                control_id : controlId
             };
 
             sendAjax("{{url_for('logic_build.edit_action_group')}}", postData, false);
             updateActGroupTbl()
             $("#action-group").modal('hide');
+            controlBuild();
         } else if(inputName.length === 0) {
             alert('이름을 입력하세요');
         } else if(inputCnt.length === 0) {

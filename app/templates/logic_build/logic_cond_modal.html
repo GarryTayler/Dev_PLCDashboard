@@ -119,6 +119,7 @@
 
     function condSelect() {
         const selIDs = getTblChk("#logic-cond-modal");
+        console.log(selIDs)
         if(selIDs.length > 0) {
             if(condGroupID > 0) {
                 $('#cond-group-palette').show();
@@ -126,18 +127,10 @@
                 const beforeID = condgroupName && condgroupName.attr('condgroup') ? condgroupName.attr('condgroup') : logicCondModal.attr('before');
                 const isLogic = typeof logicID === 'undefined';
                 sendAjax("{{url_for('logic_build.add_cond')}}", {condGroupID, beforeID, condID: selIDs}, !isLogic);
-                if(isAddPalette) {
+                if(isLogic) {
                     logicCondModal.modal('hide');
-                    setTimeout(function(){
-                        selectAction();
-                    }, 500);
-                } else {
-                    if(isLogic) {
-                        logicCondModal.modal('hide');
-                        updateBuildPanel();
-                    }
+                    updateBuildPanel();
                 }
-                
             } else {
                 alert('조건그룹을 입력하세요');
             }

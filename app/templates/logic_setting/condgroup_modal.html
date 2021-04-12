@@ -106,9 +106,13 @@
             const postData = getPostData("#cond-group");
             postData['cond_group_reverse'] = $("#cond-group-reverse").prop('checked') ? '1' : '0';
             postData['cond_group_id'] = condGroupID;
+            postData['control_id'] = controlId;
             sendAjax("{{url_for('logic_build.edit_cond_group')}}", postData, false);
             updateCondGroupTbl();
             $("#cond-group").modal('hide');
+            if(isAddPalette) {
+                doActGroupCreate();
+            }
         } else {
             alert('이름을 입력하세요');
             nameInput.addClass('border-danger');
