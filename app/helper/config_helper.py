@@ -25,7 +25,7 @@ class Config_Helper:
             self.config.add_section(section_name)
         else:
             self.config.set(section_name, variable_name, variable_value)
-            with open(config.CONFIG_PATH + '\Config.ini', 'w+', encoding="utf-16-le") as f:
+            with open(config.CONFIG_PATH + '\Config.ini', 'w+', encoding="utf16") as f:
                 self.config.write(f, space_around_delimiters=False)
 
     def remove_variable(self, section_name, variable_name=''):
