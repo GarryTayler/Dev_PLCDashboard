@@ -39,7 +39,7 @@
             addChannel();
         } else if(flag === "del") {
             const selRow = $("#contextmenu").attr("selrow");
-            if(selRow && confirm('삭제하시겠습니까?')) {
+            if(selRow && confirm('삭제하시겠습니까1?')) {
                 sendAjax("{{url_for('communicate.remove_modbus')}}", {selRow, selType: 'custom'}, false);
                 updateVariable(channelTbl);
             }
@@ -82,7 +82,7 @@
             addFrame();
         } else {
             const selRow = $("#contextmenu").attr("selrow").replace('frame-', '');
-            if(selRow && confirm('삭제하시겠습니까?')) {
+            if(selRow && confirm('삭제하시겠습니까2?')) {
                 sendAjax("{{url_for('communicate.remove_modbus')}}", {selRow, selType: 'frame'}, false);
                 updateVariable(frameTbl);
             }
@@ -94,7 +94,7 @@
             addSegment();
         } else if(flag === "del") {
             const selRow = $("#contextmenu").attr("selrow").replace('seg-', '');
-            if(selRow && confirm('삭제하시겠습니까?')) {
+            if(selRow && confirm('삭제하시겠습니까3?')) {
                 sendAjax("{{url_for('communicate.remove_modbus')}}", {selRow, selType: 'segment'}, false);
                 showFrameData();
             }

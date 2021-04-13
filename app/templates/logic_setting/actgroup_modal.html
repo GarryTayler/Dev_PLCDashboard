@@ -85,7 +85,7 @@
         if(flag === "plus") {
             doActGroupCreate();
         } else if(flag === "del") {
-            if(selRow && confirm('삭제하시겠습니까?')) {
+            if(selRow && confirm('삭제하시겠습니까56?')) {
                 sendAjax("{{url_for('logic_build.remove_action_group')}}", {selRow}, false);
                 updateActGroupTbl()
             }

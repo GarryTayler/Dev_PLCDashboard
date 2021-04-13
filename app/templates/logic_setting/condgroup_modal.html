@@ -66,7 +66,7 @@
         if(flag === "plus") {
             doCondGroupCreate();
         } else if(flag === "del") {
-            if(selRow && confirm('삭제하시겠습니까?')) {
+            if(selRow && confirm('삭제하시겠습니까456?')) {
                 sendAjax("{{url_for('logic_build.remove_cond_group')}}", {selRow}, false);
                 updateCondGroupTbl();
             }

@@ -129,7 +129,7 @@ def detail(selid=0):
                                 element[indStr] = '21.5'
 
             return render_template('monitor/detail.html', selMonitor=selMonitor, variable_list=variable_list,
-                                   image_list=image_list, element_list=element_list, remotes=get_remotes())
+                                   image_list=image_list, element_list=element_list, remotes=get_remotes(), selid=selid)
         else:
             return redirect('/')
     else:

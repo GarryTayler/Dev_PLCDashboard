@@ -89,7 +89,7 @@
             addDef();
         } else if(flag === "del") {
             const selRow = $("#contextmenu").attr("selrow");
-            if(selRow && confirm('삭제하시겠습니까?')) {
+            if(selRow && confirm('삭제하시겠습니까4345?')) {
                 sendAjax("{{url_for('logic_setting.remove_recipe')}}", {selRow}, false);
                 updateVariable(recipeDefTbl);
             }
@@ -195,7 +195,7 @@
                 selIDs.push($(selChk[ii]).attr('id').replace('recipe-var-', ''));
             }
 
-            if(confirm('삭제하시겠습니까?')) {
+            if(confirm('삭제하시겠습니까453389?')) {
                 sendAjax("{{url_for('logic_setting.remove_recipe')}}", {selRow: selIDs.join(','), selType: 'var', recipeDefID}, false);
                 recipeDetail();
             }
@@ -212,7 +212,7 @@
                 selIDs.push($(selChk[ii]).attr('id').replace('recipe-name-', ''));
             }
 
-            if(confirm('삭제하시겠습니까?')) {
+            if(confirm('삭제하시겠습니까08123?')) {
                 sendAjax("{{url_for('logic_setting.remove_recipe')}}", {selRow: selIDs.join(','), selType: 'name', recipeDefID}, false);
                 recipeDetail();
             }

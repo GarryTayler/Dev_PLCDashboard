@@ -1100,7 +1100,7 @@
         } else if(flag === "edit" && selRow) {
             editCondAction(selRow);
         } else if(flag === "del") {
-            if(selRow && confirm('삭제하시겠습니까?')) {
+            if(selRow && confirm('삭제하시겠습니까222?')) {
                 sendAjax("{{url_for('logic_setting.remove_condition')}}", {selRow}, false);
                 updateVariable(typeof logicCondTbl === "undefined" ? dataTables: logicCondTbl);
             }

@@ -212,7 +212,7 @@ function getTblChk(tableID, suffix = '') {
 function removeAction(tableID, url, suffix = '', flag = true) {
     const selRow = getTblChk(tableID, suffix);
     if(selRow.length > 0) {
-        if(confirm('삭제하시겠습니까?')) {
+        if(confirm('삭제하시겠습니까1?')) {
             sendAjax(url, {selRow}, flag);
         }
     } else {
@@ -236,7 +236,7 @@ function removeCustom(tableID, url, replaceStr = '', customData = {}, refresh = 
         }
 
         if(selIDs.length > 0) {
-            if(confirm('삭제하시겠습니까?')) {
+            if(confirm('삭제하시겠습니까2?')) {
                 sendAjax(url, {...customData, selRow: selIDs.join(',')}, refresh);
             }
         }
@@ -473,10 +473,24 @@ $(document).ready(function() {
         $(this).find('i.build-remove-icon').hide();
     });
 
+    /*
     $("i.build-remove-icon").on('click', function(e) {
         e.preventDefault();
         if(confirm('삭제하시겠습니까?')) {
             let urlArr = $(this).closest('a').attr('href').trim().split('/');
+            urlArr[2] = "remove_" + urlArr[2];
+            const selRow = urlArr[3];
+            urlArr.splice(-1, 1);
+            const urlStr = urlArr.join('/');
+
+            sendAjax(urlStr, {selRow});
+        }
+    }); */
+
+    $("i.build-remove-detail-icon").on('click', function(e) {
+        e.preventDefault();    
+        if(confirm('삭제하시겠습니까3?')) {
+            let urlArr = $(this).attr('detailurl').trim().split('/');
             urlArr[2] = "remove_" + urlArr[2];
             const selRow = urlArr[3];
             urlArr.splice(-1, 1);
