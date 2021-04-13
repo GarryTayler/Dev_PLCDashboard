@@ -689,13 +689,13 @@ def change_mode():
             config_helper.initSection(section_name)
             interval_write(section_name)
 
-        #u2p_shm = U2p_Logic()
-        #u2p_shm.change_run_mode(1 if selMode == "stop" else 0)
-
         section_name = "GENERAL"
         config_helper.initSection(section_name)
         config_helper.set_value(section_name, "GMT_TIME_ZONE", '9:00')
         config_helper.set_value(section_name, "RUN_MODE", 'TRUE' if selMode == "stop" else 'FALSE')
+
+        #u2p_shm = U2p_Logic()
+        #u2p_shm.change_run_mode(1 if selMode == "stop" else 0)
 
         selSet = models.Settings.query.filter_by(name='mode').first()
         selSet.value = 'run' if selMode == "stop" else 'stop'
