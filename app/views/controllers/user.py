@@ -535,7 +535,7 @@ def variable_write(section, variable, ind):
     prefixStr = "REMOTE_ITEM." + str(ind)
     typeArr = variable.type.split('-')
     varStr = config.VARIABLE_MATCH[typeArr[0]] + '.' + typeArr[1]
-    locStr = "REMOTE." + str(variable.remote) if variable.remote > 0 else "LOCAL.0"
+    locStr = "REMOTE." + str(variable.remote - 1) if variable.remote > 0 else "LOCAL.0"
     config_helper.set_value(section, prefixStr, locStr + "." + varStr)
 
 
@@ -675,7 +675,7 @@ def change_mode():
             threads = [gevent.spawn(remote_write(section_name, remotes[ind], ind)) for ind in range(len(remotes))]
             gevent.joinall(threads)
 
-            variables = models.Variable.query.filter_by(use_flag='1').all()
+            variables = models.Variable.query.filter(models.Variable.use_flag=='1', models.Variable.remote > 0).order_by(models.Variable.remote.asc()).all()
             threads = [gevent.spawn(variable_write(section_name, variables[ind], ind)) for ind in range(len(variables))]
             gevent.joinall(threads)
 
@@ -689,8 +689,8 @@ def change_mode():
             config_helper.initSection(section_name)
             interval_write(section_name)
 
-        u2p_shm = U2p_Logic()
-        u2p_shm.change_run_mode(1 if selMode == "stop" else 0)
+        #u2p_shm = U2p_Logic()
+        #u2p_shm.change_run_mode(1 if selMode == "stop" else 0)
 
         section_name = "GENERAL"
         config_helper.initSection(section_name)

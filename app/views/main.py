@@ -53,7 +53,8 @@ def current_time():
 
     # u2p_shm = U2p_Logic()
     # mode = "run" if u2p_shm.get_run_mode() == 1 else "stop"
-    mode = "stop"
+    selSet = models.Settings.query.filter_by(name='mode').first()
+    mode = selSet.value
 
     userid=''
     if session and session.get('user_id'):
