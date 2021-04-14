@@ -159,12 +159,17 @@
             const curType = $("#" + selid).attr('seltype');
             if(curID && curID.length > 0) {
                 //modalSubType.val(curID.split('-')[0]).attr('disabled', true);
-                if(selid )
                 chkArr.push($("#" + selid).attr('seltypeid')+";"+curID+";"+curType);
             } else {
                 modalSubType.val('digital').attr('disabled', false);
             }
+            if(curID) {
+                let typeTemp = curID.split('-')[0]
+                varSelect.val(curType)
+                modalSubType.val(typeTemp)
+            }
         }
+        
 
         const modalFluid = $("#modal-from-fluid");
         if(disabled) {
@@ -278,7 +283,10 @@
                 {
                     render: function (data, type, row) {
                         const selType = modalSubType.val();
-                        return '<div class="form-check"><input type="checkbox" class="form-check-input check-row" id="check-row-' + selType + '-' + row.id + '"><label class="form-check-label" for="check-row-' + selType + '-' + row.id + '"></label></div>';
+                        let idTemp = row.id;
+                        if(row.remote_id != '0')
+                            idTemp = row.addr_id;
+                        return '<div class="form-check"><input type="checkbox" class="form-check-input check-row" id="check-row-' + selType + '-' + idTemp + '"><label class="form-check-label" for="check-row-' + selType + '-' + row.id + '"></label></div>';
                     }
                 },
                 {
@@ -312,13 +320,16 @@
                     updateVariable();
                 } else {
                     setDataTblPage(variableTbl, oSettings._iDisplayLength);
+
                     const trArr = $("#modal-variable-tbl tbody tr");
                     const prefixStr = varSelect.find(':selected').attr('remote-id') + ';';
                     const suffixStr = ';' + varSelect.val();
                     for (let ii = 0; ii < trArr.length; ii++) {
                         const trItem = $(trArr[ii]);
+
                         if(trItem.find("input[type='checkbox']").attr('id')) {
                             const trID = prefixStr + trItem.find("input[type='checkbox']").attr('id').replace('check-row-', '') + suffixStr;
+
                             trItem.find("input[type='checkbox']").prop('checked', chkArr.indexOf(trID) >= 0);
                         }
                     }

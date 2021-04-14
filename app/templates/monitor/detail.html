@@ -978,7 +978,7 @@
 
 {% block script %}
     {% include 'common/datatable.html' %}
-    {% include 'common/variable_modal.html' %}
+    {% include 'common/variable_modal_mornitor.html' %}
     {% include 'common/logicbuild.html' %}
     <script src="{{ url_for('static', filename='js/datetimepicker.min.js') }}"></script>
     <script src="{{ url_for('static', filename='js/jquery.inputmask.min.js') }}"></script>
@@ -1432,12 +1432,18 @@
                                 inputItem.val(elemOptions[key]);
                                 // delete elemOptions[key];
                                 if(key + "_selid" in elemOptions) {
+                                    chkArr = [];
+                                    chkArr.push(elemOptions["set_val_address"]+";"+elemOptions[key + "_selid"]+";"+elemOptions[key + "_seltype"])
                                     inputItem.attr('selid', elemOptions[key + "_selid"]);
                                     inputItem.attr('seltype', elemOptions[key + "_seltype"]);
                                     inputItem.attr('sellocstr', elemOptions[key + "_sellocstr"]);
+                                    inputItem.attr('seltypeid', elemOptions["set_val_address"])
+                                    inputItem.attr('selrow', elemOptions[key + "_selid"])
                                     delete elemOptions[key + "_selid"]
                                     delete elemOptions[key + "_seltype"]
                                     delete elemOptions[key + "_sellocstr"]
+                                    delete elemOptions["set_val_address"]
+                                    delete elemOptions[key + "_selid"]
                                 }
                                 break;
                             }
