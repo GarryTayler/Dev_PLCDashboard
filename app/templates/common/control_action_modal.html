@@ -882,7 +882,7 @@
         } else if(flag === "edit" && selRow) {
             editAction(selRow);
         } else {
-            if(selRow && confirm('삭제하시겠습니까333?')) {
+            if(selRow && confirm('삭제하시겠습니까?')) {
                 sendAjax("{{url_for('logic_setting.remove_action')}}", {selRow}, false);
                 updateVariable(typeof logicActTbl === "undefined" ? dataTables : logicActTbl);
             }

@@ -215,7 +215,7 @@
         if(flag === "plus") {
             controlCreate();
         } else if(flag === "del") {
-            if(selRow && confirm('삭제하시겠습니까9086?')) {
+            if(selRow && confirm('삭제하시겠습니까?')) {
                 sendAjax("{{url_for('logic_build.remove_control')}}", {selRow}, false);
                 updateVariable(logicControlTbl);
             }

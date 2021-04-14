@@ -749,7 +749,7 @@
                 modbusModal.modal('show');
             } else if(flag === "del") {
                 const selRow = $("#contextmenu").attr("selrow").replace('modbus-', '');
-                if(selRow && confirm('삭제하시겠습니까555?')) {
+                if(selRow && confirm('삭제하시겠습니까?')) {
                     sendAjax("{{url_for('communicate.remove_modbus')}}", {selRow}, false);
                     updateVariable(modbusTbl);
                 }
@@ -881,7 +881,7 @@
                 addChannel(str);
             } else if(flag === "del") {
                 const selRow = $("#contextmenu").attr("selrow").replace('channel-', '');
-                if(selRow && confirm('삭제하시겠습니까666?')) {
+                if(selRow && confirm('삭제하시겠습니까?')) {
                     sendAjax("{{url_for('communicate.remove_modbus')}}", {selRow, selType: 'channel'}, false);
                     updateVariable(str.length === 0 ? modbusChlTbl : rtuChlTbl);
                 }

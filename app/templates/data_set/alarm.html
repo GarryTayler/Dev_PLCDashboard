@@ -937,7 +937,7 @@
                 addAlarm();
             } else if(flag === "del") {
                 const selRow = $("#contextmenu").attr("selrow");
-                if(selRow && confirm('삭제하시겠습니까888?')) {
+                if(selRow && confirm('삭제하시겠습니까?')) {
                     sendAjax("{{url_for('data_set.remove_alarm')}}", {selRow}, false);
                     updateVariable(alarmTbl);
                 }

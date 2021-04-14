@@ -334,7 +334,7 @@
                                         <div class="header-badge" data-id="{{element.id}}">
                                             <i class="fas fa-palette mr-2" onclick="showPalette('#monitor-element-{{element.id}}')"></i>
                                             <i class="fas fa-edit mr-2" data-type="{{element.type}}" data-options="{{element.options}}" data-name="{{element.name}}" {%if element.type=='read_val'%}read_digital_on_img="{{element.read_digital_on_img}}" read_digital_off_img="{{element.read_digital_off_img}}" read_digital_icon_img={{element.read_digital_icon_img}}{%elif element.type=='set_val'%}set_digital_icon_img="{{element.set_digital_icon_img}}"{%endif%}></i>
-                                            <i class="fas fa-trash"></i>
+                                            <i class="fas fa-trash remove-element"></i>
                                         </div>
                                     </div>
                                 </div>
@@ -1409,7 +1409,7 @@
                 $(this).toggleClass('selected');
             });
 
-            $("div.header-badge i.fa-trash").on('click', function() {
+            $("div.header-badge i.fa-trash.remove-element").on('click', function() {
                 removeChild("{{url_for('monitor.remove_element')}}", {elemID: $(this).closest('div').data('id')});
             });
 

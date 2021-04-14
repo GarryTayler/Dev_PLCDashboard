@@ -108,7 +108,7 @@
     let selFont = {}, fileUpdate = false;
     const hexDigits = ["0","1","2","3","4","5","6","7","8","9","a","b","c","d","e","f"];
     function removeChild(url, selID, flag = true) {
-        if(confirm('삭제하시겠습니까4444?')) {
+        if(confirm('삭제하시겠습니까?')) {
             sendAjax(url, selID, flag);
         }
     }
@@ -245,7 +245,7 @@
     function initLogicIcons() {
         const circleUp = $("i.fa-chevron-circle-up");
         const circleDown = $("i.fa-chevron-circle-down");
-        const trashArr = $("div.header-badge i.fa-trash");
+        const trashArr = $("div.header-badge i.fa-trash.remove-element");
         if(curMode === "stop" && curAuth) {
             circleUp.unbind('click');
             circleDown.unbind('click');

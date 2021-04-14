@@ -164,7 +164,7 @@ def logic(selid=0):
                                    control_limit=const.uiSizeCtrl, condgroup_limit=const.uiSizeEvalGrp,
                                    actgroup_limit=const.uiSizeActGrp, action_limit=const.uiSizeAct,
                                    condition_limit=const.uiSizeEval, time_limit=const.uiSizeTimePeriod,
-                                   alarms=alarms, remotes=get_remotes(), priority="5")
+                                   alarms=alarms, remotes=get_remotes(), priority="5", selid=selid)
         else:
             return redirect('/')
     else:
