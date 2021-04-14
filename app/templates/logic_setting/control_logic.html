@@ -127,12 +127,13 @@
 
     function addPalette() {
         isAddPalette = true;
-        console.log(controlList)
         if(controlList.status) {
             if(controlList.cond_page_list && controlList.cond_page_list.length == 0) {
-                doCondGroupCreate();
+                //doCondGroupCreate();
+                selectCondGroup()
             } else if(controlList.act_page_list && controlList.act_page_list.length == 0) {
-                doActGroupCreate();
+                //doActGroupCreate();
+                selectActGroup()
             }
         }
     }

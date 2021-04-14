@@ -516,9 +516,9 @@ def add_actgroup():
     controlID = postData.get('controlID')
     actgroupID = postData.get('actgroupID')
     beforeID = postData.get('beforeID')
-    if check_null(controlID) and check_null(actgroupID) and check_null(beforeID):
+    if check_null(controlID) and check_null(actgroupID):
         actgroupModel = models.ActionGroup
-        if int(beforeID) > 0:
+        if  check_null(beforeID) and int(beforeID) > 0:
             beforeActGroup = actgroupModel.query.filter_by(id=beforeID).first()
             if beforeActGroup:
                 beforeActGroup.controlid = '0'
@@ -544,9 +544,9 @@ def add_condgroup():
     controlID = postData.get('controlID')
     condgroupID = postData.get('condgroupID')
     beforeID = postData.get('beforeID')
-    if check_null(controlID) and check_null(condgroupID) and check_null(beforeID) > 0:
+    if check_null(controlID) and check_null(condgroupID):
         condgroupModel = models.ConditionGroup
-        if int(beforeID) > 0:
+        if check_null(beforeID) and int(beforeID) > 0:
             beforeCondGroup = condgroupModel.query.filter_by(id=beforeID).first()
             beforeCondGroup.controlid = '0'
             beforeCondGroup.options = ''

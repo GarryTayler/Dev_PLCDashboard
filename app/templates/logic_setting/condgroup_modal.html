@@ -110,9 +110,6 @@
             sendAjax("{{url_for('logic_build.edit_cond_group')}}", postData, false);
             updateCondGroupTbl();
             $("#cond-group").modal('hide');
-            if(isAddPalette) {
-                doActGroupCreate();
-            }
         } else {
             alert('이름을 입력하세요');
             nameInput.addClass('border-danger');
