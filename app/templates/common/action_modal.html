@@ -621,7 +621,7 @@
                 </div>
             </div>
             <div class="modal-footer">
-                <button class="btn btn-secondary btn-icon-split" data-dismiss="modal">
+                <button class="btn btn-secondary btn-icon-split" onclick="delFormulaVal()" data-dismiss="modal">
                     <span class="icon text-white-50">
                         <i class="fas fa-times"></i>
                     </span>
@@ -1601,6 +1601,7 @@
         </div>
     `;
     function selectFormula() {
+        $('#formula-area').val($('#formula-value').val())
         $("#formula-modal").modal('show');
     }
 
@@ -2016,6 +2017,10 @@
         const textLen = selText.length;
         formulaInput.val(curText.substr(0, curPosition) + selText + curText.substr(curPosition)).focus();
         formulaInput[0].selectionStart = formulaInput[0].selectionEnd = curPosition + (hasFunc ? textLen - 1 : textLen);
+    }
+
+    function delFormulaVal() {
+        $('#formula-area').val("");
     }
 
     $(document).ready(function () {
