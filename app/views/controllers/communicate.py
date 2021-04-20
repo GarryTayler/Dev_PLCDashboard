@@ -1,4 +1,4 @@
-from flask import render_template, Blueprint, request
+from flask import render_template, Blueprint, request, session
 from app.views.controllers.user import login_required
 from app import models, db, config
 from sqlalchemy import cast, Integer, func
@@ -44,7 +44,16 @@ def remote():
 
     # rm_mem = RemoteDevice_Memory()
     # local_data = rm_mem.get_local_status()
+    selSet = models.Settings.query.filter_by(name='mode').first()
+    mode = selSet.value
+
     local_data = {}
+
+    if mode == 'run':
+        print("run")
+    else: 
+        print("stop")
+    
     return render_template('communicate/remote.html', remote_limit=remote_limit, local_ip=local_ip, local_use=local_use,
                            local_port=local_port, remotes=get_remotes(), local_data=local_data)
 
