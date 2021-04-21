@@ -59,8 +59,21 @@ def Bytes2Int(byteStr):
     return int.from_bytes(byteStr, 'big')
 
 
+# def parse_wstring(byteArr):
+#     ind = byteArr.find(b'\x00\x00')
+#     print(ind)
+#     decode = defaultDecode if ind == 0 else 'utf16'
+#     # byteArr = byteArr[:ind + 1] if ind == 0 else byteArr
+#     byteArr = byteArr[:ind + 2] if ind > 0 else byteArr
+#     print(byteArr)
+#     return byteArr.decode(decode)
+
+
 def parse_wstring(byteArr):
     ind = byteArr.find(b'\x00\x00')
-    decode = defaultDecode if ind == 0 else unicodeDecode
-    byteArr = byteArr[:ind + 1] if ind == 0 else byteArr
-    return byteArr.decode(decode)
+    decode = defaultDecode if ind == 0 else 'utf16'
+    decodeStr = byteArr.decode(decode)
+    # print(decodeStr)
+    ind = decodeStr.find('\x00')
+    # print(ind)
+    return decodeStr[:ind] if ind > 0 else decodeStr
