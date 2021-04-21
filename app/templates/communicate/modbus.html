@@ -1151,9 +1151,9 @@
                     'defaultContent': '',
                     'createdCell': function(td, cellData, rowData) {
                         if(rowData.modbus.ok) {
-                            $(td).addClass('bg-success');
+                            $(td).addClass('success-cell-font');
                         } else if(rowData.modbus.err) {
-                            $(td).addClass('bg-warning');
+                            $(td).addClass('fail-cell-font');
                         }
                     }
                 });
@@ -1236,9 +1236,9 @@
                     'defaultContent': '',
                     'createdCell': function(td, cellData, rowData) {
                         if(rowData.modbus.ok) {
-                            $(td).addClass('bg-success');
+                            $(td).addClass('success-cell-font');
                         } else if(rowData.modbus.err) {
-                            $(td).addClass('bg-warning');
+                            $(td).addClass('fail-cell-font');
                         }
                     }
                 });
@@ -1326,9 +1326,9 @@
                     'defaultContent': '',
                     'createdCell': function(td, cellData, rowData) {
                         if(rowData.modbus.ok) {
-                            $(td).addClass('bg-success');
+                            $(td).addClass('success-cell-font');
                         } else if(rowData.modbus.err) {
-                            $(td).addClass('bg-warning');
+                            $(td).addClass('fail-cell-font');
                         }
                     }
                 });

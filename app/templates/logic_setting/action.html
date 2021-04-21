@@ -93,11 +93,10 @@
                     'defaultContent': '',
                     'createdCell': function(td, cellData, rowData) {
                         if(rowData.shm.busy) {
-                            $(td).addClass('bg-warning');
                         } else if(rowData.shm.done) {
-                            $(td).addClass('bg-success');
+                            $(td).addClass('success-cell-font');
                         } else if(rowData.shm.err) {
-                            $(td).addClass('bg-danger');
+                            $(td).addClass('fail-cell-font');
                         }
                     }
                 });

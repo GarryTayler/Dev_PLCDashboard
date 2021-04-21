@@ -1,3 +1,9 @@
+.success-cell-font {
+    color: blue;
+}
+.fail-cell-font {
+    color: red;
+}
 .modal { overflow: auto !important; }
 .header-img {
     width: 30px;

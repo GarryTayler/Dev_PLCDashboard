@@ -176,9 +176,10 @@
                     'defaultContent': '',
                     'createdCell': function(td, cellData, rowData) {
                         if(rowData.run.busy) {
-                            $(td).addClass('bg-warning');
                         } else if(rowData.run.done) {
-                            $(td).addClass('bg-success');
+                            $(td).addClass('success-cell-font');
+                        } else if(rowData.run.err) {
+                            $(td).addClass('fail-cell-font');
                         }
                     }
                 })

@@ -57,7 +57,7 @@
                                                 <input type="number" class="form-control" id="port-address" value="{{local_port}}" />
                                             </td>
                                             {% if selmode == "run" %}
-                                                <td class="{%if local_data.ok%}bg-success{%elif local_data.err%}bg-warning{%endif%}">{{local_data.status}}</td>
+                                                <td class="{%if local_data.ok%}success-cell-font{%elif local_data.err%}fail-cell-font{%endif%}">{{local_data.status}}</td>
                                             {% endif %}
                                         </tr>
                                     </tbody>
@@ -508,9 +508,9 @@
                     'defaultContent': '',
                     'createdCell': function(td, cellData, rowData) {
                         if(rowData.client.con) {
-                            $(td).addClass('bg-success');
+                            $(td).addClass('success-cell-font');
                         } else if(rowData.client.err) {
-                            $(td).addClass('bg-danger');
+                            $(td).addClass('fail-cell-font');
                         }
                     }
                 });
