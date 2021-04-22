@@ -18,9 +18,10 @@ def add_monitor():
     postData = request.values
     inputName = postData.get('input_name')
     selID = postData.get('inputID')
+
     if check_null(inputName) and check_null(selID):
-        if int(selID) > 0:
-            newMonitor = models.Monitor.query.filter_by(id=selID).first()
+        if len(selID) > 1:
+            newMonitor = models.Monitor.query.filter_by(monitor_id=selID).first()
             newMonitor.name = inputName
         else:
             letters = string.digits
