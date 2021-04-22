@@ -6,6 +6,8 @@ from flask_sqlalchemy import make_url
 from sqlalchemy import cast, Integer, create_engine
 from app.helper.LocalVar import SharedMem_LocalVar
 import json, os
+import string
+import random
 
 monitor = Blueprint('monitor', __name__, url_prefix='/monitor')
 
@@ -21,28 +23,34 @@ def add_monitor():
             newMonitor = models.Monitor.query.filter_by(id=selID).first()
             newMonitor.name = inputName
         else:
-            newMonitor = models.Monitor(
-                options="",
-                back_img="",
-                name=inputName
-            )
-            db.session.add(newMonitor)
-
+            letters = string.digits
+            while True:
+                monitor_id = ''.join(random.choice(letters) for i in range(3))
+                checkMonitor = models.Monitor.query.filter_by(monitor_id=monitor_id).first()
+                if checkMonitor is None:
+                    newMonitor = models.Monitor(
+                        options="",
+                        back_img="",
+                        name=inputName,
+                        monitor_id=monitor_id
+                    )
+                    db.session.add(newMonitor)
+                    break
         db.session.commit()
         db.session.refresh(newMonitor)
-        response = {'status': True, 'selid': newMonitor.id}
+        response = {'status': True, 'selid': newMonitor.monitor_id}
     else:
         response = {'status': False, 'message': 'Invalid request'}
 
     return json.dumps(response)
 
 
-@monitor.route('/detail', defaults={'selid': 0})
+@monitor.route('/detail', defaults={'selid': '000'})
 @monitor.route('/detail/<selid>')
 @login_required
-def detail(selid=0):
-    if int(selid) > 0:
-        selMonitor = models.Monitor.query.filter_by(id=selid).first()
+def detail(selid='000'):
+    if selid != '':
+        selMonitor = models.Monitor.query.filter_by(monitor_id=selid).first()
         if selMonitor:
             collectModel = models.DataCollect
             variable_list = collectModel.query.filter(collectModel.options.ilike('%analog-%')).all()
@@ -69,7 +77,6 @@ def detail(selid=0):
                                 _key_value = 'read_val'
                             if(variable_type == 'analog'):
                                 variable_remote = options[_key_value + '_variable_seltype'].split('-')[1]
-                                print(variable_remote, options[_key_value + '_variable_selid'])
                                 unit_row = models.Variable.query.filter(models.Variable.remote == variable_remote, models.Variable.type == options[_key_value + '_variable_selid']).first()
                                 if(unit_row is not None):
                                     element['unit'] = unit_row.unit
@@ -167,7 +174,7 @@ def remove_detail():
     postData = request.values
     selRow = postData.get('selRow')
     if check_null(selRow):
-        models.Monitor.query.filter_by(id=selRow).delete()
+        models.Monitor.query.filter_by(monitor_id=selRow).delete()
         models.MonitorElement.query.filter_by(monitorid=selRow).delete()
         db.session.commit()
         response = {'status': True}

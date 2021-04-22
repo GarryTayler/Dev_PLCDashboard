@@ -49,7 +49,7 @@ def current_time():
     logicModel = models.Logic
     logic = logicModel.query.with_entities(logicModel.id, logicModel.name).all()
     selModel = models.Monitor
-    monitors = selModel.query.with_entities(selModel.id, selModel.name).all()
+    monitors = selModel.query.with_entities(selModel.id, selModel.name, selModel.monitor_id).all()
 
     # u2p_shm = U2p_Logic()
     # mode = "run" if u2p_shm.get_run_mode() == 1 else "stop"

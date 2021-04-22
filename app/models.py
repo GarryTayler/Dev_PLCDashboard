@@ -245,6 +245,7 @@ class Monitor(db.Model, UserMixin):
     name = db.Column(db.String)
     options = db.Column(db.Text)
     back_img = db.Column(db.String)
+    monitor_id = db.Column(db.String)
 
 
 class MonitorElement(db.Model, UserMixin):

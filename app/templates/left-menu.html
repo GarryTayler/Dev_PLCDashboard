@@ -24,7 +24,7 @@
                 <h6 class="collapse-header">모니터링:</h6>
                 {% for monitor in monitors %}
                     {% if not 'monitor-' ~ monitor.id in auth_list %}
-                        <a class="collapse-item{% if selMonitor and selMonitor.id == monitor.id %} logic-set-active{% endif %}" href="{{url_for('monitor.detail', selid=monitor.id)}}">
+                        <a class="collapse-item{% if selMonitor and selMonitor.id == monitor.id %} logic-set-active{% endif %}" href="{{url_for('monitor.detail', selid=monitor.monitor_id)}}">
                             {% if monitor.name|length > 8 %}
                                 {{monitor.name[:8]}}...
                             {% else %}

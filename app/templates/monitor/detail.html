@@ -991,7 +991,8 @@
     <script>
         let selType = "", insertID = '0';
         const btnDefaultColor = '#6c757d', chartBack = "rgba(255, 255, 255, 0)";
-        const monitorID = "{{selMonitor.id}}";
+        const monitorID = "{{selMonitor.monitor_id}}";
+
         const assetPath = "{{url_for('static', filename='upload/')}}";
         const gaugeOpt = {
             angle: -0.25,
