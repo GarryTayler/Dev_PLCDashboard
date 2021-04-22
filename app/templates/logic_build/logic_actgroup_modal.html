@@ -70,13 +70,25 @@
     let logicActGroupTbl;
     function actGroupSelect() {
         const selIDs = getTblChk("#logic-actgroup-table", "actgroup-");
-        if(selIDs.length > 0) {
-            if(isAddPalette) {
-                sendAjax("{{url_for('logic_build.add_condgroup')}}", {controlID, condgroupID: selIDs, beforeID: $("#condgroup-name").attr('condgroup')});
-                sendAjax("{{url_for('logic_build.add_actgroup')}}", {controlID, actgroupID: selIDs, beforeID: $("#actgroup-name").attr('actgroup')});
+        if(selIDs) {
+            let temp = selIDs.split(",")
+            if(temp.length > 1) {
+                alert('한개동작그룹을 선택하세요');
+            } else {
+                if(selIDs.length > 0) {
+                    if(isAddPalette) {
+                        sendAjax("{{url_for('logic_build.add_condgroup')}}", {controlID, condgroupID: isPaletteCondGroupId, beforeID: $("#condgroup-name").attr('condgroup')}, false);
+                        sendAjax("{{url_for('logic_build.add_actgroup')}}", {controlID, actgroupID: selIDs, beforeID: $("#actgroup-name").attr('actgroup')}, false);
+                        $("#actgroup-modal").modal('hide');
+                        cancelActGroupSelect()
+                        controlBuild();
+                    }
+                    else
+                        sendAjax("{{url_for('logic_build.add_actgroup')}}", {controlID, actgroupID: selIDs, beforeID: $("#actgroup-name").attr('actgroup')});
+                } else {
+                    alert('동작그룹을 선택하세요');
+                }
             }
-            else
-                sendAjax("{{url_for('logic_build.add_actgroup')}}", {controlID, actgroupID: selIDs, beforeID: $("#actgroup-name").attr('actgroup')});
         } else {
             alert('동작그룹을 선택하세요');
         }
