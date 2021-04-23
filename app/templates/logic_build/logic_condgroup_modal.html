@@ -107,7 +107,7 @@
                 setDataTblPage($("#logic-condgroup-table"), oSettings._iDisplayLength);
             },
             'ajax': {
-                'url': "{{url_for('logic_setting.condgroup_list')}}",
+                'url': "{{url_for('logic_setting.condgroup_list_setting')}}",
                 'headers': {"X-CSRFToken": csrf_token},
                 'data': function(data) {
                     return {

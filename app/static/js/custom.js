@@ -318,7 +318,7 @@ function setVariableDataTblPage(tblInst, dispLen) {
     tblInst.attr('before_clicked', '0');
     localStorage.setItem('page-cnt', dispLen);
 
-    const curPage = curPage;
+    //const curPage = curPage;
     if(variableInst && curPage && curPage > 0) {
         localStorage.removeItem('variable-modal-cur-page');
         variableInst.page(parseInt(curPage));

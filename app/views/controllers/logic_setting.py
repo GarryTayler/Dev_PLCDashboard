@@ -326,8 +326,8 @@ def condgroup_list():
     beforeID = postData.get('beforeID')
     if check_null(beforeID):
         condgroups = condgroups.filter(or_(condgroupModel.controlid == '0', condgroupModel.id == beforeID))
-    else:
-        condgroups = condgroups.filter(condgroupModel.controlid == '0')
+    #else:
+    #    condgroups = condgroups.filter(condgroupModel.controlid == '0')
 
     totalCount = condgroups.count()
 
@@ -349,9 +349,73 @@ def condgroup_list():
 
     return json.dumps(datatable_list(data_list, totalCount, draw))
 
+@logic_setting.route('/condgroup_list_setting', methods=['POST'])
+@login_required
+def condgroup_list_setting():
+    postData = request.values
+    draw, start, length, columnIndex, columnName, sortOrder = datatable_head(postData)
+
+    condgroupModel = models.ConditionGroup
+    condgroups = condgroupModel.query.outerjoin(models.Control, condgroupModel.controlid == models.Control.id) \
+        .with_entities(condgroupModel.id, condgroupModel.name, condgroupModel.controlid, condgroupModel.operator,
+                       condgroupModel.reverse) \
+        .add_columns(models.Control.name.label('control_name'))
+
+    beforeID = postData.get('beforeID')
+    if check_null(beforeID):
+        condgroups = condgroups.filter(or_(condgroupModel.controlid == '0', condgroupModel.id == beforeID))
+    else :
+        condgroups = condgroups.filter(condgroupModel.controlid == '0')
+
+    totalCount = condgroups.count()
+
+    sortObj = condgroupModel.id.asc()
+    condgroups = condgroups.order_by(sortObj).offset(start).limit(length).all()
+    data_list = [{"id": condgroup[0], "name": condgroup[1], "controlid": condgroup[2], "operator": condgroup[3],
+                  "reverse": config.USE_FLAG[int(condgroup[4])], "control_name": condgroup[5], "ind": start + ind + 1,
+                  "valid": "TRUE"} for ind, condgroup in enumerate(condgroups)]
+
+    return json.dumps(datatable_list(data_list, totalCount, draw))
+
 @logic_setting.route('/actgroup_list', methods=['POST'])
 @login_required
 def actgroup_list():
+    postData = request.values
+    draw, start, length, columnIndex, columnName, sortOrder = datatable_head(postData)
+
+    actgroupModel = models.ActionGroup
+    actGroups = actgroupModel.query.outerjoin(models.Control, actgroupModel.controlid == models.Control.id) \
+        .with_entities(actgroupModel.id, actgroupModel.name, actgroupModel.controlid, actgroupModel.mode,
+                       actgroupModel.cnt) \
+        .add_columns(models.Control.name.label('control_name'))
+
+    beforeID = postData.get('beforeID')
+    if check_null(beforeID):
+        actGroups = actGroups.filter(or_(actgroupModel.controlid == '0', actgroupModel.id == beforeID))
+
+    totalCount = actGroups.count()
+
+    # if columnName == "name":
+    #     sortObj = actgroupModel.name.asc() if sortOrder == "asc" else actgroupModel.name.desc()
+    # elif columnName == "mode":
+    #     sortObj = actgroupModel.mode.asc() if sortOrder == "asc" else actgroupModel.mode.desc()
+    # elif columnName == "cnt":
+    #     sortObj = actgroupModel.cnt.asc() if sortOrder == "asc" else actgroupModel.cnt.desc()
+    # else:
+    #     sortObj = actgroupModel.id.asc() if sortOrder == "asc" else actgroupModel.id.desc()
+
+    sortObj = actgroupModel.id.asc()
+    actGroups = actGroups.order_by(sortObj).offset(start).limit(length).all()
+    # validList = get_logic_mem(LogicMemory.Const_ActGroup, start, length, const.uiSizeActGrp) validList[ind]
+    data_list = [{"id": condgroup[0], "name": condgroup[1], "mode": config.ACTION_GROUP_MODE[condgroup[3]],
+                  "cnt": condgroup[4], "control_name": condgroup[5], "ind": start + ind + 1, "mode1": condgroup[3],
+                  "run": "TRUE"} for ind, condgroup in enumerate(actGroups)]
+
+    return json.dumps(datatable_list(data_list, totalCount, draw))
+
+@logic_setting.route('/actgroup_list_setting', methods=['POST'])
+@login_required
+def actgroup_list_setting():
     postData = request.values
     draw, start, length, columnIndex, columnName, sortOrder = datatable_head(postData)
 
@@ -1035,5 +1099,5 @@ def get_page_number():
                 pageNum = int(i/int(length))
     else:
         pageNum = int(int(variable1[1])/int(length))
-    
+    print(remoteID, variable1, pageNum)
     return json.dumps(pageNum)

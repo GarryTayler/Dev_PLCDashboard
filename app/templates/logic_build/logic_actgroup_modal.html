@@ -109,7 +109,7 @@
                 setDataTblPage($("#logic-actgroup-table"), oSettings._iDisplayLength);
             },
             'ajax': {
-                'url': "{{url_for('logic_setting.actgroup_list')}}",
+                'url': "{{url_for('logic_setting.actgroup_list_setting')}}",
                 'headers': { "X-CSRFToken": csrf_token },
                 'data': function(data) {
                     return {
