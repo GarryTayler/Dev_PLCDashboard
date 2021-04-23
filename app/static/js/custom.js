@@ -270,11 +270,12 @@ function showAddMonitor() {
     $("#monitor-modal").attr('selid', '0').modal('show');
 }
 
-function showAddLogic(selID = 0) {
+function showAddLogic(selID) {
     const nameInput = $("#logic-name");
     nameInput.removeClass('border-danger');
-    if(selID === 0) {
+    if(selID == null || selID == undefined || selID.length < 2) {
         nameInput.val('');
+        selID = '0';
     } else {
         const logicItem = $("#logic-item-" + selID);
         nameInput.val(logicItem.attr('data-name'));
@@ -441,7 +442,7 @@ $(document).ready(function() {
         const nameInput = $("#logic-name");
         const logicName = nameInput.val().trim();
         if(logicName.length > 0) {
-            const selID = parseInt($("#new-logic-modal").attr('selid'));
+            const selID = $("#new-logic-modal").attr('selid');
             const postData = {
                 name: logicName,
                 mode: $("#logic-mode").val(),
@@ -451,7 +452,7 @@ $(document).ready(function() {
 
             const respFunc = function(resp) {
                 if(resp.status) {
-                    if(selID > 0) {
+                    if(selID.length > 1) {
                         location.reload();
                     } else {
                         location.href = "/logic_build/logic/" + resp.selid;

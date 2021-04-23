@@ -47,7 +47,7 @@ def current_time():
 
     now = datetime.now()
     logicModel = models.Logic
-    logic = logicModel.query.with_entities(logicModel.id, logicModel.name).all()
+    logic = logicModel.query.with_entities(logicModel.id, logicModel.name, logicModel.logicid).all()
     selModel = models.Monitor
     monitors = selModel.query.with_entities(selModel.id, selModel.name, selModel.monitor_id).all()
 

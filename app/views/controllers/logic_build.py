@@ -5,6 +5,8 @@ from sqlalchemy import cast, Integer
 from app.helper import const, LogicMemory
 from app.helper.common import check_null, get_desc_str, get_desc_str1, get_remotes
 import json
+import string
+import random
 
 logic_build = Blueprint('logic_build', __name__, url_prefix='/logic_build')
 
@@ -118,13 +120,12 @@ def remove_control():
     return json.dumps(response)
 
 
-@logic_build.route('/logic', defaults={'selid': 0})
+@logic_build.route('/logic', defaults={'selid': '000'})
 @logic_build.route('/logic/<selid>')
 @login_required
-def logic(selid=0):
-    selid = int(selid)
-    if selid > 0:
-        selLogic = models.Logic.query.filter_by(id=selid).first()
+def logic(selid='000'):
+    if selid != '':
+        selLogic = models.Logic.query.filter_by(logicid=selid).first()
         if selLogic:
             controlModel = models.Control
             controls = controlModel.query.filter_by(logicid=selid).order_by(cast(controlModel.ind, Integer)).all()
@@ -177,25 +178,34 @@ def edit_logic():
     postData = request.form.to_dict()
     logicName = postData.get('name')
     selid = postData.get('selid')
+
+    print("logicName, selid")
+    print(selid)
+
     if check_null(logicName) and check_null(selid):
-        if int(selid) > 0:
-            newLogic = models.Logic.query.filter_by(id=selid).first()
+        if len(selid) > 1:
+            newLogic = models.Logic.query.filter_by(logicid=selid).first()
             newLogic.name = logicName
             newLogic.mode = postData.get('mode')
             newLogic.use_flag = postData.get('use_flag')
         else:
-            newLogic = models.Logic(
-                options='',
-                name=logicName,
-                mode=postData.get('mode'),
-                use_flag=postData.get('use_flag')
-            )
-
-            db.session.add(newLogic)
-
+            letters = string.digits
+            while True:
+                logicid = ''.join(random.choice(letters) for i in range(3))
+                checkLogic = models.Logic.query.filter_by(logicid=logicid).first()
+                if checkLogic is None:
+                    newLogic = models.Logic(
+                        options='',
+                        name=logicName,
+                        mode=postData.get('mode'),
+                        use_flag=postData.get('use_flag'),
+                        logicid=logicid
+                    )
+                    db.session.add(newLogic)
+                    break
         db.session.commit()
         db.session.refresh(newLogic)
-        response = {'status': True, 'selid': newLogic.id}
+        response = {'status': True, 'selid': newLogic.logicid}
     else:
         response = {'status': False, 'message': 'Invalid request'}
 
@@ -231,7 +241,13 @@ def remove_logic():
     if check_null(selIDS):
         selIDS = selIDS.split(",")
         for selid in selIDS:
-            models.Logic.query.filter_by(id=selid).delete()
+            models.Logic.query.filter_by(logicid=selid).delete()
+
+            controls = models.Control.query.filter_by(logicid=selid).all()
+            for control in controls:
+                control.logicid = '0'
+                control.options = ''
+                control.ind = '1000'
 
         db.session.commit()
         response = {'status': True}
@@ -569,6 +585,10 @@ def add_condgroup():
 def add_control():
     postData = request.values
     logicID = postData.get('logicID')
+
+    print("logicID==================")
+    print(logicID)
+
     controlID = postData.get('controlID')
     beforeID = postData.get('beforeID')
     if check_null(logicID) and check_null(controlID) and check_null(beforeID) > 0:

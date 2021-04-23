@@ -87,6 +87,7 @@ class Logic(db.Model, UserMixin):
     options = db.Column(db.Text)
     use_flag = db.Column(db.String)
     mode = db.Column(db.String)
+    logicid = db.Column(db.String)
 
 
 class ExecFunc(db.Model, UserMixin):

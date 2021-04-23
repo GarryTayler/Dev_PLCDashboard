@@ -31,7 +31,7 @@ def control_list():
     draw, start, length, columnIndex, columnName, sortOrder = datatable_head(postData)
 
     controlModel = models.Control
-    controls = controlModel.query.outerjoin(models.Logic, models.Logic.id == controlModel.logicid) \
+    controls = controlModel.query.outerjoin(models.Logic, models.Logic.logicid == controlModel.logicid) \
         .with_entities(controlModel.id, controlModel.name, controlModel.use_flag, controlModel.priority,
                        controlModel.mode) \
         .add_columns(models.Logic.name.label('logic_name'))

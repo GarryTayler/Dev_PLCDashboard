@@ -55,7 +55,7 @@
                 <h6 class="collapse-header">로직구성:</h6>
                 {% for control in logic_list %}
                     {% if not  'logic-' ~ control.id in auth_list %}
-                        <a class="collapse-item{% if logic and control.id == logic.id %} logic-set-active{% endif %}" href="{{url_for('logic_build.logic', selid=control.id)}}">
+                        <a class="collapse-item{% if logic and control.logicid == logic.logicid %} logic-set-active{% endif %}" href="{{url_for('logic_build.logic', selid=control.logicid)}}">
                             {% if control.name|length > 8 %}
                                 {{control.name[:8]}}...
                             {% else %}
