@@ -68,14 +68,25 @@
 
 <script>
     let logicCondGroupTbl;
+    let isPaletteCondGroupId;
     function condGroupSelect() {
         const selIDs = getTblChk("#logic-condgroup-table", "condgroup-");
-        if(selIDs.length > 0) {
-            if(isAddPalette) {
-                $('#condgroup-modal').modal("hide");
-                selectActGroup()
+        if(selIDs) {
+            let temp = selIDs.split(",")
+            if(temp.length > 1) {
+                alert('한개조건그룹을 선택하세요');
             } else {
-                sendAjax("{{url_for('logic_build.add_condgroup')}}", {controlID, condgroupID: selIDs, beforeID: $("#condgroup-name").attr('condgroup')});
+                if(selIDs.length > 0) {
+                    if(isAddPalette) {
+                        $('#condgroup-modal').modal("hide");
+                        isPaletteCondGroupId = selIDs
+                        selectActGroup()
+                    } else {
+                        sendAjax("{{url_for('logic_build.add_condgroup')}}", {controlID, condgroupID: selIDs, beforeID: $("#condgroup-name").attr('condgroup')});
+                    }
+                }else {
+                    alert('조건그룹을 선택하세요');
+                }
             }
         } else {
             alert('조건그룹을 선택하세요');

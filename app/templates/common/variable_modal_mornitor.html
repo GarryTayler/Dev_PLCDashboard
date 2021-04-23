@@ -136,6 +136,11 @@
     const varSelect = $("#modal-variable-type");
     const modalSubType = $("#modal-variable-subtype");
     let variableInst, chkArr = [];
+    let curPage = 0;
+    let pageLoad = false;
+    let curId = '';
+    let dataLength = 10;
+    let selectedPage = 0;
 
     function showFluid(selid, subtype = '') {
         $("#modal-fluid-variable").val('').removeAttr('origin').removeAttr('selid').removeAttr('seltype').removeAttr('sellocstr');
@@ -151,20 +156,30 @@
 
     function showFixed(selid, type="", disabled=true) {
         chkArr = [];
+        pageLoad = true;
         $("#modal-fixed-fromid").val(selid);
         if(type.length > 0) {
             modalSubType.val(type).attr('disabled', true);
         } else {
             const curID = $("#" + selid).attr('selid');
+            curId = curID;
             const curType = $("#" + selid).attr('seltype');
+            const selTypeId= $("#" + selid).attr('seltypeid');
             if(curID && curID.length > 0) {
                 //modalSubType.val(curID.split('-')[0]).attr('disabled', true);
-                if(selid )
                 chkArr.push($("#" + selid).attr('seltypeid')+";"+curID+";"+curType);
+                reloadTable($("#" + selid).attr('seltypeid'), $("#" + selid).attr('seltype'), $("#" + selid).attr('selid'))
             } else {
                 modalSubType.val('digital').attr('disabled', false);
+                curPage = 0;
+            }
+            if(curID) {
+                let typeTemp = curID.split('-')[0]
+                varSelect.val(curType)
+                modalSubType.val(typeTemp)
             }
         }
+        
 
         const modalFluid = $("#modal-from-fluid");
         if(disabled) {
@@ -172,8 +187,8 @@
         } else {
             modalFluid.val(1);
         }
-
-        updateVariable(variableInst);
+        
+            updateVariable(variableInst);
         $("#fixed-variable").modal('show');
     }
 
@@ -250,6 +265,30 @@
         $("#fluid-variable").modal('hide');
     }
 
+    function reloadTable(typeid, type, id) {
+        $.ajax({
+            url: "{{url_for('logic_setting.get_page_number')}}",
+            data: {
+                variable: id,
+                variable_type: type,
+                variable_id: typeid,
+                curID : curId,
+                length : dataLength
+            },
+            dataType: 'json',
+            type: 'POST',
+            headers: { "X-CSRFToken": csrf_token },
+            success: function(resp) {
+                if(resp) {
+                    selectedPage = resp
+                    curPage = resp
+                    variableInst.page(parseInt(resp));
+                    updateVariable(variableInst);
+                }
+            }
+        });
+    }
+
     $(document).ready(function () {
         variableInst = variableTbl.DataTable({
             ...dataTableLang,
@@ -261,16 +300,15 @@
                 'url': "{{url_for('logic_setting.variable_list')}}",
                 'headers': { "X-CSRFToken": csrf_token },
                 'data': function(data){
-                    // let curPage = localStorage.getItem('cur-page');
-                    // curPage = curPage ? curPage : 0;
+                    let pageNo = curPage
                     data = {
                         ...data,
-                        // start: curPage * parseInt(data.length),
+                        start: parseInt(pageNo) * parseInt(data.length),
                         variable: varSelect.val(),
                         variable_type: modalSubType.val(),
                         variable_id: varSelect.find(':selected').attr('remote-id')
                     }
-
+                    
                     return data;
                 }
             },
@@ -278,7 +316,10 @@
                 {
                     render: function (data, type, row) {
                         const selType = modalSubType.val();
-                        return '<div class="form-check"><input type="checkbox" class="form-check-input check-row" id="check-row-' + selType + '-' + row.id + '"><label class="form-check-label" for="check-row-' + selType + '-' + row.id + '"></label></div>';
+                        let idTemp = row.id;
+                        if(row.remote_id != '0')
+                            idTemp = row.addr_id;
+                        return '<div class="form-check"><input type="checkbox" class="form-check-input check-row" id="check-row-' + selType + '-' + idTemp + '"><label class="form-check-label" for="check-row-' + selType + '-' + row.id + '"></label></div>';
                     }
                 },
                 {
@@ -307,24 +348,30 @@
             },
             "drawCallback": function(oSettings) {
                 const pageInfo = variableInst.page.info();
+                
                 if(parseInt(pageInfo.length) * pageInfo.page > pageInfo.recordsTotal) {
                     variableInst.page(0);
-                    updateVariable();
+                    updateVariable(variableInst);
                 } else {
-                    setDataTblPage(variableTbl, oSettings._iDisplayLength);
+                    setVariableDataTblPage(variableTbl, oSettings._iDisplayLength);
+
                     const trArr = $("#modal-variable-tbl tbody tr");
                     const prefixStr = varSelect.find(':selected').attr('remote-id') + ';';
                     const suffixStr = ';' + varSelect.val();
                     for (let ii = 0; ii < trArr.length; ii++) {
                         const trItem = $(trArr[ii]);
+
                         if(trItem.find("input[type='checkbox']").attr('id')) {
                             const trID = prefixStr + trItem.find("input[type='checkbox']").attr('id').replace('check-row-', '') + suffixStr;
+
                             trItem.find("input[type='checkbox']").prop('checked', chkArr.indexOf(trID) >= 0);
                         }
                     }
                 }
             }
         });
+
+        
 
         variableInst.on('click', 'tbody tr', function() {
             const trArr = $("#modal-variable-tbl tbody tr");
@@ -343,5 +390,12 @@
                 }
             }
         });
+
+        $(window).bind("beforeunload", function() {
+            if(variableInst) {
+                curPage = variableInst.page.info().page;
+            }
+        });
+
     });
 </script>
