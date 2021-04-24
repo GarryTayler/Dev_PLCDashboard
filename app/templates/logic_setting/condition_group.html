@@ -104,7 +104,6 @@
     <script>
         function doCondGroupBuild(selRow = '') {
             const selChk = selRow.length > 0 ? [selRow] : getTblChk("#condgroup-table", "condgroup-").split(',');
-            console.log(selChk)
             if(selChk.length > 0 && selChk[0].length > 0) {
                 condGroupID = selChk[0];
                 $.ajax({

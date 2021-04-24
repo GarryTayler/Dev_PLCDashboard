@@ -140,6 +140,7 @@
 
     function controlBuild(selRow = '') {
         const selChk = selRow.length > 0 ? [selRow] : getTblChk(controlTbl).split(",");
+        logicSettingSelected = selRow
         if(selChk.length > 0 && selChk[0].length > 0) {
             controlID = parseInt(selChk[0]);
             $.ajax({

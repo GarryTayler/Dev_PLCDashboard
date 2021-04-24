@@ -68,6 +68,7 @@
 
 <script>
     let logicActGroupTbl;
+    let logicSettingSelected;
     function actGroupSelect() {
         const selIDs = getTblChk("#logic-actgroup-table", "actgroup-");
         if(selIDs) {
@@ -81,7 +82,7 @@
                         sendAjax("{{url_for('logic_build.add_actgroup')}}", {controlID, actgroupID: selIDs, beforeID: $("#actgroup-name").attr('actgroup')}, false);
                         $("#actgroup-modal").modal('hide');
                         cancelActGroupSelect()
-                        controlBuild();
+                        controlBuild(logicSettingSelected);
                     }
                     else
                         sendAjax("{{url_for('logic_build.add_actgroup')}}", {controlID, actgroupID: selIDs, beforeID: $("#actgroup-name").attr('actgroup')});
