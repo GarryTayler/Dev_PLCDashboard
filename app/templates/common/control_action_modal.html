@@ -51,7 +51,7 @@
                         <label class="input-label" for="action-order">실행순서</label>
                     </div>
                     <div class="col-5">
-                        <input type="number" class="form-control" placeholder="실행순서" id="action-order" min="1" max="32767"  onkeypress="return event.charCode >= 48 && event.charCode <= 57">
+                        <input type="number" class="form-control" placeholder="실행순서" id="action-order" value="1" min="1" max="32767"  onkeypress="return event.charCode >= 48 && event.charCode <= 57">
                     </div>
                 </div>
                 <div class="form-group row">
@@ -769,32 +769,38 @@
 
     function doFuncSave() {
         $("#action-modal .insert-alert").hide();
-        $("#action-modal input").removeClass('border-danger');
 
         let postData = {};
-        postData['action_type'] = input_val("action-type-select");
         postData['use_flag'] = $("#ckbx-style-1-1-action").prop('checked') ? '1' : '0';
 
+        $("#action-modal input").removeClass('border-danger');
+
         const action_name = input_val("action-name");
-        if(action_name && action_name.length > 0) {
-            postData['action_name'] = action_name;
-        } else {
+        if(!action_name) {
+            showErr("action-name");
             return false;
         }
+        postData['action_name'] = action_name;
 
         const action_order = input_val("action-order");
-        if(action_order && action_order.length > 0) {
-            postData['action_order'] = action_order;
-        } else {
+        if(!action_order) {
+            showErr("action-order");
             return false;
         }
+        postData['action_order'] = action_order;        
 
+
+        postData['action_type'] = input_val("action-type-select");
         let inputArr = $("#action-" + postData['action_type'] + " input");
-        let inputInvalid = false;
+        // let inputInvalid = false;
+        let inputValid = true;
         for(let ii = 0; ii < inputArr.length; ii++) {
-            const inputID = $(inputArr[ii]).attr('id');
+            const inputItem = $(inputArr[ii]);
+            const inputID = inputItem.attr('id');
             const inputID1 = $("#" + inputID);
-            const inputVal = $(inputArr[ii]).val().trim();
+            const inputVal = inputItem.val().trim();
+
+            if(inputItem.attr('type') === "checkbox" || !inputItem.attr('id')) continue;
 
             const filterParents = inputID1.parents("div")
                     .filter(function() {
@@ -803,8 +809,8 @@
 
             if(filterParents === 0 && inputVal.length === 0) {
                 showErr(inputID);
-                inputInvalid = true;
-                break;
+                inputValid = false;
+                return false;
             } else if(filterParents === 0) {
                 let inputKey = inputID1.hasClass('action-control') ? inputID.replace('control-', '').replaceAll('-', '_') : inputID.replaceAll('-', '_');
                 postData[inputKey] = inputKey === "shell_exec" ? ($(inputArr[ii]).prop('checked') ? '1' : '0') : inputVal;
@@ -816,17 +822,35 @@
             }
         }
 
-        if(inputInvalid) {
-            return false;
+        switch(postData['action_type']) {
+            case 'function':
+                postData['func_select_selid'] = $("#func-select").attr('selid');
+                break;
+            case 'control':
+                postData['control_id'] = $("#control-select").attr('selid');
+                break;
+            case 'act_group':
+                postData['actgroup_id'] = $("#act-group-select").attr('selid');
+                break;
+            case 'shell_exec':
+                postData['shell_exec'] = $("#shell-exec").prop('checked') ? '1' : '0';
+                break;
+            case 'user_def_comm':
+                postData['channel_id'] = $("#comm-channel").attr('selid');
+                postData['frame_id'] = $("#comm-frame").attr('selid');
+                break;
+            case 'recipe':
+                const recipeInput = $("#recipe-value");
+                postData['def_id'] = recipeInput.attr('defid');
+                postData['recipe_id'] = recipeInput.attr('selid');
+                break;
         }
-
-        inputArr = $("#action-" + postData['action_type'] + " select");
-        for(let ii = 0; ii < inputArr.length; ii++) {
-            postData[$(inputArr[ii]).attr('name').trim()] = $(inputArr[ii]).val();
-        }
-
-        if(postData['action_type'] === 'function') {
-            postData['func_select_selid'] = $("#func-select").attr('selid');
+        if(inputValid) {
+            inputArr = $("#action-" + postData['action_type'] + " select");
+            for(let ii = 0; ii < inputArr.length; ii++) {
+                if($(inputArr[ii]).attr('name') != undefined)
+                    postData[$(inputArr[ii]).attr('name').trim()] = $(inputArr[ii]).val();
+            }
         }
 
         postData['selid'] = $("#action-selid").val();
