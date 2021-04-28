@@ -1771,7 +1771,8 @@
         if(inputValid) {
             let inputArr = $("#" + postData['action_type'] + "-input select");
             for(let ii = 0; ii < inputArr.length; ii++) {
-                postData[$(inputArr[ii]).attr('name').trim()] = $(inputArr[ii]).val();
+                if($(inputArr[ii]).attr('name') != undefined)
+                    postData[$(inputArr[ii]).attr('name').trim()] = $(inputArr[ii]).val();
             }
         }
 
