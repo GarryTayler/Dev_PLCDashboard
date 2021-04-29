@@ -518,7 +518,7 @@ def remove_action():
             db.session.commit()
             response = {'status': True}
         else:
-            response = {'status': False, 'message': 'Condition Not Found'}
+            response = {'status': False, 'message': 'Action Not Found'}
     else:
         response = {'status': False, 'message': 'Invalid request'}
 

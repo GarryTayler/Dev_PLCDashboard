@@ -477,6 +477,26 @@ def remove_action():
 
     return json.dumps(response)
 
+@logic_setting.route('/remove_action_in_action_group', methods=['POST'])
+@login_required
+def remove_action_in_action_group():
+    postData = request.values
+    action_ids = postData.get('selRow')
+    if check_null(action_ids):
+        action_ids = action_ids.split(",")
+        for action_id in action_ids:
+            selAction = models.Action.query.filter_by(id=action_id).first()
+            if selAction:
+                selAction.actgroup = 0
+                selAction.actoptions = ""
+                selAction.ind = '1000'
+                db.session.commit()
+                response = {'status': True}
+            else:
+                response = {'status': False, 'message': 'Action Not Found'}
+    else:
+        response = {'status': False, 'message': 'Invalid request'}
+    return json.dumps(response)
 
 @logic_setting.route('/update_action', methods=['POST'])
 @login_required

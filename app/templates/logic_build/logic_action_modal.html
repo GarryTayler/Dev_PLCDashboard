@@ -146,8 +146,9 @@
 
     function delActGroup(selid = '0') {
         if(confirm('삭제하시겠습니까?')) {
-            sendAjax("{{url_for('logic_setting.remove_action')}}", {selRow: selid}, false);
-            updateBuildPanel1();
+            sendAjax("{{url_for('logic_setting.remove_action_in_action_group')}}", {selRow: selid}, false, false, function(resp) {
+                updateBuildPanel1();
+            });
         }
     }
 
