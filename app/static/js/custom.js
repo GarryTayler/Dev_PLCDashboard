@@ -9,7 +9,10 @@ function numberWithCommas(x) {
 
 const infoCallback = function( settings, start, end, max, total, pre ) {
                     let api = this.api();
-                    return "전체 " + numberWithCommas(total) + " 개중 " + numberWithCommas(start) + " 부터 " + numberWithCommas((  (total > start + parseInt(api.page.info().length) - 1) ? (start + parseInt(api.page.info().length) - 1) : (total)  )) + " 까지 표시";
+                    if(parseInt(total) > 0)
+                        return "전체 " + numberWithCommas(total) + " 개중 " + numberWithCommas(start) + " 부터 " + numberWithCommas((  (total > start + parseInt(api.page.info().length) - 1) ? (start + parseInt(api.page.info().length) - 1) : (total)  )) + " 까지 표시";
+                    else
+                        return "표시할 데이터가 없습니다.";
 };
 
 const dataTableLang = {
