@@ -125,16 +125,16 @@
                 <div id="action-analog" class="type-div">
                     <div class="form-group row">
                         <div class="col-2">
-                            <label class="input-label action-control" for="action-analog-variable">변수</label>
+                            <label class="input-label action-control" for="control-analog-variable">변수</label>
                         </div>
                         <div class="col-5">
                             <div class="input-group">
-                                <input type="text" class="form-control" id="action-analog-variable" readonly>
+                                <input type="text" class="form-control action-control" id="control-analog-variable" readonly>
                                 <span class="input-group-append dropdown">
                                     <button class="btn btn-primary dropdown-toggle" data-toggle="dropdown"></button>
                                     <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-                                        <a class="dropdown-item" href="#" onclick="showFixed('action-analog-variable', 'analog');">고정변수</a>
-                                        <a class="dropdown-item" href="#" onclick="showFluid('action-analog-variable', 'analog');">가변변수</a>
+                                        <a class="dropdown-item" href="#" onclick="showFixed('control-analog-variable', 'analog');">고정변수</a>
+                                        <a class="dropdown-item" href="#" onclick="showFluid('control-analog-variable', 'analog');">가변변수</a>
                                     </div>
                                 </span>
                             </div>
@@ -142,22 +142,22 @@
                     </div>
                     <div class="form-group row">
                         <div class="col-2">
-                            <label class="input-label" for="action-analog-value">값</label>
+                            <label class="input-label" for="control-analog-value">값</label>
                         </div>
                         <div class="col-5">
                             <div class="value-radio">
                                 <div class="form-check mb-2">
-                                    <input type="checkbox" class="form-check-input" id="action-analog-value-radio" checked>
-                                    <label class="form-check-label" for="action-analog-value-radio">변수</label>
+                                    <input type="checkbox" class="form-check-input action-control" id="control-analog-value-radio" checked>
+                                    <label class="form-check-label" for="control-analog-value-radio">변수</label>
                                 </div>
                                 <input type="number" class="form-control alt-input">
                                 <div class="input-group">
-                                    <input type="text" class="form-control action-control" id="action-analog-value" readonly>
+                                    <input type="text" class="form-control action-control" id="control-analog-value" readonly>
                                     <span class="input-group-append dropdown">
                                         <button class="btn btn-primary dropdown-toggle" data-toggle="dropdown"></button>
                                         <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-                                            <a class="dropdown-item" href="#" onclick="showFixed('action-analog-value', 'analog');">고정변수</a>
-                                            <a class="dropdown-item" href="#" onclick="showFluid('action-analog-value', 'analog');">가변변수</a>
+                                            <a class="dropdown-item" href="#" onclick="showFixed('control-analog-value', 'analog');">고정변수</a>
+                                            <a class="dropdown-item" href="#" onclick="showFluid('control-analog-value', 'analog');">가변변수</a>
                                         </div>
                                     </span>
                                 </div>
