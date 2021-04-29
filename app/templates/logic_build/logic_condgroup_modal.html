@@ -110,10 +110,11 @@
                 'url': "{{url_for('logic_setting.condgroup_list_setting')}}",
                 'headers': {"X-CSRFToken": csrf_token},
                 'data': function(data) {
-                    return {
+                    return data;
+                    /* return {
                         ...data,
                         beforeID: $("#condgroup-name").attr('condgroup')
-                    };
+                    }; */
                 }
             },
             "columns": [

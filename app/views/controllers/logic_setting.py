@@ -361,12 +361,12 @@ def condgroup_list_setting():
                        condgroupModel.reverse) \
         .add_columns(models.Control.name.label('control_name'))
 
-    beforeID = postData.get('beforeID')
-    if check_null(beforeID):
-        condgroups = condgroups.filter(or_(condgroupModel.controlid == '0', condgroupModel.id == beforeID))
-    else :
-        condgroups = condgroups.filter(condgroupModel.controlid == '0')
-
+    #beforeID = postData.get('beforeID')
+    #if check_null(beforeID):
+    #    condgroups = condgroups.filter(or_(condgroupModel.controlid == '0', condgroupModel.id == beforeID))
+    #else :
+    #    condgroups = condgroups.filter(condgroupModel.controlid == '0')
+    condgroups = condgroups.filter(condgroupModel.controlid == '0')
     totalCount = condgroups.count()
 
     sortObj = condgroupModel.id.asc()
@@ -425,11 +425,12 @@ def actgroup_list_setting():
                        actgroupModel.cnt) \
         .add_columns(models.Control.name.label('control_name'))
 
-    beforeID = postData.get('beforeID')
-    if check_null(beforeID):
-        actGroups = actGroups.filter(or_(actgroupModel.controlid == '0', actgroupModel.id == beforeID))
-    else:
-        actGroups = actGroups.filter(actgroupModel.controlid == '0')
+    #beforeID = postData.get('beforeID')
+    #if check_null(beforeID):
+    #    actGroups = actGroups.filter(or_(actgroupModel.controlid == '0', actgroupModel.id == beforeID))
+    #else:
+    #    actGroups = actGroups.filter(actgroupModel.controlid == '0')
+    actGroups = actGroups.filter(actgroupModel.controlid == '0')
 
     totalCount = actGroups.count()
 

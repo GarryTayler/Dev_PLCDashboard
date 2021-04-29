@@ -532,24 +532,34 @@ def add_actgroup():
     controlID = postData.get('controlID')
     actgroupID = postData.get('actgroupID')
     beforeID = postData.get('beforeID')
+    #if check_null(controlID) and check_null(actgroupID):
+    #    actgroupModel = models.ActionGroup
+    #    if  check_null(beforeID) and int(beforeID) > 0:
+    #        beforeActGroup = actgroupModel.query.filter_by(id=beforeID).first()
+    #        if beforeActGroup:
+    #            beforeActGroup.controlid = '0'
+    #            beforeActGroup.options = ''
+
+    #    for selid in actgroupID.split(','):
+    #        selActGroup = actgroupModel.query.filter_by(id=selid).first()
+    #        if selActGroup:
+    #            selActGroup.controlid = controlID
+
+    #    db.session.commit()
+    #    response = {'status': True}
+    #else:
+    #    response = {'status': False, 'message': 'Invalid request'}
     if check_null(controlID) and check_null(actgroupID):
         actgroupModel = models.ActionGroup
-        if  check_null(beforeID) and int(beforeID) > 0:
-            beforeActGroup = actgroupModel.query.filter_by(id=beforeID).first()
-            if beforeActGroup:
-                beforeActGroup.controlid = '0'
-                beforeActGroup.options = ''
-
         for selid in actgroupID.split(','):
             selActGroup = actgroupModel.query.filter_by(id=selid).first()
             if selActGroup:
                 selActGroup.controlid = controlID
 
-        db.session.commit()
+        db.session.commit()    
         response = {'status': True}
     else:
         response = {'status': False, 'message': 'Invalid request'}
-
     return json.dumps(response)
 
 
@@ -560,13 +570,24 @@ def add_condgroup():
     controlID = postData.get('controlID')
     condgroupID = postData.get('condgroupID')
     beforeID = postData.get('beforeID')
+    #if check_null(controlID) and check_null(condgroupID):
+    #    condgroupModel = models.ConditionGroup
+    #    if check_null(beforeID) and int(beforeID) > 0:
+    #        beforeCondGroup = condgroupModel.query.filter_by(id=beforeID).first()
+    #        beforeCondGroup.controlid = '0'
+    #        beforeCondGroup.options = ''
+
+    #    for selid in condgroupID.split(','):
+    #        selCondGroup = condgroupModel.query.filter_by(id=selid).first()
+    #        if selCondGroup:
+    #            selCondGroup.controlid = controlID
+
+    #    db.session.commit()
+    #    response = {'status': True}
+    #else:
+    #    response = {'status': False, 'message': 'Invalid request'}
     if check_null(controlID) and check_null(condgroupID):
         condgroupModel = models.ConditionGroup
-        if check_null(beforeID) and int(beforeID) > 0:
-            beforeCondGroup = condgroupModel.query.filter_by(id=beforeID).first()
-            beforeCondGroup.controlid = '0'
-            beforeCondGroup.options = ''
-
         for selid in condgroupID.split(','):
             selCondGroup = condgroupModel.query.filter_by(id=selid).first()
             if selCondGroup:
@@ -576,7 +597,6 @@ def add_condgroup():
         response = {'status': True}
     else:
         response = {'status': False, 'message': 'Invalid request'}
-
     return json.dumps(response)
 
 

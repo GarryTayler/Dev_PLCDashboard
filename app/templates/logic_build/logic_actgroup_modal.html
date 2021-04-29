@@ -78,11 +78,13 @@
             } else {
                 if(selIDs.length > 0) {
                     if(isAddPalette) {
-                        sendAjax("{{url_for('logic_build.add_condgroup')}}", {controlID, condgroupID: isPaletteCondGroupId, beforeID: $("#condgroup-name").attr('condgroup')}, false);
-                        sendAjax("{{url_for('logic_build.add_actgroup')}}", {controlID, actgroupID: selIDs, beforeID: $("#actgroup-name").attr('actgroup')}, false);
-                        $("#actgroup-modal").modal('hide');
-                        cancelActGroupSelect()
-                        controlBuild(logicSettingSelected);
+                        sendAjax("{{url_for('logic_build.add_condgroup')}}", {controlID, condgroupID: isPaletteCondGroupId, beforeID: $("#condgroup-name").attr('condgroup')}, false, false, function(resp) {
+                            sendAjax("{{url_for('logic_build.add_actgroup')}}", {controlID, actgroupID: selIDs, beforeID: $("#actgroup-name").attr('actgroup')}, false, false, function(resp1) {
+                                $("#actgroup-modal").modal('hide');
+                                cancelActGroupSelect()
+                                controlBuild(logicSettingSelected);
+                            });
+                        });
                     }
                     else
                         sendAjax("{{url_for('logic_build.add_actgroup')}}", {controlID, actgroupID: selIDs, beforeID: $("#actgroup-name").attr('actgroup')});
@@ -113,10 +115,11 @@
                 'url': "{{url_for('logic_setting.actgroup_list_setting')}}",
                 'headers': { "X-CSRFToken": csrf_token },
                 'data': function(data) {
-                    return {
+                    /*return {
                         ...data,
                         beforeID: $("#actgroup-name").attr('actgroup')
-                    };
+                    };*/
+                    return data;
                 }
             },
             "columns": [
