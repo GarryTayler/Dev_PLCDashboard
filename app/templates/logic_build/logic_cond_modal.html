@@ -147,8 +147,9 @@
 
     function delCondGroup(selid = '0') {
         if(confirm('삭제하시겠습니까?')) {
-            sendAjax("{{url_for('logic_build.remove_cond')}}", {actID: selid}, false);
-            updateBuildPanel();
+            sendAjax("{{url_for('logic_build.remove_cond')}}", {actID: selid}, false, false, function(resp) {
+                updateBuildPanel();
+            });
         }
     }
 
