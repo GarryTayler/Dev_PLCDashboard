@@ -978,7 +978,8 @@
 
 {% block script %}
     {% include 'common/datatable.html' %}
-    {% include 'common/variable_modal_mornitor.html' %}
+    <!-- {% include 'common/variable_modal_mornitor.html' %} -->
+    {% include 'common/variable_modal.html' %}
     {% include 'common/logicbuild.html' %}
     <script src="{{ url_for('static', filename='js/datetimepicker.min.js') }}"></script>
     <script src="{{ url_for('static', filename='js/jquery.inputmask.min.js') }}"></script>
