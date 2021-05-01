@@ -1038,17 +1038,18 @@
                             }
                         } else if(dataType === "schedule") {
                             const dayBtns = $("#schedule-input .day-btn");
-                            const selDays = optionArr.schedule_days.split(",");
-                            if(selDays.length > 0) {
-                                for(let ii = 0; ii < dayBtns.length; ii++) {
-                                    const dayBtn = $(dayBtns[ii]).attr("data-val");
-                                    if(selDays.indexOf(dayBtn) >= 0) {
-                                        $(dayBtns[ii]).removeClass('btn-secondary');
-                                        $(dayBtns[ii]).addClass('btn-primary');
+                            if(optionArr.hasOwnProperty('schedule_days')) {
+                                const selDays = optionArr.schedule_days.split(",");
+                                if(selDays.length > 0) {
+                                    for(let ii = 0; ii < dayBtns.length; ii++) {
+                                        const dayBtn = $(dayBtns[ii]).attr("data-val");
+                                        if(selDays.indexOf(dayBtn) >= 0) {
+                                            $(dayBtns[ii]).removeClass('btn-secondary');
+                                            $(dayBtns[ii]).addClass('btn-primary');
+                                        }
                                     }
                                 }
                             }
-
                             const selInterval = $("#schedule-interval").val();
                             if(selInterval === "DATE") {
                                 $(".term-schedule").show();
