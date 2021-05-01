@@ -669,8 +669,6 @@
                                     <option value="combobox">콤보박스</option>
                                     <option value="pushbtn">푸시버튼</option>
                                     <option value="switch">스위치</option>
-{#                                    <option value="locus">락커스위치</option>#}
-{#                                    <option value="lottery">로터리스위치</option>#}
                                 </select>
                             </div>
                         </div>
@@ -1444,7 +1442,6 @@
                                     delete elemOptions[key + "_selid"]
                                     delete elemOptions[key + "_seltype"]
                                     delete elemOptions[key + "_sellocstr"]
-                                    delete elemOptions["set_val_address"]
                                     delete elemOptions[key + "_selid"]
                                 }
                                 break;
@@ -1469,7 +1466,10 @@
                     digitalContent.hide();
                     digitalElem.hide();
 
-                    $("#read-val-address").prop('checked', elemOptions['read_val_address'] === '1');
+                    if(elemType == 'read_val')
+                        $("#read-val-address").prop('checked', elemOptions['read_val_address'] === '1');
+                    else
+                        $("#set-val-address").prop('checked', elemOptions['set_val_address'] === '1');
 
                     if(elemOptions.hasOwnProperty('read_analog_type')) {
                         analogContent.show();
