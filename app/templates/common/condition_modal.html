@@ -215,7 +215,7 @@
                                     <span class="input-group-append dropdown">
                                         <button class="btn btn-primary dropdown-toggle" data-toggle="dropdown"></button>
                                         <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-                                            <a class="dropdown-item" href="#" onclick="showFixed('analog-option', 'time');">고정변수</a>
+                                            <a class="dropdown-item" href="#" onclick="showFixed('analog-option', 'time', true, $('#analog-option-val'));">고정변수</a>
                                             <a class="dropdown-item" href="#" onclick="showFluid('analog-option', 'time');">가변변수</a>
                                         </div>
                                     </span>
@@ -300,7 +300,7 @@
                                     <span class="input-group-append dropdown">
                                         <button class="btn btn-primary dropdown-toggle" data-toggle="dropdown"></button>
                                         <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-                                            <a class="dropdown-item" href="#" onclick="showFixed('string-option', 'time');">고정변수</a>
+                                            <a class="dropdown-item" href="#" onclick="showFixed('string-option', 'time', true, $('#string-option-val'));">고정변수</a>
                                             <a class="dropdown-item" href="#" onclick="showFluid('string-option', 'time');">가변변수</a>
                                         </div>
                                     </span>
@@ -710,7 +710,7 @@
                     <div class="input-group" style="disp1">
                         <input type="text" class="form-control" id="start.input" readonly attr1.str>
                         <span class='input-group-append'>
-                            <button class="btn btn-primary" onclick="showFixed('start.id', 'time')">...</button>
+                            <button class="btn btn-primary" onclick="showFixed('start.id', 'time', true, $('#start.input'))">...</button>
                         </span>
                     </div>
                 </div>
@@ -725,7 +725,7 @@
                     <div class="input-group" style="disp2">
                         <input type="text" class="form-control end-period" id="end.input" attr.str readonly>
                         <span class="input-group-append">
-                            <button class="btn btn-primary end-btn" onclick="showFixed('end.id', 'time')" btn.str>...</button>
+                            <button class="btn btn-primary end-btn" onclick="showFixed('end.id', 'time', true, $('#end.input'))" btn.str>...</button>
                         </span>
                     </div>
                 </div>

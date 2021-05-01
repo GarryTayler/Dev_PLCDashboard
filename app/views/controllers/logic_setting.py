@@ -763,7 +763,7 @@ def variable_list():
             itemChk = selVar.use_flag if selVar else '0'
             itemDefault = selVar.defaults if selVar else ''
             selList.append({'id': i, 'address': variableStr + str(i), 'name': itemName, 'chk': itemChk, 'unit': itemUnit,
-                            'default': itemDefault, 'remote_id': remoteID})
+                            'default': itemDefault, 'remote_id': remoteID, 'addr_id': str(i)})
     
     
     return json.dumps(datatable_list(selList, totalCount, draw))
@@ -1085,40 +1085,18 @@ def write_variable():
 @login_required
 def get_page_number():
     postData = request.values
-    
-    remoteID = postData.get('variable_id')
-    variable_type = postData.get('variable_type')
-    variable1 = postData.get('curID').split('-')
+    remoteID = postData.get('remote_id')
     length = postData.get('length')
-    
-    totalCount = 0
+    variableAddr = postData.get('variable_addr')
+    variableType = postData.get('variable_type')
+    print(remoteID, length, variableAddr, variableType)
     pageNum = 0
-    variable_type1 = config.VARIABLE_MATCH[variable1[0]]
-    
-    if variable_type1 == "DG":
-        totalCount = const.uiSizeDigital
-    elif variable_type1 == "AN":
-        totalCount = const.uiSizeAnalog
-    elif variable_type1 == "ST":
-        totalCount = const.uiSizeString
-    elif variable_type1 == "DT":
-        totalCount = const.uiSizeDate
-    elif variable_type1 == "TM":
-        totalCount = const.uiSizeTime
 
-    if remoteID != '0':
-        data_list_count = models.Variable.query.filter_by(remote=remoteID).filter_by(use_flag="1").filter(models.Variable.type.ilike('%'+variable1[0]+'%')).all()
-        totalCount = len(data_list_count)
-    
-    orderObj = models.Variable.addr_id.asc()
-    data_list = models.Variable.query.filter_by(remote=remoteID).filter_by(use_flag="1").filter(models.Variable.type.ilike('%'+variable1[0]+'%')).order_by(orderObj).all()
-
-    if remoteID != '0':
-        for i in range(len(data_list)):
-            print(data_list[i].type, i)
-            if data_list[i].type == postData.get('curID'):
-                pageNum = int(i/int(length))
+    if check_null(remoteID) and check_null(length) and check_null(variableAddr) and check_null(variableType):
+        pageNum = models.Variable.query.filter(models.Variable.remote==remoteID, models.Variable.use_flag=="1", models.Variable.addr_id<=variableAddr, models.Variable.type.ilike('%'+variableType+'%')).count()
+        if(int(pageNum) > 0):
+            pageNum = int((int(pageNum) - 1)/int(length)) + 1
+        print(pageNum)
     else:
-        pageNum = int(int(variable1[1])/int(length))
-    print(remoteID, variable1, pageNum)
+        pageNum = 0
     return json.dumps(pageNum)
