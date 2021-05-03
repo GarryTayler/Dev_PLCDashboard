@@ -606,9 +606,6 @@ def add_control():
     postData = request.values
     logicID = postData.get('logicID')
 
-    print("logicID==================")
-    print(logicID)
-
     controlID = postData.get('controlID')
     beforeID = postData.get('beforeID')
     if check_null(logicID) and check_null(controlID) and check_null(beforeID) > 0:

@@ -1728,7 +1728,7 @@
                         return $(this).css('display') === "none";
                     }).length;
 
-                if(filterParents === 0 && inputVal.length === 0) {
+                if(filterParents === 0 && inputVal.length === 0 && postData['action_type'] != 'function') {
                     showErr(inputID);
                     inputValid = false;
                     return false;
