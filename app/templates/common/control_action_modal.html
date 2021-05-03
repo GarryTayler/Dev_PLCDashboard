@@ -818,6 +818,9 @@
                     postData[inputKey + "_selid"] = inputID1.attr("selid");
                     postData[inputKey + "_seltype"] = inputID1.attr("seltype");
                     postData[inputKey + "_sellocstr"] = inputID1.attr("sellocstr");
+                    if( !(inputID1.attr("deviceid") == null || inputID1.attr("deviceid") == '' || inputID1.attr("deviceid") == undefined) ) {
+                        postData[inputKey + "_deviceid"] = inputID1.attr("deviceid");
+                    }
                 }
             }
         }

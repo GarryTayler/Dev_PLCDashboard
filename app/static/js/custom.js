@@ -261,7 +261,10 @@ function getPostData(panelID) {
         if(inputItem.attr('selid')) {
             postData[selKey + '_selid'] = inputItem.attr('selid');
             postData[selKey + '_seltype'] = inputItem.attr('seltype');
-            postData[selKey + '_sellocstr'] = inputItem.attr('sellocstr');
+            postData[selKey + '_sellocstr'] = inputItem.attr('sellocstr');   
+            if( !(inputItem.attr("deviceid") == null || inputItem.attr("deviceid") == '' || inputItem.attr("deviceid") == undefined) ) {
+                postData[selKey + "_deviceid"] = inputItem.attr("deviceid");
+            }
         }
     }
 

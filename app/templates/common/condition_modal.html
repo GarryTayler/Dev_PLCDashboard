@@ -710,7 +710,7 @@
                     <div class="input-group" style="disp1">
                         <input type="text" class="form-control" id="start.input" readonly attr1.str>
                         <span class='input-group-append'>
-                            <button class="btn btn-primary" onclick="showFixed('start.id', 'time', true, $('#start.input'))">...</button>
+                            <button class="btn btn-primary" onclick="showFixed('start.id', 'time', true)">...</button>
                         </span>
                     </div>
                 </div>
@@ -725,7 +725,7 @@
                     <div class="input-group" style="disp2">
                         <input type="text" class="form-control end-period" id="end.input" attr.str readonly>
                         <span class="input-group-append">
-                            <button class="btn btn-primary end-btn" onclick="showFixed('end.id', 'time', true, $('#end.input'))" btn.str>...</button>
+                            <button class="btn btn-primary end-btn" onclick="showFixed('end.id', 'time', true)" btn.str>...</button>
                         </span>
                     </div>
                 </div>
@@ -788,6 +788,9 @@
                         postData[inputKey + "_selid"] = inputID1.attr("selid");
                         postData[inputKey + "_seltype"] = inputID1.attr("seltype");
                         postData[inputKey + "_sellocstr"] = inputID1.attr("sellocstr");
+                        if(!(inputID1.attr("deviceid") == null || inputID1.attr("deviceid") == '' || inputID1.attr("deviceid") == undefined)) {
+                            postData[inputKey + "_deviceid"] = inputID1.attr("deviceid");
+                        }
                     }
                 }
             }
@@ -831,6 +834,7 @@
         }
 
         postData["selid"] = $("#selid").val();
+
         sendAjax("{{url_for('logic_setting.add_condition')}}", postData, false);
         updateVariable(typeof logicCondTbl === 'undefined' ? dataTables : logicCondTbl);
         $("#condition-modal").modal('hide');
