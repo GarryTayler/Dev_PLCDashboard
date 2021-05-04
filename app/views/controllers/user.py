@@ -295,14 +295,30 @@ def write_condition(section_name, condition, ind):
                     config_helper.set_value(section_name, prefixStr + optionArr['condition_option'], optionArr['analog_option_val'])
 
     elif condition.type == config.V_STRING:
-        config_helper.set_value(section_name, prefixStr + "VAR", optionArr['string_variable_sellocstr'])
+        if 'string_variable_change_sellocstr' in optionArr:
+            config_helper.set_value(section_name, prefixStr + "VAR", optionArr['string_variable_change_sellocstr'])
+        else:     
+            config_helper.set_value(section_name, prefixStr + "VAR", optionArr['string_variable_sellocstr'])
+
         config_helper.set_value(section_name, prefixStr + "OPR", optionArr['string_condition'])
-        config_helper.set_value(section_name, prefixStr + "VAL", optionArr['string_value_sellocstr'] if 'string_value_sellocstr' in optionArr else optionArr['string_value'])
-        config_helper.set_value(section_name, prefixStr + "OPTION", optionArr['string_option'])
-        if optionArr['string_option'] == "MIN_PEND_TIME":
-            config_helper.set_value(section_name, prefixStr + "MIN_PEND_TIME", optionArr[
-                'string_option_val_sellocstr'] if 'string_option_val_sellocstr' in optionArr else optionArr[
-                'string_option_val'])
+        
+        if 'string_value_change_sellocstr' in optionArr:
+            config_helper.set_value(section_name, prefixStr + "VAL", optionArr['string_value_change_sellocstr'])    
+        elif 'string_value_sellocstr' in optionArr:
+            config_helper.set_value(section_name, prefixStr + "VAL", optionArr['string_value_sellocstr'])    
+        elif 'string_value' in optionArr:
+            config_helper.set_value(section_name, prefixStr + "VAL", optionArr['string_value'])    
+        
+        if optionArr['string_option'] in varOptions:
+            config_helper.set_value(section_name, prefixStr + "OPTION", optionArr['string_option'])
+            if optionArr['string_option'] == "MIN_PEND_TIME":
+                if 'string_option_val_change_sellocstr' in optionArr:
+                    config_helper.set_value(section_name, prefixStr + optionArr['string_option'], optionArr['string_option_val_change_sellocstr'])    
+                elif 'string_option_val_sellocstr' in optionArr:
+                    config_helper.set_value(section_name, prefixStr + optionArr['string_option'], optionArr['string_option_val_sellocstr'])    
+                elif 'string_option_val' in optionArr:
+                    config_helper.set_value(section_name, prefixStr + optionArr['string_option'], optionArr['string_option_val'])    
+
     elif condition.type == config.V_SCHEDULE:
         config_helper.set_value(section_name, prefixStr + "SCH_START_DATE", optionArr['schedule_start'])
         termialVal = optionArr['schedule_terminal']
