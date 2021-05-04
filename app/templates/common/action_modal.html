@@ -1890,9 +1890,17 @@
                                 idStr = "#" + idStr;
                                 $(idStr).val(optionArr[idSplit]);
                                 if(optionArr.hasOwnProperty(idSplit + "_selid")) {
-                                    $(idStr).attr('selid', optionArr[idSplit + "_selid"])
+                                    if(optionArr.hasOwnProperty(idSplit + "_deviceid")) {
+                                        $(idStr).attr('selid', optionArr[idSplit + "_selid"])
+                                        .attr('seltype', optionArr[idSplit + "_seltype"])
+                                        .attr('sellocstr', optionArr[idSplit + "_sellocstr"])
+                                        .attr('deviceid', optionArr[idSplit + "_deviceid"]);
+                                    }
+                                    else {
+                                        $(idStr).attr('selid', optionArr[idSplit + "_selid"])
                                         .attr('seltype', optionArr[idSplit + "_seltype"])
                                         .attr('sellocstr', optionArr[idSplit + "_sellocstr"]);
+                                    }
                                 }
                             }
 
@@ -1902,9 +1910,17 @@
                                 const idSplit = idStr.replaceAll('-', '_');
                                 idStr = "#" + idStr;
                                 $(idStr).val(optionArr[idSplit]);
-                                $(idStr).attr('selid', optionArr[idSplit + "_selid"])
+                                if(optionArr.hasOwnProperty(idSplit + "_deviceid")) {
+                                    $(idStr).attr('selid', optionArr[idSplit + "_selid"])
+                                    .attr('seltype', optionArr[idSplit + "_seltype"])
+                                    .attr('sellocstr', optionArr[idSplit + "_sellocstr"])
+                                    .attr('deviceid', optionArr[idSplit + "_deviceid"]);
+                                }
+                                else {
+                                    $(idStr).attr('selid', optionArr[idSplit + "_selid"])
                                     .attr('seltype', optionArr[idSplit + "_seltype"])
                                     .attr('sellocstr', optionArr[idSplit + "_sellocstr"]);
+                                }
                             }
                         } else if(dataType === "control") {
                             $("#control-select").attr('selid', optionArr['control_id']);
