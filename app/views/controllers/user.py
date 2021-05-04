@@ -265,16 +265,35 @@ def write_condition(section_name, condition, ind):
             if optionArr['digital_option'] == 'MIN_PEND_TIME':
                 if 'digital_option_val_change_sellocstr' in optionArr:
                     config_helper.set_value(section_name, prefixStr + optionArr['digital_option'], optionArr['digital_option_val_change_sellocstr'])    
-                else:
-                    config_helper.set_value(section_name, prefixStr + optionArr['digital_option'], optionArr['digital_option_val_sellocstr'])    
+                elif 'digital_option_val_sellocstr' in optionArr:
+                    config_helper.set_value(section_name, prefixStr + optionArr['digital_option'], optionArr['digital_option_val_sellocstr'])
+                elif 'digital_option_val' in optionArr:
+                    config_helper.set_value(section_name, prefixStr + optionArr['digital_option'], optionArr['digital_option_val'])
     elif condition.type == config.V_ANALOG:
-        config_helper.set_value(section_name, prefixStr + "VAR", optionArr['analog_variable_sellocstr'])
+        if 'analog_variable_change_sellocstr' in optionArr:
+            config_helper.set_value(section_name, prefixStr + "VAR", optionArr['analog_variable_change_sellocstr'])
+        else:
+            config_helper.set_value(section_name, prefixStr + "VAR", optionArr['analog_variable_sellocstr'])
+
         config_helper.set_value(section_name, prefixStr + "OPR", optionArr['analog_condition'])
-        config_helper.set_value(section_name, prefixStr + "VAL", optionArr['analog_value_sellocstr'] if 'analog_value_sellocstr' in optionArr else optionArr['analog_value'])
+        
+        if 'analog_value_change_sellocstr' in optionArr:
+            config_helper.set_value(section_name, prefixStr + "VAL", optionArr['analog_value_change_sellocstr'])
+        elif 'analog_value_sellocstr' in optionArr:
+            config_helper.set_value(section_name, prefixStr + "VAL", optionArr['analog_value_sellocstr'])
+        else:
+            config_helper.set_value(section_name, prefixStr + "VAL", optionArr['analog_value'])
+
         if optionArr['condition_option'] in varOptions:
             config_helper.set_value(section_name, prefixStr + "OPTION", optionArr['condition_option'])
-        else:
-            config_helper.set_value(section_name, prefixStr + "OPTION", optionArr['analog_option_val_sellocstr'] if 'analog_option_val_sellocstr' in optionArr else optionArr['analog_option_val'])
+            if optionArr['condition_option'] == 'MIN_PEND_TIME':
+                if 'analog_option_val_change_sellocstr' in optionArr:
+                    config_helper.set_value(section_name, prefixStr + optionArr['condition_option'], optionArr['analog_option_val_change_sellocstr'])    
+                elif 'analog_option_val_sellocstr' in optionArr:
+                    config_helper.set_value(section_name, prefixStr + optionArr['condition_option'], optionArr['analog_option_val_sellocstr'])
+                elif 'analog_option_val' in optionArr:
+                    config_helper.set_value(section_name, prefixStr + optionArr['condition_option'], optionArr['analog_option_val'])
+
     elif condition.type == config.V_STRING:
         config_helper.set_value(section_name, prefixStr + "VAR", optionArr['string_variable_sellocstr'])
         config_helper.set_value(section_name, prefixStr + "OPR", optionArr['string_condition'])
