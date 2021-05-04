@@ -1,4 +1,4 @@
-from flask import render_template, Blueprint, session, redirect, request, flash, url_for
+from flask import render_template, Blueprint, session, redirect, request, flash, url_for, send_file
 from app import models, db, config, main
 from functools import wraps
 from sqlalchemy.sql.expression import func
@@ -6,7 +6,7 @@ from app.helper.common import check_null, datatable_list, datatable_head, get_et
 from app.helper.config_helper import Config_Helper
 from app.helper.U2PMemory import U2p_Logic
 import json, gevent, os
-
+import csv
 config_helper = Config_Helper()
 userbp = Blueprint('userbp', __name__, url_prefix='/user')
 
@@ -917,3 +917,57 @@ def updateaccept():
         db.session.commit()
 
     return json.dumps({'status': True})
+
+@userbp.route('/mornitor')
+@login_required
+def mornitor():
+    int_list = {}
+    int_list['sVersion'] = 1
+    int_list['sLicenseKey'] = '1111-1111'
+    int_list['udiCPULoad'] = '40'
+    int_list['uiTaskCnt'] = 20
+    int_list['workMornitor'] = [
+        {'task' : 'T1', 'cycleCount' : 2, 'cycleTime' : 10, 'minCycleTime' : 5, 'maxCycleTime': 15, 'avgCycleTime' : 10, 'interval' : 100, 'cyclePercent' : 10, 'jitter' : 100, 'minJitter' : 100, 'maxJitter' : 150},
+        {'task' : 'T1', 'cycleCount' : 2, 'cycleTime' : 10, 'minCycleTime' : 5, 'maxCycleTime': 15, 'avgCycleTime' : 10, 'interval' : 100, 'cyclePercent' : 40, 'jitter' : 100, 'minJitter' : 100, 'maxJitter' : 150},
+        {'task' : 'T1', 'cycleCount' : 2, 'cycleTime' : 10, 'minCycleTime' : 5, 'maxCycleTime': 15, 'avgCycleTime' : 10, 'interval' : 100, 'cyclePercent' : 70, 'jitter' : 100, 'minJitter' : 100, 'maxJitter' : 150},
+        {'task' : 'T1', 'cycleCount' : 2, 'cycleTime' : 10, 'minCycleTime' : 5, 'maxCycleTime': 15, 'avgCycleTime' : 10, 'interval' : 100, 'cyclePercent' : 90, 'jitter' : 100, 'minJitter' : 100, 'maxJitter' : 150},
+    ]
+    userid=''
+    mode='stop'
+    if session and session.get('user_id'):
+        userid = session['user_id']
+        selSet = models.Settings.query.filter_by(name='mode').filter_by(userid=userid).first()
+        mode = selSet.value
+    int_list['mode'] = mode
+    return render_template('setting/mornitor.html', mornitor=int_list)
+
+@userbp.route('/error')
+@login_required
+def error():
+    int_list = {}
+    int_list['errorCnt'] = 4
+    int_list['errorList'] = [
+        {'datetime' : '2020-09-12 12:00:00', 'position' : '로작-동작-3', 'content' : '에러내용1'},
+        {'datetime' : '2020-09-12 12:00:00', 'position' : '로작-동작-3', 'content' : '에러내용2'},
+        {'datetime' : '2020-09-12 12:00:00', 'position' : '로작-동작-3', 'content' : '에러내용3'},
+        {'datetime' : '2020-09-12 12:00:00', 'position' : '로작-동작-3', 'content' : '에러내용4'},
+    ]
+    
+    return render_template('setting/error.html', error=int_list)
+
+@userbp.route('/csv_export', defaults={'csvType': 'collect'})
+@userbp.route('/csv_export/<csvType>')
+@login_required
+def csv_export(csvType='collect'):
+    with open(config.CONFIG_PATH + '\setting.csv', "w", encoding='utf-8-sig', newline='') as csv_file:
+        writer = csv.writer(csv_file)
+        writer.writerow(['항목', ''])
+        writer.writerow(['모니터링', ''])
+        writer.writerow(['로직구성', ''])
+        writer.writerow(['로직설정', ''])
+        writer.writerow(['데이터설정', ''])
+        writer.writerow(['통신설정', ''])
+
+    fileName = '설정.csv'
+    return send_file(config.CONFIG_PATH + '\setting.csv', mimetype='text/csv', attachment_filename=fileName,
+                     as_attachment=True)
