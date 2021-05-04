@@ -455,7 +455,7 @@
         let selType = $("#modal-fluid-type").find(':selected').attr('remote-id');
 
         const selSubtype = getFilterkey($("#modal-fluid-subtype").val());
-        selType = selType === '0' ? "LOCAL." + selSubtype + ".(" : "REMOTE." + selType + "." + selSubtype + ".(";
+        selType = selType === '0' ? "LOCAL." + selSubtype + ".(" : "REMOTE." + (parseInt(selType)-1) + "." + selSubtype + ".(";
 
         const fluidVariable = $("#modal-fluid-variable");
         const selLocStr = fluidVariable.attr("sellocstr");

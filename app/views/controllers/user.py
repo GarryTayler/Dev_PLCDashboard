@@ -357,9 +357,12 @@ def write_condition(section_name, condition, ind):
             config_helper.set_value(section_name, prefixStr + "VAR", optionArr['differ_variable_sellocstr'])
 
     elif condition.type == config.V_CLOCK:
-        config_helper.set_value(section_name, prefixStr + "VAR",
-                                optionArr['cycle_value_sellocstr'] if 'cycle_value_sellocstr' in optionArr else
-                                optionArr['cycle_value'])
+        if 'cycle_value_change_sellocstr' in optionArr:
+            config_helper.set_value(section_name, prefixStr + "CLOCK", optionArr['cycle_value_change_sellocstr'])
+        elif 'cycle_value_sellocstr' in optionArr:
+            config_helper.set_value(section_name, prefixStr + "CLOCK", optionArr['cycle_value_sellocstr'])
+        elif 'cycle_value' in optionArr:
+            config_helper.set_value(section_name, prefixStr + "CLOCK", optionArr['cycle_value'])
 
     elif condition.type == config.V_REFER:
         config_helper.set_value(section_name, prefixStr + "OPR", optionArr['refer_cond_select'])
