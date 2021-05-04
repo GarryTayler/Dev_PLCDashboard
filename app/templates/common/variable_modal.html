@@ -458,14 +458,15 @@
 
         const fluidVariable = $("#modal-fluid-variable");
         const selLocStr = fluidVariable.attr("sellocstr");
-
-        $(currentID).val("가변변수(" + selType + selLocStr + "))");
-        $(currentID).attr("selid", fluidVariable.attr("selid"));
-        $(currentID).attr("seltype", fluidVariable.attr("seltype"));
-        $(currentID).attr("sellocstr", fluidVariable.attr("sellocstr"));
-        $(currentID).attr("deviceid", $("#modal-fluid-type").val());
-        $(currentID).trigger('change');
-
+        
+        if(!(selLocStr == '' || selLocStr == undefined || selLocStr == null)) {
+            $(currentID).val("가변변수(" + selType + selLocStr + "))");
+            $(currentID).attr("selid", fluidVariable.attr("selid"));
+            $(currentID).attr("seltype", fluidVariable.attr("seltype"));
+            $(currentID).attr("sellocstr", fluidVariable.attr("sellocstr"));
+            $(currentID).attr("deviceid", $("#modal-fluid-type").val());
+            $(currentID).trigger('change');
+        }
         $("#fluid-variable").modal('hide');
     }
 </script>
