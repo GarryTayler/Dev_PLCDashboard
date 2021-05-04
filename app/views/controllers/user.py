@@ -334,7 +334,7 @@ def write_condition(section_name, condition, ind):
                 config_helper.set_value(section_name, prefixStr + "SCH_WEEK_SEL." + str(i), 'TRUE' if str(i) in schedule_days else 'FALSE')
         if termialVal == "EXEC_NUM":
             config_helper.set_value(section_name, prefixStr + "SCH_EXEC_NUM", optionArr['schedule_count'])
-            
+
     elif condition.type == config.V_PERIOD:
         for i in range(100):
             ii = i + 1
@@ -349,12 +349,18 @@ def write_condition(section_name, condition, ind):
                                         optionArr[endKey])
             else:
                 break
+
     elif condition.type == config.V_CHANGE:
-        config_helper.set_value(section_name, prefixStr + "VAR", optionArr['differ_variable_sellocstr'])
+        if 'differ_variable_change_sellocstr' in optionArr:
+            config_helper.set_value(section_name, prefixStr + "VAR", optionArr['differ_variable_change_sellocstr'])
+        else:
+            config_helper.set_value(section_name, prefixStr + "VAR", optionArr['differ_variable_sellocstr'])
+
     elif condition.type == config.V_CLOCK:
         config_helper.set_value(section_name, prefixStr + "VAR",
                                 optionArr['cycle_value_sellocstr'] if 'cycle_value_sellocstr' in optionArr else
                                 optionArr['cycle_value'])
+
     elif condition.type == config.V_REFER:
         config_helper.set_value(section_name, prefixStr + "OPR", optionArr['refer_cond_select'])
         suffixStr = optionArr['alarm_differ'] + "."
@@ -362,6 +368,7 @@ def write_condition(section_name, condition, ind):
         config_helper.set_value(section_name, prefixStr + "REF", suffixStr + get_group_index(selModel, optionArr[
             'refer_condition_condid'] if 'refer_condition_condid' in optionArr else optionArr[
             'refer_condition_condgroupid']))
+
     elif condition.type == config.V_ALARM:
         config_helper.set_value(section_name, prefixStr + "ALARM_INDEX",
                                 get_group_index(models.Alarm, optionArr['alarm_select_selid']))
