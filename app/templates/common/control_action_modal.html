@@ -820,6 +820,7 @@
                     postData[inputKey + "_sellocstr"] = inputID1.attr("sellocstr");
                     if( !(inputID1.attr("deviceid") == null || inputID1.attr("deviceid") == '' || inputID1.attr("deviceid") == undefined) ) {
                         postData[inputKey + "_deviceid"] = inputID1.attr("deviceid");
+                        postData[inputKey + "_change_sellocstr"] = inputID1.attr("change_sellocstr");
                     }
                 }
             }

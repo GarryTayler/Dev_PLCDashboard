@@ -1741,6 +1741,7 @@
                         postData[inputKey + "_sellocstr"] = inputID1.attr("sellocstr");
                         if( !(inputID1.attr("deviceid") == null || inputID1.attr("deviceid") == '' || inputID1.attr("deviceid") == undefined) ) {
                             postData[inputKey + "_deviceid"] = inputID1.attr("deviceid");
+                            postData[inputKey + "_change_sellocstr"] = inputID1.attr("change_sellocstr");
                         }
                     }
                 }
@@ -1894,7 +1895,8 @@
                                         $(idStr).attr('selid', optionArr[idSplit + "_selid"])
                                         .attr('seltype', optionArr[idSplit + "_seltype"])
                                         .attr('sellocstr', optionArr[idSplit + "_sellocstr"])
-                                        .attr('deviceid', optionArr[idSplit + "_deviceid"]);
+                                        .attr('deviceid', optionArr[idSplit + "_deviceid"])
+                                        .attr('change_sellocstr', optionArr[idSplit + "_change_sellocstr"]);
                                     }
                                     else {
                                         $(idStr).attr('selid', optionArr[idSplit + "_selid"])
@@ -1914,7 +1916,8 @@
                                     $(idStr).attr('selid', optionArr[idSplit + "_selid"])
                                     .attr('seltype', optionArr[idSplit + "_seltype"])
                                     .attr('sellocstr', optionArr[idSplit + "_sellocstr"])
-                                    .attr('deviceid', optionArr[idSplit + "_deviceid"]);
+                                    .attr('deviceid', optionArr[idSplit + "_deviceid"])
+                                    .attr('change_sellocstr', optionArr[idSplit + "_change_sellocstr"]);
                                 }
                                 else {
                                     $(idStr).attr('selid', optionArr[idSplit + "_selid"])

@@ -422,6 +422,7 @@
                 selInputID = "#" + $("#modal-fixed-fromid").val().trim();
             }
             if(selInputID.length > 0) {
+                $(selInputID).removeAttr("change_sellocstr").removeAttr("deviceid");
                 $(selInputID).val(inputNames.join(','));
                 $(selInputID).attr("selid", selIDs.join(','));
                 $(selInputID).attr("origin", inputNames.join(','));
@@ -458,13 +459,14 @@
 
         const fluidVariable = $("#modal-fluid-variable");
         const selLocStr = fluidVariable.attr("sellocstr");
-        
+
         if(!(selLocStr == '' || selLocStr == undefined || selLocStr == null)) {
             $(currentID).val("가변변수(" + selType + selLocStr + "))");
             $(currentID).attr("selid", fluidVariable.attr("selid"));
             $(currentID).attr("seltype", fluidVariable.attr("seltype"));
             $(currentID).attr("sellocstr", fluidVariable.attr("sellocstr"));
             $(currentID).attr("deviceid", $("#modal-fluid-type").val());
+            $(currentID).attr("change_sellocstr", selType + selLocStr + ")");
             $(currentID).trigger('change');
         }
         $("#fluid-variable").modal('hide');

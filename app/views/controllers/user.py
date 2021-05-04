@@ -10,7 +10,7 @@ import json, gevent, os
 config_helper = Config_Helper()
 userbp = Blueprint('userbp', __name__, url_prefix='/user')
 
-varOptions = ['1_PULSE', 'NONE']
+varOptions = ['MIN_PEND_TIME', '1_PULSE', 'NONE']
 
 
 def login_required(f):
@@ -250,15 +250,23 @@ def write_condition(section_name, condition, ind):
 
     optionArr = json.loads(condition.options) if len(condition.options) > 0 else {}
     if condition.type == config.V_DIGITAL:
-        config_helper.set_value(section_name, prefixStr + "VAR", optionArr['digital_variable_sellocstr'])
+        if 'digital_variable_change_sellocstr' in optionArr:
+            config_helper.set_value(section_name, prefixStr + "VAR", optionArr['digital_variable_change_sellocstr'])    
+        else:
+            config_helper.set_value(section_name, prefixStr + "VAR", optionArr['digital_variable_sellocstr'])
         config_helper.set_value(section_name, prefixStr + "OPR", optionArr['digital_select'])
         if optionArr['digital_select'] in ['!=', '=']:
-            config_helper.set_value(section_name, prefixStr + "VAL", optionArr['digital_condition_sellocstr'])
-
+            if 'digital_condition_change_sellocstr' in optionArr:
+                config_helper.set_value(section_name, prefixStr + "VAL", optionArr['digital_condition_change_sellocstr'])
+            else:
+                config_helper.set_value(section_name, prefixStr + "VAL", optionArr['digital_condition_sellocstr'])
         if optionArr['digital_option'] in varOptions:
             config_helper.set_value(section_name, prefixStr + "OPTION", optionArr['digital_option'])
-        else:
-            config_helper.set_value(section_name, prefixStr + "OPTION", optionArr['digital_option_val_sellocstr'] if 'digital_option_val_sellocstr' in optionArr else optionArr['digital_option_val'])
+            if optionArr['digital_option'] == 'MIN_PEND_TIME':
+                if 'digital_option_val_change_sellocstr' in optionArr:
+                    config_helper.set_value(section_name, prefixStr + optionArr['digital_option'], optionArr['digital_option_val_change_sellocstr'])    
+                else:
+                    config_helper.set_value(section_name, prefixStr + optionArr['digital_option'], optionArr['digital_option_val_sellocstr'])    
     elif condition.type == config.V_ANALOG:
         config_helper.set_value(section_name, prefixStr + "VAR", optionArr['analog_variable_sellocstr'])
         config_helper.set_value(section_name, prefixStr + "OPR", optionArr['analog_condition'])

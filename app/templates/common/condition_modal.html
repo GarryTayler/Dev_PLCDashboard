@@ -111,7 +111,7 @@
                             <select class="form-control condition-select" name="digital_option">
                                 <option value="NONE">없음</option>
                                 <option value="1_PULSE">1펄스</option>
-                                <option value="2" condition="1">유지시간</option>
+                                <option value="MIN_PEND_TIME" condition="1">유지시간</option>
                             </select>
                         </div>
                         <div class="col-6">
@@ -200,7 +200,7 @@
                             <select class="form-control condition-select" name="condition_option">
                                 <option value="NONE">없음</option>
                                 <option value="1_PULSE">1펄스</option>
-                                <option value="2" condition="1">유지시간</option>
+                                <option value="MIN_PEND_TIME" condition="1">유지시간</option>
                             </select>
                         </div>
                         <div class="col-6">
@@ -510,7 +510,7 @@
                             <select class="form-control condition-select" name="differ_option">
                                 <option value="NONE">없음</option>
                                 <option value="1_PULSE">1펄스</option>
-                                <option value="2" condition="1">유지시간</option>
+                                <option value="MIN_PEND_TIME" condition="1">유지시간</option>
                             </select>
                         </div>
                         <div class="col-6">
@@ -556,7 +556,7 @@
                             <select class="form-control condition-select" name="alarm_option">
                                 <option value="0">없음</option>
                                 <option value="1">1펄스</option>
-                                <option value="2" condition="1">유지시간</option>
+                                <option value="MIN_PEND_TIME" condition="1">유지시간</option>
                             </select>
                         </div>
                     </div>
@@ -790,6 +790,7 @@
                         postData[inputKey + "_sellocstr"] = inputID1.attr("sellocstr");
                         if(!(inputID1.attr("deviceid") == null || inputID1.attr("deviceid") == '' || inputID1.attr("deviceid") == undefined)) {
                             postData[inputKey + "_deviceid"] = inputID1.attr("deviceid");
+                            postData[inputKey + "_change_sellocstr"] = inputID1.attr("change_sellocstr");
                         }
                     }
                 }
