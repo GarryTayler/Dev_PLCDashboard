@@ -436,10 +436,18 @@ def write_action(section_name, action, ind):
             config_helper.set_value(section_name, prefixStr + "VAL", optionArr['digital_value'])
 
     elif action.type == config.V_ANALOG:
-        config_helper.set_value(section_name, prefixStr + "VAR", optionArr['analog_variable_sellocstr'])
-        config_helper.set_value(section_name, prefixStr + "VAL",
-                                optionArr['analog_value_sellocstr'] if 'analog_value_sellocstr' in optionArr else
-                                optionArr['analog_value'])
+        if 'analog_variable_change_sellocstr' in optionArr:
+            config_helper.set_value(section_name, prefixStr + "VAR", optionArr['analog_variable_change_sellocstr'])
+        elif 'analog_variable_sellocstr' in optionArr:
+            config_helper.set_value(section_name, prefixStr + "VAR", optionArr['analog_variable_sellocstr'])
+        
+        if 'analog_value_change_sellocstr' in optionArr:
+            config_helper.set_value(section_name, prefixStr + "VAL", optionArr['analog_value_change_sellocstr'])
+        elif 'analog_value_sellocstr' in optionArr:
+            config_helper.set_value(section_name, prefixStr + "VAL", optionArr['analog_value_sellocstr'])
+        elif 'analog_value' in optionArr:
+            config_helper.set_value(section_name, prefixStr + "VAL", optionArr['analog_value'])
+
     elif action.type == config.V_STRING:
         config_helper.set_value(section_name, prefixStr + "VAR", optionArr['string_variable_sellocstr'])
         config_helper.set_value(section_name, prefixStr + "VAL",
