@@ -421,11 +421,20 @@ def write_action(section_name, action, ind):
                             get_group_index(models.ActionGroup, action.actgroup))
     config_helper.set_value(section_name, prefixStr + "TYPE", action.type)
     optionArr = json.loads(action.options) if len(action.options) > 0 else {}
+
     if action.type == config.V_DIGITAL:
-        config_helper.set_value(section_name, prefixStr + "VAR", optionArr['digital_variable_sellocstr'])
-        config_helper.set_value(section_name, prefixStr + "VAL",
-                                optionArr['digital_value_sellocstr'] if 'digital_value_sellocstr' in optionArr else
-                                optionArr['digital_value'])
+        if 'digital_variable_change_sellocstr' in optionArr:
+            config_helper.set_value(section_name, prefixStr + "VAR", optionArr['digital_variable_change_sellocstr'])
+        elif 'digital_variable_sellocstr' in optionArr:
+            config_helper.set_value(section_name, prefixStr + "VAR", optionArr['digital_variable_sellocstr'])
+        
+        if 'digital_value_change_sellocstr' in optionArr:
+            config_helper.set_value(section_name, prefixStr + "VAL", optionArr['digital_value_change_sellocstr'])
+        elif 'digital_value_sellocstr' in optionArr:
+            config_helper.set_value(section_name, prefixStr + "VAL", optionArr['digital_value_sellocstr'])
+        elif 'digital_value' in optionArr:
+            config_helper.set_value(section_name, prefixStr + "VAL", optionArr['digital_value'])
+
     elif action.type == config.V_ANALOG:
         config_helper.set_value(section_name, prefixStr + "VAR", optionArr['analog_variable_sellocstr'])
         config_helper.set_value(section_name, prefixStr + "VAL",
