@@ -449,10 +449,18 @@ def write_action(section_name, action, ind):
             config_helper.set_value(section_name, prefixStr + "VAL", optionArr['analog_value'])
 
     elif action.type == config.V_STRING:
-        config_helper.set_value(section_name, prefixStr + "VAR", optionArr['string_variable_sellocstr'])
-        config_helper.set_value(section_name, prefixStr + "VAL",
-                                optionArr['string_value_sellocstr'] if 'string_value_sellocstr' in optionArr else
-                                optionArr['string_value'])
+        if 'string_variable_change_sellocstr' in optionArr:
+            config_helper.set_value(section_name, prefixStr + "VAR", optionArr['string_variable_change_sellocstr'])
+        elif 'string_variable_sellocstr' in optionArr:
+            config_helper.set_value(section_name, prefixStr + "VAR", optionArr['string_variable_sellocstr'])
+        
+        if 'string_value_change_sellocstr' in optionArr:
+            config_helper.set_value(section_name, prefixStr + "VAL", optionArr['string_value_change_sellocstr'])
+        elif 'string_value_sellocstr' in optionArr:
+            config_helper.set_value(section_name, prefixStr + "VAL", optionArr['string_value_sellocstr'])
+        elif 'string_value' in optionArr:
+            config_helper.set_value(section_name, prefixStr + "VAL", optionArr['string_value'])
+
     elif action.type == config.V_TIME:
         config_helper.set_value(section_name, prefixStr + "VAR", optionArr['time_variable_sellocstr'])
         config_helper.set_value(section_name, prefixStr + "VAL",
