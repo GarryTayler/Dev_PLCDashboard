@@ -52,7 +52,7 @@ def get_desc_str(item):
         returnStr += ', '
         if item['digital_option'] == 'NONE':
             returnStr += '옵션없음'
-        elif item['digital_option'] == '2':
+        elif item['digital_option'] == 'MIN_PEND_TIME':
             returnStr += '유지시간: ' + item['digital_option_val']
         else:
             returnStr += '1펄스'
@@ -62,7 +62,7 @@ def get_desc_str(item):
         returnStr += ', '
         if item['condition_option'] == 'NONE':
             returnStr += '옵션없음'
-        elif item['condition_option'] == '2':
+        elif item['condition_option'] == 'MIN_PEND_TIME':
             returnStr += '유지시간: ' + item['analog_option_val']
         else:
             returnStr += '1펄스'
@@ -90,7 +90,7 @@ def get_desc_str(item):
         returnStr += ', '
         if item['string_option'] == 'NONE':
             returnStr += '옵션없음'
-        elif item['string_option'] == '2':
+        elif item['string_option'] == 'MIN_PEND_TIME':
             returnStr += '유지시간: ' + item['string_option_val']
         else:
             returnStr += '1펄스'
@@ -137,8 +137,8 @@ def get_desc_str(item):
         returnStr = item['alarm_select'] + ", "
         if item['alarm_option'] == "NONE":
             returnStr += "옵션없음"
-        elif item['alarm_option'] == "2":
-            returnStr += "유지시간 " + item['differ_option_time']
+        elif item['alarm_option'] == "MIN_PEND_TIME":
+            returnStr += "유지시간 " + item['alarm_option_time']
         else:
             returnStr += "1펄스"
 
