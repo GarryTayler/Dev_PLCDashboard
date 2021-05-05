@@ -939,7 +939,19 @@ def mornitor():
         selSet = models.Settings.query.filter_by(name='mode').filter_by(userid=userid).first()
         mode = selSet.value
     int_list['mode'] = mode
-    return render_template('setting/mornitor.html', mornitor=int_list)
+
+    intervals = models.SettingInterval.query.all()
+    interval_list = {}
+    for intItem in config.INTERVAL_LIST:
+        itemVal = ""
+        for intItem1 in intervals:
+            if intItem1.set_name == intItem:
+                itemVal = intItem1.interval
+                break
+
+        interval_list[intItem] = itemVal
+    
+    return render_template('setting/mornitor.html', mornitor=int_list, intervals=interval_list)
 
 @userbp.route('/error')
 @login_required
