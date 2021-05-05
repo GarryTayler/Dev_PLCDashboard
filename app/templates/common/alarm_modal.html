@@ -718,6 +718,8 @@
         const selectedTr = $("#alarm-table tbody tr.selected");
         const selTrID = selectedTr.attr("data-row");
         const selTrName = selectedTr.attr("data-name");
+        
+        console.log(selTrName, selTrID, selectedTr);
 
         $(selID).attr("selid", selTrID);
         $(selID).val(selTrName);

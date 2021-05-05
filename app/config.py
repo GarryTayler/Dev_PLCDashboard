@@ -44,7 +44,8 @@ V_SCHEDULE = "SCHEDULE"
 V_PERIOD = "TIME_PERIOD"
 V_CHANGE = "CHANGE"
 V_CLOCK = "CLOCK"
-V_REFER = "REFER_TO"
+V_REFER = "REF_EVAL"
+V_REFER_GRP = "REF_EVALGRP"
 V_ALARM = "ALARM"
 V_TIME = "TIME"
 V_DATE = "DATE"
@@ -75,7 +76,8 @@ VARIABLE_TYPE = {
     V_PERIOD: '시간구간',
     V_CHANGE: '변경감지',
     V_CLOCK: '시간주기',
-    V_REFER: '다른조건',
+    V_REFER: '조건참조',
+    V_REFER_GRP: '조건그룹참조',
     V_ALARM: '알람발생',
     V_TIME: '시간',
     V_DATE: '날짜',

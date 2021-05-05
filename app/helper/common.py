@@ -121,8 +121,16 @@ def get_desc_str(item):
         returnStr = item['refer_cond_select'] + " " + item['refer_condition'] + ", "
         if item['differ_option'] == "NONE":
             returnStr += "옵션없음"
-        elif item['differ_option'] == "2":
+        elif item['differ_option'] == "MIN_PEND_TIME":
             returnStr += "유지시간 " + item['differ_option_time']
+        else:
+            returnStr += "1펄스"
+    elif type1 == config.V_REFER_GRP:
+        returnStr = item['refer_cond_grp_select'] + " " + item['refer_condition_grp'] + ", "
+        if item['refer-condition-grp_option'] == "NONE":
+            returnStr += "옵션없음"
+        elif item['refer-condition-grp_option'] == "MIN_PEND_TIME":
+            returnStr += "유지시간 " + item['refer_condition_grp_option_time']
         else:
             returnStr += "1펄스"
     elif type1 == config.V_ALARM:

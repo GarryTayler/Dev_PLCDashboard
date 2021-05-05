@@ -366,11 +366,33 @@ def write_condition(section_name, condition, ind):
 
     elif condition.type == config.V_REFER:
         config_helper.set_value(section_name, prefixStr + "OPR", optionArr['refer_cond_select'])
-        suffixStr = optionArr['alarm_differ'] + "."
-        selModel = models.Condition if suffixStr == "EVAL." else models.ConditionGroup
-        config_helper.set_value(section_name, prefixStr + "REF", suffixStr + get_group_index(selModel, optionArr[
-            'refer_condition_condid'] if 'refer_condition_condid' in optionArr else optionArr[
-            'refer_condition_condgroupid']))
+        if 'refer_condition_condid' in optionArr:
+            config_helper.set_value(section_name, prefixStr + "REF_INDEX", optionArr['refer_condition_condid'])    
+        
+        if optionArr['differ_option'] in varOptions:
+            config_helper.set_value(section_name, prefixStr + "OPTION", optionArr['differ_option'])
+            if optionArr['differ_option'] == "MIN_PEND_TIME":
+                if 'differ_option_time_change_sellocstr' in optionArr:
+                    config_helper.set_value(section_name, prefixStr + optionArr['differ_option'], optionArr['differ_option_time_change_sellocstr'])    
+                elif 'differ_option_time_sellocstr' in optionArr:
+                    config_helper.set_value(section_name, prefixStr + optionArr['differ_option'], optionArr['differ_option_time_sellocstr'])    
+                elif 'differ_option_time' in optionArr:
+                    config_helper.set_value(section_name, prefixStr + optionArr['differ_option'], optionArr['differ_option_time'])
+
+    elif condition.type == config.V_REFER_GRP:
+        config_helper.set_value(section_name, prefixStr + "OPR", optionArr['refer_cond_grp_select'])
+        if 'refer_condition_condgroupid' in optionArr:
+            config_helper.set_value(section_name, prefixStr + "REF_INDEX", optionArr['refer_condition_condgroupid'])    
+        
+        if optionArr['refer-condition-grp_option'] in varOptions:
+            config_helper.set_value(section_name, prefixStr + "OPTION", optionArr['refer-condition-grp_option'])
+            if optionArr['refer-condition-grp_option'] == "MIN_PEND_TIME":
+                if 'refer_condition_grp_option_time_change_sellocstr' in optionArr:
+                    config_helper.set_value(section_name, prefixStr + optionArr['refer-condition-grp_option'], optionArr['refer_condition_grp_option_time_change_sellocstr'])    
+                elif 'refer_condition_grp_option_time_sellocstr' in optionArr:
+                    config_helper.set_value(section_name, prefixStr + optionArr['refer-condition-grp_option'], optionArr['refer_condition_grp_option_time_sellocstr'])    
+                elif 'refer_condition_grp_option_time' in optionArr:
+                    config_helper.set_value(section_name, prefixStr + optionArr['refer-condition-grp_option'], optionArr['refer_condition_grp_option_time']) 
 
     elif condition.type == config.V_ALARM:
         config_helper.set_value(section_name, prefixStr + "ALARM_INDEX",
