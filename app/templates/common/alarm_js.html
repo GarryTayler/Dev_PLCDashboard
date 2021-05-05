@@ -58,7 +58,7 @@
             "columns": [
                 {
                     render: function (data, type, row) {
-                        return checkForm.replaceAll('data.id', row.id).replaceAll('data.attr', "data-name='" + row.name + "' mtype='" + row.type + "' category='" + row.category + "' confirm='" + row.confirm + "'");
+                        return checkForm.replaceAll('data.id', row.id).replaceAll('data.attr', "data-row='" + row.id + "' data-name='" + row.name + "' mtype='" + row.type + "' category='" + row.category + "' confirm='" + row.confirm + "'");
                     }
                 },
                 {"data": "ind"},
