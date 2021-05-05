@@ -1,0 +1,94 @@
+{% extends "layout.html" %}
+
+{% block content %}
+    <div class="card shadow mb-4">
+        <div class="card-header py-3">
+            <h6 class="m-0 font-weight-bold text-primary">시스템모니터</h6>
+        </div>
+        <div class="card-body">
+            <label class="form-check-label mb-3">소프트웨어 버전 : {{mornitor.sVersion}}</label><br/>
+            <label class="form-check-label mb-3">라이센스 키 : {{mornitor.sLicenseKey}}</label><br/>
+            <div class="mb-3">
+                <label class="form-check-label mb-1">작업 부하율 </label>
+                <div class="progress" style="margin-left: 10px;margin-right: 10px;">
+                    <div class="progress-bar" role="progressbar" style="width: 25%;" aria-valuenow="25" aria-valuemin="0" aria-valuemax="100">25%</div>
+                </div>
+            </div>
+
+            <div class="mb-2">
+                <label class="form-check-label" style="position: absolute;">작업모니터</label>
+                <div class="btn-panel">
+                    {% if mornitor.mode == "run" %}
+                    <button class="btn btn-secondary btn-icon-split">
+                        <span class="text">Interval 설정</span>
+                    </button>
+                    {% else %}
+                    <button class="btn btn-primary btn-icon-split" onclick="gotoInterval();">
+                        <span class="text">Interval 설정</span>
+                    </button>
+                    {% endif %}
+                </div>
+            </div>
+            
+            <div class="row">
+                <div class="col-12">
+                    <div class="table-responsive">
+                        <table class="table table-bordered no-context" id="interval-tbl">
+                            <thead>
+                                <tr>
+                                    <th style="width: 9%">Task</th>
+                                    <th style="width: 9%">Cycle Count</th>
+                                    <th style="width: 9%">Cycle Time(㎲)</th>
+                                    <th style="width: 9%">Min.Cycle Time(㎲)</th>
+                                    <th style="width: 9%">Max.Cycle Time(㎲)</th>
+                                    <th style="width: 9%">Avg.Cycle Time(㎲)</th>
+                                    <th style="width: 9%">Interval (㎲)</th>
+                                    <th style="width: 9%">Cycle Percent(%)</th>
+                                    <th style="width: 9%">Jitter(㎲)</th>
+                                    <th style="width: 9%">Min.Jitter(㎲)</th>
+                                    <th style="width: 9%">Max.Jitter(㎲)</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for val in mornitor.workMornitor %}
+                                    <tr>
+                                        <td>{{val.task}}</td>
+                                        <td>{{val.cycleCount}}</td>
+                                        <td>{{val.cycleTime}}</td>
+                                        <td>{{val.minCycleTime}}</td>
+                                        <td>{{val.maxCycleTime}}</td>
+                                        <td>{{val.avgCycleTime}}</td>
+                                        <td>{{val.interval}}</td>
+                                        {% if val.cyclePercent < 30 %}
+                                            <td style="background: green;color: white;">{{val.cyclePercent}}%</td>
+                                        {% endif %}
+                                        {% if val.cyclePercent >= 30 and val.cyclePercent < 60 %}
+                                            <td style="background: yellow;color: black;">{{val.cyclePercent}}%</td>
+                                        {% endif %}
+                                        {% if val.cyclePercent >= 60 and val.cyclePercent < 80 %}
+                                            <td style="background: orange;color: white;">{{val.cyclePercent}}%</td>
+                                        {% endif %}
+                                        {% if val.cyclePercent >= 80 %}
+                                            <td style="background: red;color: white;">{{val.cyclePercent}}%</td>
+                                        {% endif %}
+                                        <td>{{val.jitter}}</td>
+                                        <td>{{val.minJitter}}</td>
+                                        <td>{{val.maxJitter}}</td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block script %}
+    <script>
+        function gotoInterval() {
+            window.location.href="/user/interval";
+        }
+    </script>
+{% endblock %}

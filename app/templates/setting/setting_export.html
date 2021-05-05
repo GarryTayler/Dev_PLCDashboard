@@ -62,12 +62,14 @@
                     </div>
                 </div>
             </div>
-            <button class="btn btn-primary btn-icon-split">
-                <span class="icon text-white-50">
-                    <i class="fas fa-download"></i>
-                </span>
-                <span class="text">다운로드</span>
-            </button>
+            <a href="{{url_for('userbp.csv_export', csvType='collect')}}" target="_blank">
+                <button class="btn btn-primary btn-icon-split">
+                    <span class="icon text-white-50">
+                        <i class="fas fa-file-export"></i>
+                    </span>
+                    <span class="text">다운로드</span>
+                </button>
+            </a>
             <button class="btn btn-secondary btn-icon-split">
                 <span class="icon text-white-50">
                     <i class="fas fa-times"></i>
