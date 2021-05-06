@@ -547,9 +547,9 @@ def actgroup_write(section_name, actgroup, ind):
 def control_write(section_name, control, ind):
     prefixStr = 'CONTROL.' + str(ind) + "."
     config_helper.set_value(section_name, prefixStr + "ENABLE", 'TRUE' if control.use_flag == '1' else 'FALSE')
-    config_helper.set_value(section_name, prefixStr + "PANEL_INDEX", get_group_index(models.Logic, control.logicid))
+    config_helper.set_value(section_name, prefixStr + "LOGIC_INDEX", get_group_index(models.Logic, control.logicid))
     config_helper.set_value(section_name, prefixStr + "PRIORITY", control.priority)
-    config_helper.set_value(section_name, prefixStr + "APPLY_PANEL_MODE", 'TRUE' if control.mode == '1' else 'FALSE')
+    config_helper.set_value(section_name, prefixStr + "APPLY_LOGIC_MODE", 'TRUE' if control.mode == '1' else 'FALSE')
 
 
 def logic_write(section_name, logic, ind):
