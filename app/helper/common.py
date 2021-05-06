@@ -148,7 +148,16 @@ def get_desc_str(item):
 def get_desc_str1(item):
     type1 = item['type']
     returnStr = ""
-    if type1 in [config.V_DIGITAL, config.V_ANALOG, config.V_STRING, config.V_TIME, config.V_DATE]:
+    if type1 == config.V_DIGITAL:
+        type1 = type1.lower()
+        if item[type1 + '_value'] == "TRUE":
+            returnStr = item[type1 + '_variable'] + " -> ON"
+        elif item[type1 + '_value'] == "FALSE":
+            returnStr = item[type1 + '_variable'] + " -> OFF"
+        else:
+            returnStr = item[type1 + '_variable'] + " -> " + item[type1 + '_value']
+
+    elif type1 in [config.V_ANALOG, config.V_STRING, config.V_TIME, config.V_DATE]:
         type1 = type1.lower()
         returnStr = item[type1 + '_variable'] + " -> " + item[type1 + '_value']
 
