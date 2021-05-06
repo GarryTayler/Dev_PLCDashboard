@@ -151,27 +151,37 @@ def get_desc_str1(item):
     if type1 in [config.V_DIGITAL, config.V_ANALOG, config.V_STRING, config.V_TIME, config.V_DATE]:
         type1 = type1.lower()
         returnStr = item[type1 + '_variable'] + " -> " + item[type1 + '_value']
+
     elif type1 == config.V_DELAY:
         returnStr = item['delay_value'] + " 지연"
+
     elif type1 == config.V_UCALC:
         returnStr = item['formula_variable'] + " = " + item['formula_value']
+
     elif type1 == config.V_FUNC:
         returnStr = item['func_select']
+
     elif type1 == config.V_RECIPE:
         returnStr = item['recipe_value']
+
     elif type1 == config.V_SHELLEXEC:
         returnStr = item['shell_application'] + ", " + item['shell_param'] + ", "
         if item['shell_exec'] == "1":
             returnStr += "숨김, "
         returnStr += config.SHELL_DUPLICATE[item['shell_duplicate']]
+
     elif type1 == config.V_CUSTOM:
         selChl = models.CustomChannel.query.filter_by(id=item['channel_id']).first()
         selFrame = models.CustomFrame.query.filter_by(id=item['frame_id']).first()
         returnStr = selChl.name if selChl else ""
         returnStr = returnStr + ", " + (selFrame.name if selFrame else "")
+        returnStr = returnStr + ", " + ("보내기" if item['comm_frame_type'] == 'SEND' else "받기")
+        returnStr = returnStr + ", 온도수신완료(" + (item['comm_variable_change_sellocstr'] if 'comm_variable_change_sellocstr' in item else item['comm_variable_sellocstr']) + ")"
+
     elif type1 == config.V_GROUPACT:
         selActGroup = models.ActionGroup.query.filter_by(id=item['actgroup_id']).first()
         returnStr = selActGroup.name if selActGroup else ""
+
     elif type1 == config.V_CONTROL:
         selControl = models.Control.query.filter_by(id=item['control_id']).first()
         returnStr = selControl.name if selControl else ""

@@ -498,6 +498,7 @@ def write_action(section_name, action, ind):
     elif action.type == config.V_UCALC:
         config_helper.set_value(section_name, prefixStr + "IN_EXPR", optionArr['formula_value'])
         config_helper.set_value(section_name, prefixStr + "OUT_VARS", optionArr['formula_variable_sellocstr'])
+
     elif action.type == config.V_FUNC:
         funcModel = models.ExecFunc
         selFunc = funcModel.query.filter_by(id=optionArr['func_select_selid']).with_entities(funcModel.group, funcModel.name).first()
@@ -517,17 +518,25 @@ def write_action(section_name, action, ind):
 
         config_helper.set_value(section_name, prefixStr + "IN_EXPR", ','.join(inArr))
         config_helper.set_value(section_name, prefixStr + "OUT_VARS", ','.join(outArr))
+
     elif action.type == config.V_SHELLEXEC:
         config_helper.set_value(section_name, prefixStr + "SHELL_APP", optionArr['shell_application'])
         config_helper.set_value(section_name, prefixStr + "SHELL_CMD", optionArr['shell_param'])
         config_helper.set_value(section_name, prefixStr + "HIDE_START", optionArr['shell_exec'])
         config_helper.set_value(section_name, prefixStr + "EXEC_OPTION", optionArr['shell_duplicate'])
+
     elif action.type == config.V_CUSTOM:
         config_helper.set_value(section_name, prefixStr + "COMM_INDEX",
                                 get_group_index(models.CustomChannel, optionArr['channel_id']))
         config_helper.set_value(section_name, prefixStr + "FRAME_INDEX",
                                 get_group_index(models.CustomFrame, optionArr['frame_id']))
         config_helper.set_value(section_name, prefixStr + "FRAME_MODE", optionArr['comm_frame_type'])
+
+        if 'comm_variable_change_sellocstr' in optionArr:
+            config_helper.set_value(section_name, prefixStr + "FRAME_DONE", optionArr['comm_variable_change_sellocstr'])
+        elif 'comm_variable_sellocstr' in optionArr:
+            config_helper.set_value(section_name, prefixStr + "FRAME_DONE", optionArr['comm_variable_sellocstr'])
+
     elif action.type == config.V_RECIPE:
         selModel = models.RecipeName
         nameInd = str(selModel.query.filter(selModel.id < optionArr['recipe_id']).filter(selModel.def_id == optionArr['def_id']).count())
