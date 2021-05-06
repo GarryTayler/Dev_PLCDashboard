@@ -303,25 +303,34 @@
                         </div>
                     </div>
                 </div>
+
                 <div id="delay-input" class="type-div">
                     <div class="form-group row">
                         <div class="col-2">
                             <label class="input-label" for="delay-value">지연시간</label>
                         </div>
                         <div class="col-5">
-                            <div class="input-group">
-                                <input type="text" class="form-control" id="delay-value" readonly>
-                                <span class="input-group-append dropdown">
-                                    <button class="btn btn-primary dropdown-toggle" data-toggle="dropdown"></button>
-                                    <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-                                        <a class="dropdown-item" href="#" onclick="showFixed('delay-value', 'time');">고정변수</a>
-                                        <a class="dropdown-item" href="#" onclick="showFluid('delay-value', 'time');">가변변수</a>
-                                    </div>
-                                </span>
+                            <div class="value-radio">
+                                <div class="form-check mb-2">
+                                    <input type="checkbox" class="form-check-input" id="delay-value-radio" checked>
+                                    <label class="form-check-label" for="delay-value-radio">변수</label>
+                                </div>
+                                <input type="text" class="form-control alt-input mask-time">
+                                <div class="input-group">
+                                    <input type="text" class="form-control" id="delay-value" readonly>
+                                    <span class="input-group-append dropdown">
+                                        <button class="btn btn-primary dropdown-toggle" data-toggle="dropdown"></button>
+                                        <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                                            <a class="dropdown-item" href="#" onclick="showFixed('delay-value', 'time');">고정변수</a>
+                                            <a class="dropdown-item" href="#" onclick="showFluid('delay-value', 'time');">가변변수</a>
+                                        </div>
+                                    </span>
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
+
                 <div id="user_calc-input" class="type-div">
                     <div class="form-group row">
                         <div class="col-2">

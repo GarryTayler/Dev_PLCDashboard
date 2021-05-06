@@ -488,7 +488,13 @@ def write_action(section_name, action, ind):
             config_helper.set_value(section_name, prefixStr + "VAL", optionArr['date_value'])
 
     elif action.type == config.V_DELAY:
-        config_helper.set_value(section_name, prefixStr + "DELAY_TIME", optionArr['delay_value_sellocstr'])
+        if 'delay_value_change_sellocstr' in optionArr:
+            config_helper.set_value(section_name, prefixStr + "DELAY_TIME", optionArr['delay_value_change_sellocstr'])
+        elif 'delay_value_sellocstr' in optionArr:
+            config_helper.set_value(section_name, prefixStr + "DELAY_TIME", optionArr['delay_value_sellocstr'])
+        elif 'delay_value' in optionArr:
+            config_helper.set_value(section_name, prefixStr + "DELAY_TIME", optionArr['delay_value'])
+
     elif action.type == config.V_UCALC:
         config_helper.set_value(section_name, prefixStr + "IN_EXPR", optionArr['formula_value'])
         config_helper.set_value(section_name, prefixStr + "OUT_VARS", optionArr['formula_variable_sellocstr'])
