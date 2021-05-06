@@ -462,15 +462,31 @@ def write_action(section_name, action, ind):
             config_helper.set_value(section_name, prefixStr + "VAL", optionArr['string_value'])
 
     elif action.type == config.V_TIME:
-        config_helper.set_value(section_name, prefixStr + "VAR", optionArr['time_variable_sellocstr'])
-        config_helper.set_value(section_name, prefixStr + "VAL",
-                                optionArr['time_value_sellocstr'] if 'time_value_sellocstr' in optionArr else
-                                optionArr['time_value'])
+        if 'time_variable_change_sellocstr' in optionArr:
+            config_helper.set_value(section_name, prefixStr + "VAR", optionArr['time_variable_change_sellocstr'])
+        elif 'time_variable_sellocstr' in optionArr:
+            config_helper.set_value(section_name, prefixStr + "VAR", optionArr['time_variable_sellocstr'])
+        
+        if 'time_value_change_sellocstr' in optionArr:
+            config_helper.set_value(section_name, prefixStr + "VAL", optionArr['time_value_change_sellocstr'])
+        elif 'time_value_sellocstr' in optionArr:
+            config_helper.set_value(section_name, prefixStr + "VAL", optionArr['time_value_sellocstr'])
+        elif 'time_value' in optionArr:
+            config_helper.set_value(section_name, prefixStr + "VAL", optionArr['time_value'])
+
     elif action.type == config.V_DATE:
-        config_helper.set_value(section_name, prefixStr + "VAR", optionArr['date_variable_sellocstr'])
-        config_helper.set_value(section_name, prefixStr + "VAL",
-                                optionArr['date_value_sellocstr'] if 'date_value_sellocstr' in optionArr else
-                                optionArr['date_value'])
+        if 'date_variable_change_sellocstr' in optionArr:
+            config_helper.set_value(section_name, prefixStr + "VAR", optionArr['date_variable_change_sellocstr'])
+        elif 'date_variable_sellocstr' in optionArr:
+            config_helper.set_value(section_name, prefixStr + "VAR", optionArr['date_variable_sellocstr'])
+        
+        if 'date_value_change_sellocstr' in optionArr:
+            config_helper.set_value(section_name, prefixStr + "VAL", optionArr['date_value_change_sellocstr'])
+        elif 'date_value_sellocstr' in optionArr:
+            config_helper.set_value(section_name, prefixStr + "VAL", optionArr['date_value_sellocstr'])
+        elif 'date_value' in optionArr:
+            config_helper.set_value(section_name, prefixStr + "VAL", optionArr['date_value'])
+
     elif action.type == config.V_DELAY:
         config_helper.set_value(section_name, prefixStr + "DELAY_TIME", optionArr['delay_value_sellocstr'])
     elif action.type == config.V_UCALC:
