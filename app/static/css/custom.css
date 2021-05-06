@@ -172,3 +172,9 @@ i.fa-chevron-circle-down,
         display: inline!important;
     }
 }
+.topbar .dropdown .dropdown-menu {
+    width: 170px !important;
+}
+.btn-interval-folder {
+    height: 36px;
+}
