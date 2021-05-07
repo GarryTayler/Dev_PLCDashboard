@@ -33,7 +33,7 @@
                 <div class="alert alert-danger insert-alert" role="alert">
                     값을 입력하세요
                 </div>
-                <input type="hidden" id="selid" value=""/>
+                <input type="hidden" id="actselid" value=""/>
                 <div class="form-group row">
                     <div class="col-2">
                         <label class="input-label">사용</label>
@@ -41,8 +41,8 @@
                     <div class="col-5">
                         <div class="dark">
                             <div class="ckbx-style-1">
-                                <input type="checkbox" checked id="ckbx-style-1-1" value="0">
-                                <label for="ckbx-style-1-1"></label>
+                                <input type="checkbox" checked id="actckbx-style-1-1" value="0">
+                                <label for="actckbx-style-1-1"></label>
                             </div>
                         </div>
                     </div>
@@ -540,7 +540,7 @@
                             <div class="input-group">
                                 <input type="text" class="form-control" id="act-group-select" readonly>
                                 <span class="input-group-append">
-                                    <button class="btn btn-primary" data-toggle="modal" data-target="#actgroup-modal">선택</button>
+                                    <button class="btn btn-primary" data-toggle="modal" data-target="#action-actgroup-modal">선택</button>
                                 </span>
                             </div>
                         </div>
@@ -555,7 +555,7 @@
                             <div class="input-group">
                                 <input type="text" class="form-control" id="control-select" readonly>
                                 <span class="input-group-append">
-                                    <button class="btn btn-primary" data-toggle="modal" data-target="#control-select-modal">선택</button>
+                                    <button class="btn btn-primary" data-toggle="modal" data-target="#action-control-select-modal">선택</button>
                                 </span>
                             </div>
                         </div>
@@ -690,7 +690,7 @@
     </div>
 </div>
 
-<div class="modal fade" id="control-select-modal" tabindex="-1" role="dialog">
+<div class="modal fade" id="action-control-select-modal" tabindex="-1" role="dialog">
     <div class="modal-dialog" role="document" style="max-width: 1200px !important;">
         <div class="modal-content">
             <div class="modal-header">
@@ -722,7 +722,7 @@
                 </div>
             </div>
             <div class="modal-footer">
-                <button class="btn btn-info btn-icon-split" onclick="controlSelect();">
+                <button class="btn btn-info btn-icon-split" onclick="actionControlSelect();">
                     <span class="icon text-white-50">
                         <i class="fas fa-check"></i>
                     </span>
@@ -739,7 +739,7 @@
     </div>
 </div>
 
-<div class="modal fade" id="actgroup-modal" tabindex="-1" role="dialog">
+<div class="modal fade" id="action-actgroup-modal" tabindex="-1" role="dialog">
     <div class="modal-dialog" role="document" style="max-width: 1200px !important;">
         <div class="modal-content">
             <div class="modal-header">
@@ -770,7 +770,7 @@
                 </div>
             </div>
             <div class="modal-footer">
-                <button class="btn btn-info btn-icon-split" onclick="actGroupSelect();">
+                <button class="btn btn-info btn-icon-split" onclick="actActGroupSelect();">
                     <span class="icon text-white-50">
                         <i class="fas fa-check"></i>
                     </span>
@@ -1703,7 +1703,7 @@
     function doFuncSave() {
         $("#action-modal .insert-alert").hide();
         let postData = {};
-        postData['use_flag'] = $("#ckbx-style-1-1").prop('checked') ? '1' : '0';
+        postData['use_flag'] = $("#actckbx-style-1-1").prop('checked') ? '1' : '0';
 
         $("#action-modal input").removeClass('border-danger');
 
@@ -1790,7 +1790,7 @@
             }
         }
 
-        postData['selid'] = $("#selid").val();
+        postData['selid'] = $("#actselid").val();
         postData['action_type'] = postData['action_type'].toUpperCase();
         sendAjax("{{url_for('logic_setting.update_action')}}", postData, false);
         updateVariable(typeof logicActTbl === 'undefined' ? dataTables : logicActTbl);
@@ -1798,7 +1798,7 @@
     }
 
     function doActCreate() {
-        $("#selid").val('0');
+        $("#actselid").val('0');
         $(".type-div").hide();
         $("#action-modal .insert-alert").hide();
 
@@ -1806,7 +1806,6 @@
         $("#action-order").val('1');
 
         const selType = "#" + $("#type-select").val() + "-input";
-        alert(selType);
         const selInputs = $(selType + " input");
         for(let ii = 0; ii <selInputs.length; ii++) {
             $(selInputs[ii]).removeAttr("seltype").removeAttr("selid").removeAttr("sellocstr").val('');
@@ -1859,7 +1858,7 @@
                 headers: { "X-CSRFToken": csrf_token },
                 success: function(resp) {
                     if(resp.status) {
-                        $("#selid").val(selid);
+                        $("#actselid").val(selid);
                         $(".type-div").hide();
                         $("#action-modal .insert-alert").hide();
 
@@ -1871,7 +1870,7 @@
                         $("#type-select").val(dataType);
                         $("#action-name").val(selData.name);
                         $("#action-order").val(selData.order);
-                        $("#ckbx-style-1-1").prop('checked', selData.use_flag === 1);
+                        $("#actckbx-style-1-1").prop('checked', selData.use_flag === 1);
 
                         let optionArr = {};
                         if(selData.options.length > 0) {
@@ -1961,27 +1960,27 @@
         }
     }
 
-    function controlSelect() {
+    function actionControlSelect() {
         const selIDs = getTblChk("#action-control-table");
         if(selIDs.length > 0 && selIDs.split(',').length === 1) {
             const selName = $("#action-control-table tbody input.check-row").filter(':checked').attr('data-name');
             const controlInput = $("#control-select");
             controlInput.val(selName);
             controlInput.attr('selid', selIDs);
-            $("#control-select-modal").modal('hide');
+            $("#action-control-select-modal").modal('hide');
         } else {
             alert('조건그룹을 1개선택하세요');
         }
     }
 
-    function actGroupSelect() {
+    function actActGroupSelect() {
         const selIDs = getTblChk("#action-actgroup-table", "actgroup-");
         if(selIDs.length > 0 && selIDs.split(',').length === 1) {
             const selName = $("#action-actgroup-table tbody input.check-row").filter(':checked').attr('data-name');
             const controlInput = $("#act-group-select");
             controlInput.val(selName);
             controlInput.attr('selid', selIDs);
-            $("#actgroup-modal").modal('hide');
+            $("#action-actgroup-modal").modal('hide');
         } else {
             alert('동작그룹을 1개 선택하세요');
         }
@@ -2115,7 +2114,7 @@
                 {
                     render: function (data, type, row) {
                         const nameStr = " data-name='" + row.name + "'";
-                        const attrStr = $("#control-select-modal").attr('before') === row.id.toString() ? 'checked' + nameStr : nameStr;
+                        const attrStr = $("#action-control-select-modal").attr('before') === row.id.toString() ? 'checked' + nameStr : nameStr;
                         return checkForm.replaceAll('data.id', row.id).replaceAll('data.attr', attrStr);
                     }
                 },
