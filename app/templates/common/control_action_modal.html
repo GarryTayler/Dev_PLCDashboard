@@ -105,8 +105,8 @@
                                     <label class="form-check-label" for="digital-value-radio">변수</label>
                                 </div>
                                 <select class="form-control alt-input">
-                                    <option value="0">FALSE</option>
-                                    <option value="1">TRUE</option>
+                                    <option value="FALSE">FALSE</option>
+                                    <option value="TRUE">TRUE</option>
                                 </select>
                                 <div class="input-group">
                                     <input type="text" class="form-control" id="digital-value" readonly>
@@ -453,6 +453,7 @@
                         </div>
                         <div class="col-5">
                             <select class="form-control" id="shell-duplicate">
+                                <option value="NONE">없음</option>
                                 <option value="KILL_PREV_PROCESS">이전프로세스 종료</option>
                                 <option value="NO_START_IF_EXIST">중복실행안함</option>
                             </select>

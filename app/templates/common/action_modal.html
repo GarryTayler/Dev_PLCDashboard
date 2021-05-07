@@ -464,6 +464,7 @@
                         </div>
                         <div class="col-5">
                             <select class="form-control" id="shell-duplicate" name="shell_duplicate">
+                                <option value="NONE">없음</option>
                                 <option value="KILL_PREV_PROCESS">이전프로세스 종료</option>
                                 <option value="NO_START_IF_EXIST">중복실행안함</option>
                             </select>
@@ -700,7 +701,7 @@
             </div>
             <div class="modal-body">
                 <div class="table-responsive">
-                    <table class="table table-bordered datatable-tbl no-context" id="logic-control-table">
+                    <table class="table table-bordered datatable-tbl no-context" id="action-control-table">
                         <thead>
                             <tr>
                                 <th class="text-center">
@@ -749,7 +750,7 @@
             </div>
             <div class="modal-body">
                 <div class="table-responsive">
-                    <table class="table table-bordered datatable-tbl no-context" id="logic-actgroup-table">
+                    <table class="table table-bordered datatable-tbl no-context" id="action-actgroup-table">
                         <thead>
                             <tr>
                                 <th class="text-center">
@@ -1805,6 +1806,7 @@
         $("#action-order").val('1');
 
         const selType = "#" + $("#type-select").val() + "-input";
+        alert(selType);
         const selInputs = $(selType + " input");
         for(let ii = 0; ii <selInputs.length; ii++) {
             $(selInputs[ii]).removeAttr("seltype").removeAttr("selid").removeAttr("sellocstr").val('');
@@ -1960,9 +1962,9 @@
     }
 
     function controlSelect() {
-        const selIDs = getTblChk("#logic-control-table");
+        const selIDs = getTblChk("#action-control-table");
         if(selIDs.length > 0 && selIDs.split(',').length === 1) {
-            const selName = $("#logic-control-table tbody input.check-row").filter(':checked').attr('data-name');
+            const selName = $("#action-control-table tbody input.check-row").filter(':checked').attr('data-name');
             const controlInput = $("#control-select");
             controlInput.val(selName);
             controlInput.attr('selid', selIDs);
@@ -1973,9 +1975,9 @@
     }
 
     function actGroupSelect() {
-        const selIDs = getTblChk("#logic-actgroup-table", "actgroup-");
+        const selIDs = getTblChk("#action-actgroup-table", "actgroup-");
         if(selIDs.length > 0 && selIDs.split(',').length === 1) {
-            const selName = $("#logic-actgroup-table tbody input.check-row").filter(':checked').attr('data-name');
+            const selName = $("#action-actgroup-table tbody input.check-row").filter(':checked').attr('data-name');
             const controlInput = $("#act-group-select");
             controlInput.val(selName);
             controlInput.attr('selid', selIDs);
@@ -2090,14 +2092,14 @@
             }
         });
 
-        $("#logic-control-table").DataTable({
+        $("#action-control-table").DataTable({
             ...dataTableLang,
             ...dataTableObj,
             "infoCallback": infoCallback,
             "columnDefs": columnDef,
             "order": [[ 1, "asc" ]],
             "drawCallback": function(oSettings) {
-                setDataTblPage($("#logic-control-table"), oSettings._iDisplayLength);
+                setDataTblPage($("#action-control-table"), oSettings._iDisplayLength);
             },
             'ajax': {
                 'url': "{{url_for('logic_setting.control_list')}}",
@@ -2129,14 +2131,14 @@
             }
         });
 
-        $("#logic-actgroup-table").DataTable({
+        $("#action-actgroup-table").DataTable({
             ...dataTableLang,
             ...dataTableObj,
             "infoCallback": infoCallback,
             "columnDefs": columnDef,
             "order": [[ 1, "asc" ]],
             "drawCallback": function(oSettings) {
-                setDataTblPage($("#logic-actgroup-table"), oSettings._iDisplayLength);
+                setDataTblPage($("#action-actgroup-table"), oSettings._iDisplayLength);
             },
             'ajax': {
                 'url': "{{url_for('logic_setting.actgroup_list')}}",

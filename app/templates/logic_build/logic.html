@@ -178,6 +178,8 @@
 {% endblock %}
 
 {% block script %}
+    <script src="{{ url_for('static', filename='js/datetimepicker.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/jquery.inputmask.min.js') }}"></script>
     {% include 'common/datatable.html' %}
     {% include 'logic_build/logic_control_modal.html' %}
     {% include 'common/logicbuild.html' %}
@@ -186,7 +188,8 @@
     {% include 'common/alarm_modal.html' %}
     {% include 'common/variable_modal.html' %}
     {% include 'common/condition_modal.html' %}
-    {% include 'common/control_action_modal.html' %}
+    <!-- {% include 'common/control_action_modal.html' %}   -->
+    {% include 'common/action_modal.html' %}
     {% include 'logic_setting/control_logic.html' %}
     {% include 'logic_setting/actgroup_modal.html' %}
     {% include 'logic_setting/condgroup_modal.html' %}

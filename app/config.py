@@ -147,6 +147,7 @@ VARIABLE_WEEK = {
 }
 
 SHELL_DUPLICATE = {
+    'NONE': '옵션없음',
     'KILL_PREV_PROCESS': '이전프로세스 종료',
     'NO_START_IF_EXIST': '중복실행안함'
 }

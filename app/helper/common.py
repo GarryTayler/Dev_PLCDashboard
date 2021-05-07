@@ -43,55 +43,55 @@ def get_desc_str(item):
     type1 = item['type']
     returnStr = ""
     if type1 == config.V_DIGITAL:
-        opr = 'digital_select'
+        opr = 'conddigital_select'
         if item[opr] in ['ON', 'OFF']:
-            returnStr = item['digital_variable'] + " = " + item[opr]
+            returnStr = item['conddigital_variable'] + " = " + item[opr]
         else:
-            returnStr = item['digital_variable'] + " " + item[opr] + " " + item['digital_condition']
+            returnStr = item['conddigital_variable'] + " " + item[opr] + " " + item['conddigital_condition']
 
         returnStr += ', '
-        if item['digital_option'] == 'NONE':
+        if item['conddigital_option'] == 'NONE':
             returnStr += '옵션없음'
-        elif item['digital_option'] == 'MIN_PEND_TIME':
-            returnStr += '유지시간: ' + item['digital_option_val']
+        elif item['conddigital_option'] == 'MIN_PEND_TIME':
+            returnStr += '유지시간: ' + item['conddigital_option_val']
         else:
             returnStr += '1펄스'
     elif type1 == config.V_ANALOG:
-        returnStr = item['analog_variable'] + " " + item['analog_condition'] + " " + item['analog_value']
+        returnStr = item['condanalog_variable'] + " " + item['condanalog_condition'] + " " + item['condanalog_value']
 
         returnStr += ', '
-        if item['condition_option'] == 'NONE':
+        if item['condcondition_option'] == 'NONE':
             returnStr += '옵션없음'
-        elif item['condition_option'] == 'MIN_PEND_TIME':
-            returnStr += '유지시간: ' + item['analog_option_val']
+        elif item['condcondition_option'] == 'MIN_PEND_TIME':
+            returnStr += '유지시간: ' + item['condanalog_option_val']
         else:
             returnStr += '1펄스'
     elif type1 == config.V_SCHEDULE:
-        returnStr = item['schedule_start'] + " ~ "
-        if item['schedule_terminal'] == "DATE":
-            returnStr += item['schedule_end']
+        returnStr = item['condschedule_start'] + " ~ "
+        if item['condschedule_terminal'] == "DATE":
+            returnStr += item['condschedule_end']
 
-        returnStr += ", " + item['schedule_repeat'] + config.VARIABLE_DAY[item['schedule_interval']] + "마다 반복, "
+        returnStr += ", " + item['condschedule_repeat'] + config.VARIABLE_DAY[item['condschedule_interval']] + "마다 반복, "
 
-        if item['schedule_terminal'] == "NONE":
+        if item['condschedule_terminal'] == "NONE":
             returnStr += "종료없음"
-        elif item['schedule_terminal'] == "DATE":
+        elif item['condschedule_terminal'] == "DATE":
             returnStr += "종료일"
         else:
-            returnStr += "실행횟수: " + item['schedule_count']
+            returnStr += "실행횟수: " + item['condschedule_count']
 
-        if item['schedule_interval'] == "WEEK":
-            selDays = item['schedule_days'].split(',')
+        if item['condschedule_interval'] == "WEEK":
+            selDays = item['condschedule_days'].split(',')
             weekStr = '/'.join([config.VARIABLE_WEEK[day] for day in selDays])
             returnStr += ", " + weekStr if len(weekStr) > 0 else weekStr
     elif type1 == config.V_STRING:
-        returnStr = item['string_variable'] + " " + item['string_condition'] + " " + item['string_value']
+        returnStr = item['condstring_variable'] + " " + item['condstring_condition'] + " " + item['condstring_value']
 
         returnStr += ', '
-        if item['string_option'] == 'NONE':
+        if item['condstring_option'] == 'NONE':
             returnStr += '옵션없음'
-        elif item['string_option'] == 'MIN_PEND_TIME':
-            returnStr += '유지시간: ' + item['string_option_val']
+        elif item['condstring_option'] == 'MIN_PEND_TIME':
+            returnStr += '유지시간: ' + item['condstring_option_val']
         else:
             returnStr += '1펄스'
     elif type1 == config.V_PERIOD:
@@ -110,35 +110,40 @@ def get_desc_str(item):
                 returnStr += ", " + item['start_period_' + ind] + " ~ " + item['end_period_' + ind]
 
         if item['interval_option'] == "NONE":
-            returnStr += ", 옵션없음"
+            returnStr += (", 옵션없음" if returnStr != "" else "옵션없음")
         else:
-            returnStr += ", 1펄스"
+            returnStr += (", 1펄스" if returnStr != "" else "1펄스")
+            
     elif type1 == config.V_CLOCK:
-        returnStr = item['cycle_value']
+        returnStr = item['condcycle_value']
+
     elif type1 == config.V_CHANGE:
-        returnStr = item['differ_variable']
+        returnStr = item['conddiffer_variable']
+
     elif type1 == config.V_REFER:
-        returnStr = item['refer_cond_select'] + " " + item['refer_condition'] + ", "
-        if item['differ_option'] == "NONE":
+        returnStr = item['condrefer_cond_select'] + " " + item['condrefer_condition'] + ", "
+        if item['conddiffer_option'] == "NONE":
             returnStr += "옵션없음"
-        elif item['differ_option'] == "MIN_PEND_TIME":
-            returnStr += "유지시간 " + item['differ_option_time']
+        elif item['conddiffer_option'] == "MIN_PEND_TIME":
+            returnStr += "유지시간 " + item['conddiffer_option_time']
         else:
             returnStr += "1펄스"
+
     elif type1 == config.V_REFER_GRP:
-        returnStr = item['refer_cond_grp_select'] + " " + item['refer_condition_grp'] + ", "
-        if item['refer-condition-grp_option'] == "NONE":
+        returnStr = item['condrefer_cond_grp_select'] + " " + item['condrefer_condition_grp'] + ", "
+        if item['condrefer-condition-grp_option'] == "NONE":
             returnStr += "옵션없음"
-        elif item['refer-condition-grp_option'] == "MIN_PEND_TIME":
-            returnStr += "유지시간 " + item['refer_condition_grp_option_time']
+        elif item['condrefer-condition-grp_option'] == "MIN_PEND_TIME":
+            returnStr += "유지시간 " + item['condrefer_condition_grp_option_time']
         else:
             returnStr += "1펄스"
+            
     elif type1 == config.V_ALARM:
-        returnStr = item['alarm_select'] + ", "
-        if item['alarm_option'] == "NONE":
+        returnStr = item['condalarm_select'] + ", "
+        if item['condalarm_option'] == "NONE":
             returnStr += "옵션없음"
-        elif item['alarm_option'] == "MIN_PEND_TIME":
-            returnStr += "유지시간 " + item['alarm_option_time']
+        elif item['condalarm_option'] == "MIN_PEND_TIME":
+            returnStr += "유지시간 " + item['condalarm_option_time']
         else:
             returnStr += "1펄스"
 

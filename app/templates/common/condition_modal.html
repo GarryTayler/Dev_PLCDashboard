@@ -20,7 +20,7 @@
                 <div class="alert alert-danger insert-alert" role="alert">
                     값을 입력하세요
                 </div>
-                <input type="hidden" id="selid" value=""/>
+                <input type="hidden" id="condselid" value=""/>
                 <div class="form-group row">
                     <div class="col-3">
                         <label class="input-label">사용</label>
@@ -28,8 +28,8 @@
                     <div class="col-7">
                         <div class="dark">
                             <div class="ckbx-style-1">
-                                <input type="checkbox" checked id="ckbx-style-1-1" value="0">
-                                <label for="ckbx-style-1-1"></label>
+                                <input type="checkbox" checked id="condckbx-style-1-1" value="0">
+                                <label for="condckbx-style-1-1"></label>
                             </div>
                         </div>
                     </div>
@@ -39,7 +39,7 @@
                         <label class="input-label" for="variable-name">이름</label>
                     </div>
                     <div class="col-7">
-                        <input type="text" class="form-control" required placeholder="이름입력" id="variable-name">
+                        <input type="text" class="form-control" required placeholder="이름입력" id="condvariable-name">
                     </div>
                 </div>
                 <div class="form-group row">
@@ -47,7 +47,7 @@
                         <label class="input-label" for="type-select">조건타입</label>
                     </div>
                     <div class="col-7">
-                        <select class="form-control" id="type-select">
+                        <select class="form-control" id="condtype-select">
                             <option value="digital">디지털</option>
                             <option value="analog">아날로그</option>
                             <option value="string">문자열</option>
@@ -61,19 +61,19 @@
                         </select>
                     </div>
                 </div>
-                <div id="digital-input" class="type-div">
+                <div id="conddigital-input" class="type-div">
                     <div class="form-group row">
                         <div class="col-3">
                             <label class="input-label" for="digital-variable">변수</label>
                         </div>
                         <div class="col-7">
                             <div class="input-group">
-                                <input type="text" class="form-control" id="digital-variable" readonly>
+                                <input type="text" class="form-control" id="conddigital-variable" readonly>
                                 <span class="input-group-append dropdown">
                                     <button class="btn btn-primary dropdown-toggle" data-toggle="dropdown"></button>
                                     <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-                                        <a class="dropdown-item" href="#" onclick="showFixed('digital-variable', 'digital');">고정변수</a>
-                                        <a class="dropdown-item" href="#" onclick="showFluid('digital-variable', 'digital');">가변변수</a>
+                                        <a class="dropdown-item" href="#" onclick="showFixed('conddigital-variable', 'digital');">고정변수</a>
+                                        <a class="dropdown-item" href="#" onclick="showFluid('conddigital-variable', 'digital');">가변변수</a>
                                     </div>
                                 </span>
                             </div>
@@ -84,7 +84,7 @@
                             <label class="input-label" for="digital-condition">조건선택</label>
                         </div>
                         <div class="col-3">
-                            <select class="form-control condition-select" name="digital_select">
+                            <select class="form-control condition-select" name="conddigital_select">
                                 <option value="ON">ON</option>
                                 <option value="OFF">OFF</option>
                                 <option value="=" condition="1">= (같다)</option>
@@ -92,13 +92,13 @@
                             </select>
                         </div>
                         <div class="col-6">
-                            <div class="input-group" id="digital_select" style="display: none;">
-                                <input type="text" class="form-control" id="digital-condition" readonly>
+                            <div class="input-group" id="conddigital_select" style="display: none;">
+                                <input type="text" class="form-control" id="conddigital-condition" readonly>
                                 <span class="input-group-append dropdown">
                                     <button class="btn btn-primary dropdown-toggle" data-toggle="dropdown"></button>
                                     <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-                                        <a class="dropdown-item" href="#" onclick="showFixed('digital-condition', 'digital');">고정변수</a>
-                                        <a class="dropdown-item" href="#" onclick="showFluid('digital-condition', 'digital');">가변변수</a>
+                                        <a class="dropdown-item" href="#" onclick="showFixed('conddigital-condition', 'digital');">고정변수</a>
+                                        <a class="dropdown-item" href="#" onclick="showFluid('conddigital-condition', 'digital');">가변변수</a>
                                     </div>
                                 </span>
                             </div>
@@ -109,26 +109,26 @@
                             <label class="input-label">옵션</label>
                         </div>
                         <div class="col-3">
-                            <select class="form-control condition-select" name="digital_option">
+                            <select class="form-control condition-select" name="conddigital_option">
                                 <option value="NONE">없음</option>
                                 <option value="1_PULSE">1펄스</option>
                                 <option value="MIN_PEND_TIME" condition="1">유지시간</option>
                             </select>
                         </div>
                         <div class="col-6">
-                            <div class="value-radio" id="digital_option" style="display: none;">
+                            <div class="value-radio" id="conddigital_option" style="display: none;">
                                 <div class="form-check mb-2">
-                                    <input type="checkbox" class="form-check-input" id="digital-option-radio" checked>
+                                    <input type="checkbox" class="form-check-input" id="conddigital-option-radio" checked>
                                     <label class="form-check-label" for="digital-option-radio">변수</label>
                                 </div>
                                 <input type="text" class="form-control alt-input mask-time">
                                 <div class="input-group">
-                                    <input type="text" class="form-control" id="digital-option-val" readonly>
+                                    <input type="text" class="form-control" id="conddigital-option-val" readonly>
                                     <span class="input-group-append dropdown">
                                         <button class="btn btn-primary dropdown-toggle" data-toggle="dropdown"></button>
                                         <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-                                            <a class="dropdown-item" href="#" onclick="showFixed('digital-option-val', 'time');">고정변수</a>
-                                            <a class="dropdown-item" href="#" onclick="showFluid('digital-option-val', 'time');">가변변수</a>
+                                            <a class="dropdown-item" href="#" onclick="showFixed('conddigital-option-val', 'time');">고정변수</a>
+                                            <a class="dropdown-item" href="#" onclick="showFluid('conddigital-option-val', 'time');">가변변수</a>
                                         </div>
                                     </span>
                                 </div>
@@ -136,19 +136,19 @@
                         </div>
                     </div>
                 </div>
-                <div id="analog-input" class="type-div">
+                <div id="condanalog-input" class="type-div">
                     <div class="form-group row">
                         <div class="col-3">
                             <label class="input-label" for="analog-variable">변수</label>
                         </div>
                         <div class="col-7">
                             <div class="input-group">
-                                <input type="text" class="form-control" id="analog-variable" readonly>
+                                <input type="text" class="form-control" id="condanalog-variable" readonly>
                                 <span class="input-group-append dropdown">
                                     <button class="btn btn-primary dropdown-toggle" data-toggle="dropdown"></button>
                                     <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-                                        <a class="dropdown-item" href="#" onclick="showFixed('analog-variable', 'analog');">고정변수</a>
-                                        <a class="dropdown-item" href="#" onclick="showFluid('analog-variable', 'analog');">가변변수</a>
+                                        <a class="dropdown-item" href="#" onclick="showFixed('condanalog-variable', 'analog');">고정변수</a>
+                                        <a class="dropdown-item" href="#" onclick="showFluid('condanalog-variable', 'analog');">가변변수</a>
                                     </div>
                                 </span>
                             </div>
@@ -159,7 +159,7 @@
                             <label class="input-label">조건선택</label>
                         </div>
                         <div class="col-7">
-                            <select class="form-control" name="analog_condition">
+                            <select class="form-control" name="condanalog_condition">
                                 <option value=">">>(크다)</option>
                                 <option value=">=">>=(크거나 같다)</option>
                                 <option value="=">=(같다)</option>
@@ -176,17 +176,17 @@
                         <div class="col-7">
                             <div class="value-radio">
                                 <div class="form-check mb-2">
-                                    <input type="checkbox" class="form-check-input" id="analog-value-radio" checked>
+                                    <input type="checkbox" class="form-check-input" id="condanalog-value-radio" checked>
                                     <label class="form-check-label" for="analog-value-radio">변수</label>
                                 </div>
                                 <input type="number" class="form-control alt-input">
                                 <div class="input-group">
-                                    <input type="text" class="form-control" id="analog-value" readonly>
+                                    <input type="text" class="form-control" id="condanalog-value" readonly>
                                     <span class="input-group-append dropdown">
                                         <button class="btn btn-primary dropdown-toggle" data-toggle="dropdown"></button>
                                         <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-                                            <a class="dropdown-item" href="#" onclick="showFixed('analog-value', 'analog');">고정변수</a>
-                                            <a class="dropdown-item" href="#" onclick="showFluid('analog-value', 'analog');">가변변수</a>
+                                            <a class="dropdown-item" href="#" onclick="showFixed('condanalog-value', 'analog');">고정변수</a>
+                                            <a class="dropdown-item" href="#" onclick="showFluid('condanalog-value', 'analog');">가변변수</a>
                                         </div>
                                     </span>
                                 </div>
@@ -198,26 +198,26 @@
                             <label class="input-label">옵션</label>
                         </div>
                         <div class="col-3">
-                            <select class="form-control condition-select" name="condition_option">
+                            <select class="form-control condition-select" name="condcondition_option">
                                 <option value="NONE">없음</option>
                                 <option value="1_PULSE">1펄스</option>
                                 <option value="MIN_PEND_TIME" condition="1">유지시간</option>
                             </select>
                         </div>
                         <div class="col-6">
-                            <div class="value-radio" id="condition_option" style="display: none;">
+                            <div class="value-radio" id="condcondition_option" style="display: none;">
                                 <div class="form-check mb-2">
-                                    <input type="checkbox" class="form-check-input" id="analog-option-radio" checked>
+                                    <input type="checkbox" class="form-check-input" id="condanalog-option-radio" checked>
                                     <label class="form-check-label" for="analog-option-radio">변수</label>
                                 </div>
                                 <input type="number" class="form-control alt-input">
                                 <div class="input-group">
-                                    <input type="text" class="form-control" id="analog-option-val" readonly>
+                                    <input type="text" class="form-control" id="condanalog-option-val" readonly>
                                     <span class="input-group-append dropdown">
                                         <button class="btn btn-primary dropdown-toggle" data-toggle="dropdown"></button>
                                         <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-                                            <a class="dropdown-item" href="#" onclick="showFixed('analog-option-val', 'time');">고정변수</a>
-                                            <a class="dropdown-item" href="#" onclick="showFluid('analog-option-val', 'time');">가변변수</a>
+                                            <a class="dropdown-item" href="#" onclick="showFixed('condanalog-option-val', 'time');">고정변수</a>
+                                            <a class="dropdown-item" href="#" onclick="showFluid('condanalog-option-val', 'time');">가변변수</a>
                                         </div>
                                     </span>
                                 </div>
@@ -225,19 +225,19 @@
                         </div>
                     </div>
                 </div>
-                <div id="string-input" class="type-div">
+                <div id="condstring-input" class="type-div">
                     <div class="form-group row">
                         <div class="col-3">
                             <label class="input-label" for="string-variable">변수</label>
                         </div>
                         <div class="col-7">
                             <div class="input-group">
-                                <input type="text" class="form-control" id="string-variable" readonly>
+                                <input type="text" class="form-control" id="condstring-variable" readonly>
                                 <span class="input-group-append dropdown">
                                     <button class="btn btn-primary dropdown-toggle" data-toggle="dropdown"></button>
                                     <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-                                        <a class="dropdown-item" href="#" onclick="showFixed('string-variable', 'string');">고정변수</a>
-                                        <a class="dropdown-item" href="#" onclick="showFluid('string-variable', 'string');">가변변수</a>
+                                        <a class="dropdown-item" href="#" onclick="showFixed('condstring-variable', 'string');">고정변수</a>
+                                        <a class="dropdown-item" href="#" onclick="showFluid('condstring-variable', 'string');">가변변수</a>
                                     </div>
                                 </span>
                             </div>
@@ -248,7 +248,7 @@
                             <label class="input-label">조건선택</label>
                         </div>
                         <div class="col-7">
-                            <select class="form-control" name="string_condition">
+                            <select class="form-control" name="condstring_condition">
                                 <option value="=">=(같다)</option>
                                 <option value="!=">!=(다르다)</option>
                             </select>
@@ -261,17 +261,17 @@
                         <div class="col-7">
                             <div class="value-radio">
                                 <div class="form-check mb-2">
-                                    <input type="checkbox" class="form-check-input" id="string-value-radio" checked>
+                                    <input type="checkbox" class="form-check-input" id="condstring-value-radio" checked>
                                     <label class="form-check-label" for="string-value-radio">변수</label>
                                 </div>
                                 <input type="text" class="form-control alt-input">
                                 <div class="input-group">
-                                    <input type="text" class="form-control" id="string-value" readonly>
+                                    <input type="text" class="form-control" id="condstring-value" readonly>
                                     <span class="input-group-append dropdown">
                                         <button class="btn btn-primary dropdown-toggle" data-toggle="dropdown"></button>
                                         <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-                                            <a class="dropdown-item" href="#" onclick="showFixed('string-value', 'string');">고정변수</a>
-                                            <a class="dropdown-item" href="#" onclick="showFluid('string-value', 'string');">가변변수</a>
+                                            <a class="dropdown-item" href="#" onclick="showFixed('condstring-value', 'string');">고정변수</a>
+                                            <a class="dropdown-item" href="#" onclick="showFluid('condstring-value', 'string');">가변변수</a>
                                         </div>
                                     </span>
                                 </div>
@@ -283,26 +283,26 @@
                             <label class="input-label">옵션</label>
                         </div>
                         <div class="col-3">
-                            <select class="form-control condition-select" name="string_option">
+                            <select class="form-control condition-select" name="condstring_option">
                                 <option value="NONE">없음</option>
                                 <option value="1_PULSE">1펄스</option>
                                 <option value="MIN_PEND_TIME" condition="1">유지시간</option>
                             </select>
                         </div>
                         <div class="col-6">
-                            <div class="value-radio" id="string_option" style="display: none;">
+                            <div class="value-radio" id="condstring_option" style="display: none;">
                                 <div class="form-check mb-2">
-                                    <input type="checkbox" class="form-check-input" id="string-option-val-radio" checked>
+                                    <input type="checkbox" class="form-check-input" id="condstring-option-val-radio" checked>
                                     <label class="form-check-label" for="string-option-val-radio">변수</label>
                                 </div>
                                 <input type="text" class="form-control alt-input">
                                 <div class="input-group">
-                                    <input type="text" class="form-control" id="string-option-val" readonly>
+                                    <input type="text" class="form-control" id="condstring-option-val" readonly>
                                     <span class="input-group-append dropdown">
                                         <button class="btn btn-primary dropdown-toggle" data-toggle="dropdown"></button>
                                         <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-                                            <a class="dropdown-item" href="#" onclick="showFixed('string-option-val', 'time');">고정변수</a>
-                                            <a class="dropdown-item" href="#" onclick="showFluid('string-option-val', 'time');">가변변수</a>
+                                            <a class="dropdown-item" href="#" onclick="showFixed('condstring-option-val', 'time');">고정변수</a>
+                                            <a class="dropdown-item" href="#" onclick="showFluid('condstring-option-val', 'time');">가변변수</a>
                                         </div>
                                     </span>
                                 </div>
@@ -310,13 +310,13 @@
                         </div>
                     </div>
                 </div>
-                <div id="schedule-input" class="type-div">
+                <div id="condschedule-input" class="type-div">
                     <div class="form-group row">
                         <div class="col-3">
                             <label class="input-label" for="schedule-start">시작일</label>
                         </div>
                         <div class="col-7">
-                            <input type="text" class="form-control date-picker" id="schedule-start">
+                            <input type="text" class="form-control date-picker" id="condschedule-start">
                         </div>
                     </div>
                     <div class="form-group row">
@@ -324,7 +324,7 @@
                             <label class="input-label" for="schedule-end">종료일</label>
                         </div>
                         <div class="col-7 term-schedule">
-                            <input type="text" class="form-control date-picker" id="schedule-end">
+                            <input type="text" class="form-control date-picker" id="condschedule-end">
                         </div>
                     </div>
                     <div class="form-group row">
@@ -332,7 +332,7 @@
                             <label class="input-label" for="schedule-repeat">반복주기</label>
                         </div>
                         <div class="col-7">
-                            <input type="number" class="form-control" min="1" onkeypress="return event.charCode >= 48 && event.charCode <= 57" id="schedule-repeat" value="1">
+                            <input type="number" class="form-control" min="1" onkeypress="return event.charCode >= 48 && event.charCode <= 57" id="condschedule-repeat" value="1">
                         </div>
                     </div>
                     <div class="form-group row">
@@ -340,7 +340,7 @@
                             <label class="input-label">반복단위</label>
                         </div>
                         <div class="col-7">
-                            <select class="form-control condition-select" name="schedule_interval">
+                            <select class="form-control condition-select" name="condschedule_interval">
                                 <option value="DAY">일</option>
                                 <option value="WEEK" condition="1">주</option>
                                 <option value="MONTH">월</option>
@@ -350,25 +350,25 @@
                     </div>
                     <div class="form-group row">
                         <div class="col-3">
-                            <label class="input-label" for="schedule-interval">종료선택</label>
+                            <label class="input-label" for="condschedule-interval">종료선택</label>
                         </div>
                         <div class="col-7">
-                            <select class="form-control condition-select" name="schedule_terminal" id="schedule-interval">
+                            <select class="form-control condition-select" name="condschedule_terminal" id="condschedule-interval">
                                 <option value="NONE">종료없음</option>
                                 <option value="DATE">종료일</option>
                                 <option value="EXEC_NUM" condition="1">실행횟수</option>
                             </select>
                         </div>
                     </div>
-                    <div class="form-group row" id="schedule_terminal" style="display: none;">
+                    <div class="form-group row" id="condschedule_terminal" style="display: none;">
                         <div class="col-3">
                             <label class="input-label" for="schedule-count">실행횟수</label>
                         </div>
                         <div class="col-7">
-                            <input type="number" class="form-control" min="1"  onkeypress="return event.charCode >= 48 && event.charCode <= 57" id="schedule-count" value="1">
+                            <input type="number" class="form-control" min="1"  onkeypress="return event.charCode >= 48 && event.charCode <= 57" id="condschedule-count" value="1">
                         </div>
                     </div>
-                    <div class="form-group row" id="schedule_interval" style="display: none;">
+                    <div class="form-group row" id="condschedule_interval" style="display: none;">
                         <div class="col-3">
                             <label class="input-label">요일선택</label>
                         </div>
@@ -383,7 +383,7 @@
                         </div>
                     </div>
                 </div>
-                <div id="time_period-input" class="type-div">
+                <div id="condtime_period-input" class="type-div">
                     <div class="form-group row">
                         <div class="col-12">
                             <div class="table-responsive">
@@ -396,7 +396,7 @@
                                             <th style="width: 20%">삭제</th>
                                         </tr>
                                     </thead>
-                                    <tbody id="interval-tbody" count="0">
+                                    <tbody id="condinterval-tbody" count="0">
                                     </tbody>
                                 </table>
                                 <div class="btn-panel">
@@ -422,7 +422,7 @@
                         </div>
                     </div>
                 </div>
-                <div id="clock-input" class="type-div">
+                <div id="condclock-input" class="type-div">
                     <div class="form-group row">
                         <div class="col-3">
                             <label class="input-label" for="cycle-value">주기</label>
@@ -430,17 +430,17 @@
                         <div class="col-7">
                             <div class="value-radio">
                                 <div class="form-check mb-2">
-                                    <input type="checkbox" class="form-check-input" id="cycle-value-radio" checked>
+                                    <input type="checkbox" class="form-check-input" id="condcycle-value-radio" checked>
                                     <label class="form-check-label" for="cycle-value-radio">변수</label>
                                 </div>
                                 <input type="text" class="form-control alt-input mask-time">
                                 <div class="input-group">
-                                    <input class="form-control" type="text" id="cycle-value" readonly>
+                                    <input class="form-control" type="text" id="condcycle-value" readonly>
                                     <span class="input-group-append dropdown">
                                         <button class="btn btn-primary dropdown-toggle" data-toggle="dropdown"></button>
                                         <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-                                            <a class="dropdown-item" href="#" onclick="showFixed('cycle-value', 'time');">고정변수</a>
-                                            <a class="dropdown-item" href="#" onclick="showFluid('cycle-value', 'time');">가변변수</a>
+                                            <a class="dropdown-item" href="#" onclick="showFixed('condcycle-value', 'time');">고정변수</a>
+                                            <a class="dropdown-item" href="#" onclick="showFluid('condcycle-value', 'time');">가변변수</a>
                                         </div>
                                     </span>
                                 </div>
@@ -448,32 +448,32 @@
                         </div>
                     </div>
                 </div>
-                <div id="change-input" class="type-div">
+                <div id="condchange-input" class="type-div">
                     <div class="form-group row">
                         <div class="col-3">
                             <label class="input-label" for="differ-variable">변수</label>
                         </div>
                         <div class="col-7">
                             <div class="input-group">
-                                <input class="form-control" type="text" id="differ-variable" readonly/>
+                                <input class="form-control" type="text" id="conddiffer-variable" readonly/>
                                 <span class="input-group-append dropdown">
                                     <button class="btn btn-primary dropdown-toggle" data-toggle="dropdown"></button>
                                     <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-                                        <a class="dropdown-item" href="#" onclick="showFixed('differ-variable', '');">고정변수</a>
-                                        <a class="dropdown-item" href="#" onclick="showFluid('differ-variable');">가변변수</a>
+                                        <a class="dropdown-item" href="#" onclick="showFixed('conddiffer-variable', '');">고정변수</a>
+                                        <a class="dropdown-item" href="#" onclick="showFluid('conddiffer-variable');">가변변수</a>
                                     </div>
                                 </span>
                             </div>
                         </div>
                     </div>
                 </div>
-                <div id="ref_eval-input" class="type-div">
+                <div id="condref_eval-input" class="type-div">
                     <div class="form-group row">
                         <div class="col-3">
                             <label class="input-label">연산자</label>
                         </div>
                         <div class="col-7">
-                            <select class="form-control" name="refer_cond_select">
+                            <select class="form-control" name="condrefer_cond_select">
                                 <option value="=">=(같다)</option>
                                 <option value="!=">!=(같지 않다)</option>
                             </select>
@@ -485,7 +485,7 @@
                         </div>
                         <div class="col-7">
                             <div class="input-group">
-                                <input type="text" class="form-control" id="refer-condition" readonly />
+                                <input type="text" class="form-control" id="condrefer-condition" readonly />
                                 <span class="input-group-append">
                                     <button class="btn btn-primary" onclick="conditionSelect();">선택</button>
                                 </span>
@@ -497,26 +497,26 @@
                             <label class="input-label" for="differ-option-time">옵션</label>
                         </div>
                         <div class="col-3">
-                            <select class="form-control condition-select" name="differ_option">
+                            <select class="form-control condition-select" name="conddiffer_option">
                                 <option value="NONE">없음</option>
                                 <option value="1_PULSE">1펄스</option>
                                 <option value="MIN_PEND_TIME" condition="1">유지시간</option>
                             </select>
                         </div>
                         <div class="col-6">
-                            <div class="value-radio" id="differ_option" style="display: none;">
+                            <div class="value-radio" id="conddiffer_option" style="display: none;">
                                 <div class="form-check mb-2">
-                                    <input type="checkbox" class="form-check-input" id="differ-option-time-radio" checked>
+                                    <input type="checkbox" class="form-check-input" id="conddiffer-option-time-radio" checked>
                                     <label class="form-check-label" for="differ-option-time-radio">변수</label>
                                 </div>
                                 <input type="text" class="form-control alt-input mask-time">
                                 <div class="input-group">
-                                    <input type="text" class="form-control" id="differ-option-time" readonly>
+                                    <input type="text" class="form-control" id="conddiffer-option-time" readonly>
                                     <span class="input-group-append dropdown">
                                         <button class="btn btn-primary dropdown-toggle" data-toggle="dropdown"></button>
                                         <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-                                            <a class="dropdown-item" href="#" onclick="showFixed('differ-option-time', 'time');">고정변수</a>
-                                            <a class="dropdown-item" href="#" onclick="showFluid('differ-option-time', 'time');">가변변수</a>
+                                            <a class="dropdown-item" href="#" onclick="showFixed('conddiffer-option-time', 'time');">고정변수</a>
+                                            <a class="dropdown-item" href="#" onclick="showFluid('conddiffer-option-time', 'time');">가변변수</a>
                                         </div>
                                     </span>
                                 </div>
@@ -524,13 +524,13 @@
                         </div>
                     </div>
                 </div>
-                <div id="ref_evalgrp-input" class="type-div">
+                <div id="condref_evalgrp-input" class="type-div">
                     <div class="form-group row">
                         <div class="col-3">
                             <label class="input-label">연산자</label>
                         </div>
                         <div class="col-7">
-                            <select class="form-control" name="refer_cond_grp_select">
+                            <select class="form-control" name="condrefer_cond_grp_select">
                                 <option value="=">=(같다)</option>
                                 <option value="!=">!=(같지 않다)</option>
                             </select> 
@@ -543,7 +543,7 @@
                         </div>    
                         <div class="col-7">
                             <div class="input-group">
-                                <input type="text" class="form-control" id="refer-condition-grp" readonly />
+                                <input type="text" class="form-control" id="condrefer-condition-grp" readonly />
                                 <span class="input-group-append">
                                     <button class="btn btn-primary" onclick="conditionGroupSelect();">선택</button>
                                 </span>
@@ -556,26 +556,26 @@
                             <label class="input-label" for="refer-condition-grp-option">옵션</label>
                         </div>    
                         <div class="col-3">
-                            <select class="form-control condition-select" name="refer-condition-grp_option">
+                            <select class="form-control condition-select" name="condrefer-condition-grp_option">
                                 <option value="NONE">없음</option>
                                 <option value="1_PULSE">1펄스</option>
                                 <option value="MIN_PEND_TIME" condition="1">유지시간</option>
                             </select>     
                         </div>
                         <div class="col-6">
-                            <div class="value-radio" id="refer-condition-grp_option" style="display: none;">
+                            <div class="value-radio" id="condrefer-condition-grp_option" style="display: none;">
                                 <div class="form-check mb-2">
-                                    <input type="checkbox" class="form-check-input" id="refer-condition-grp-option-time-radio" checked>
+                                    <input type="checkbox" class="form-check-input" id="condrefer-condition-grp-option-time-radio" checked>
                                     <label class="form-check-label" for="refer-condition-grp-option-time-radio">변수</label>
                                 </div>
                                 <input type="text" class="form-control alt-input mask-time"> 
                                 <div class="input-group">
-                                    <input type="text" class="form-control" id="refer-condition-grp-option-time" readonly>    
+                                    <input type="text" class="form-control" id="condrefer-condition-grp-option-time" readonly>    
                                     <span class="input-group-append dropdown">
                                         <button class="btn btn-primary dropdown-toggle" data-toggle="dropdown"></button>
                                         <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-                                            <a class="dropdown-item" href="#" onclick="showFixed('refer-condition-grp-option-time', 'time');">고정변수</a>
-                                            <a class="dropdown-item" href="#" onclick="showFluid('refer-condition-grp-option-time', 'time');">가변변수</a>
+                                            <a class="dropdown-item" href="#" onclick="showFixed('condrefer-condition-grp-option-time', 'time');">고정변수</a>
+                                            <a class="dropdown-item" href="#" onclick="showFluid('condrefer-condition-grp-option-time', 'time');">가변변수</a>
                                         </div>
                                     </span>
                                 </div>
@@ -583,16 +583,16 @@
                         </div>
                     </div>
                 </div>
-                <div id="alarm-input" class="type-div">
+                <div id="condalarm-input" class="type-div">
                     <div class="form-group row">
                         <div class="col-3">
                             <label class="input-label" for="alarm-select">알람선택</label>
                         </div>
                         <div class="col-7">
                             <div class="input-group">
-                                <input type="text" class="form-control" id="alarm-select" readonly />
+                                <input type="text" class="form-control" id="condalarm-select" readonly />
                                 <span class="input-group-append">
-                                    <button class="btn btn-primary" onclick="selectAlarm('alarm-select');">선택</button>
+                                    <button class="btn btn-primary" onclick="selectAlarm('condalarm-select');">선택</button>
                                 </span>
                             </div>
                         </div>
@@ -602,30 +602,30 @@
                             <label class="input-label" for="alarm-option-time">옵션</label>
                         </div>
                         <div class="col-7">
-                            <select class="form-control condition-select" name="alarm_option">
+                            <select class="form-control condition-select" name="condalarm_option">
                                 <option value="NONE">없음</option>
                                 <option value="1_PULSE">1펄스</option>
                                 <option value="MIN_PEND_TIME" condition="1">유지시간</option>
                             </select>
                         </div>
                     </div>
-                    <div class="form-group row value-radio" id="alarm_option" style="display: none;">
+                    <div class="form-group row value-radio" id="condalarm_option" style="display: none;">
                         <div class="col-3">
                             <label class="input-label" for="alarm-option-time">유지시간</label>
                         </div>
                         <div class="col-7">
                             <div class="form-check mb-2">
-                                <input type="checkbox" class="form-check-input" id="alarm-option-time-radio" checked>
+                                <input type="checkbox" class="form-check-input" id="condalarm-option-time-radio" checked>
                                 <label class="form-check-label" for="alarm-option-time-radio">변수</label>
                             </div>
                             <input type="text" class="form-control alt-input mask-time">
                             <div class="input-group">
-                                <input type="text" class="form-control" id="alarm-option-time" readonly>
+                                <input type="text" class="form-control" id="condalarm-option-time" readonly>
                                 <span class="input-group-append dropdown">
                                     <button class="btn btn-primary dropdown-toggle" data-toggle="dropdown"></button>
                                     <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-                                        <a class="dropdown-item" href="#" onclick="showFixed('alarm-option-time', 'time');">고정변수</a>
-                                        <a class="dropdown-item" href="#" onclick="showFluid('alarm-option-time', 'time');">가변변수</a>
+                                        <a class="dropdown-item" href="#" onclick="showFixed('condalarm-option-time', 'time');">고정변수</a>
+                                        <a class="dropdown-item" href="#" onclick="showFluid('condalarm-option-time', 'time');">가변변수</a>
                                     </div>
                                 </span>
                             </div>
@@ -799,17 +799,17 @@
         $("#condition-modal .modal-body input").removeClass('border-danger');
 
         let postData = {};
-        postData['use_flag'] = $("#ckbx-style-1-1").prop('checked') ? '1' : '0';
+        postData['use_flag'] = $("#condckbx-style-1-1").prop('checked') ? '1' : '0';
 
-        const condition_name = input_val("variable-name");
+        const condition_name = input_val("condvariable-name");
         if(!condition_name) {
             showErr("variable-name");
             return false;
         }
         postData['condition_name'] = condition_name;
 
-        postData['condition_type'] = input_val("type-select");
-        const inputArr = $("#" + postData['condition_type'] + "-input input");
+        postData['condition_type'] = input_val("condtype-select");
+        const inputArr = $("#cond" + postData['condition_type'] + "-input input");
         let inputValid = true;
         if(inputArr.length > 0) {
             for(let ii = 0; ii < inputArr.length; ii++) {
@@ -847,7 +847,7 @@
         }
 
         if(inputValid) {
-            let inputArr = $("#" + postData['condition_type'] + "-input select");
+            let inputArr = $("#cond" + postData['condition_type'] + "-input select");
             for(let ii = 0; ii < inputArr.length; ii++) {
                 const inputItem = $(inputArr[ii]);
                 if(inputItem.attr('name')) {
@@ -860,7 +860,7 @@
         postData['condition_type'] = postData['condition_type'].toUpperCase();
 
         if(condType === "schedule") {
-            if($("select[name='schedule_interval']").val() === "WEEK") {
+            if($("select[name='condschedule_interval']").val() === "WEEK") {
                 let selDays = [];
                 const dayBtn = $(".day-btn");
                 for(let ii = 0; ii < dayBtn.length; ii++) {
@@ -870,19 +870,19 @@
                     }
                 }
 
-                postData['schedule_days'] = selDays.join(',');
+                postData['condschedule_days'] = selDays.join(',');
             }
         } else if(condType === "ref_eval") {
-            const referInput = $("#refer-condition");
-            postData['refer_condition_condid'] = referInput.attr('condid');
+            const referInput = $("#condrefer-condition");
+            postData['condrefer_condition_condid'] = referInput.attr('condid');
         } else if(condType === "ref_evalgrp") {
-            const referInput = $("#refer-condition-grp");
-            postData['refer_condition_condgroupid'] = referInput.attr('condgroupid');
+            const referInput = $("#condrefer-condition-grp");
+            postData['condrefer_condition_condgroupid'] = referInput.attr('condgroupid');
         } else if(condType === "alarm") {
-            postData['alarm_select_selid'] = $("#alarm-select").attr('selid');
+            postData['condalarm_select_selid'] = $("#condalarm-select").attr('selid');
         }
 
-        postData["selid"] = $("#selid").val();
+        postData["selid"] = $("#condselid").val();
 
         sendAjax("{{url_for('logic_setting.add_condition')}}", postData, false);
         updateVariable(typeof logicCondTbl === 'undefined' ? dataTables : logicCondTbl);
@@ -890,7 +890,7 @@
     }
 
     function addRow() {
-        const intervalTbody = $("#interval-tbody");
+        const intervalTbody = $("#condinterval-tbody");
         const intervalOption = $("select[name='interval_option']").val();
         const newCnt = parseInt(intervalTbody.attr('count').trim()) + 1;
         if(newCnt <= periodLimit) {
@@ -920,13 +920,13 @@
     }
 
     function initRowIndex() {
-        const rowArr = $("#interval-tbody tr");
+        const rowArr = $("#condinterval-tbody tr");
         for(let ii = 0; ii < rowArr.length; ii++) {
             const rowItem = $(rowArr[ii]);
             rowItem.find('td:first').text(ii + 1);
         }
 
-        $("#interval-tbody").attr('count', rowArr.length);
+        $("#condinterval-tbody").attr('count', rowArr.length);
     }
 
     function selectAlarm(selid) {
@@ -951,8 +951,7 @@
         if(selInput.length === 1) {
             const selChk = $(selInput[0]);
             const selID = selChk.attr('id').replace('check-row-', '');
-            $("#refer-condition").val(selChk.attr('data-name')).removeAttr('condgroupid').attr('condid', selID);
-
+            $("#condrefer-condition").val(selChk.attr('data-name')).removeAttr('condgroupid').attr('condid', selID);
             $("#condition-select").modal('hide');
         } else {
             alert('조건을 선택하세요');
@@ -964,7 +963,7 @@
         if(selInput.length === 1) {
             const selChk = $(selInput[0]);
             const selID = selChk.attr('id').replace('check-row-', '');
-            $("#refer-condition-grp").val(selChk.attr('data-name')).attr('condgroupid', selID).removeAttr('condid');
+            $("#condrefer-condition-grp").val(selChk.attr('data-name')).attr('condgroupid', selID).removeAttr('condid');
             $("#condgroup-select").modal('hide');
         } else {
             alert('조건그룹을 선택하세요');
@@ -973,15 +972,15 @@
 
     function doCondCreate() {
         if(conditionCnt < conditionLimit) {
-            $("#selid").val('0');
+            $("#condselid").val('0');
             $(".type-div").hide();
-            $("#variable-name").val("");
-            $("#schedule-count").val(1);
-            $("#schedule-repeat").val(1);
+            $("#condvariable-name").val("");
+            $("#condschedule-count").val(1);
+            $("#condschedule-repeat").val(1);
             $("#condition-modal .insert-alert").hide();
-            $("#interval-tbody").attr('count', '0').html("");
+            $("#condinterval-tbody").attr('count', '0').html("");
 
-            const selType = "#" + $("#type-select").val() + "-input";
+            const selType = "#cond" + $("#condtype-select").val() + "-input";
             const selInputs = $(selType + " input");
             for(let ii = 0; ii <selInputs.length; ii++) {
                 $(selInputs[ii]).removeAttr("seltype").removeAttr("selid").removeAttr("sellocstr").val('');
@@ -1014,18 +1013,18 @@
                 headers: { "X-CSRFToken": csrf_token },
                 success: function(resp) {
                     if(resp.status) {
-                        $("#selid").val(selid);
+                        $("#condselid").val(selid);
                         $(".type-div").hide();
                         $("#condition-modal .insert-alert").hide();
 
                         const selData = resp.data;
                         const dataType = selData.type.toLowerCase();
-                        const selType = "#" + dataType + "-input";
+                        const selType = "#cond" + dataType + "-input";
                         $(selType).show();
 
-                        $("#type-select").val(dataType);
-                        $("#variable-name").val(selData.name);
-                        $("#ckbx-style-1-1").prop('checked', selData.use_flag === 1);
+                        $("#condtype-select").val(dataType);
+                        $("#condvariable-name").val(selData.name);
+                        $("#condckbx-style-1-1").prop('checked', selData.use_flag === 1);
 
                         let optionArr = {};
                         if(selData.options.length > 0) {
@@ -1083,17 +1082,17 @@
                                         .replace('btn.str', btnStr);
                                 }
 
-                                $("#interval-tbody").html(html).attr('count', indexArr.length + 1);
+                                $("#condinterval-tbody").html(html).attr('count', indexArr.length + 1);
                                 $(".period-remove-btn").click(function () {
                                     $(this).closest('tr').remove();
                                 });
 
-                                initTimeMask("#interval-tbody");
+                                initTimeMask("#condinterval-tbody");
                             }
                         } else if(dataType === "schedule") {
-                            const dayBtns = $("#schedule-input .day-btn");
-                            if(optionArr.hasOwnProperty('schedule_days')) {
-                                const selDays = optionArr.schedule_days.split(",");
+                            const dayBtns = $("#condschedule-input .day-btn");
+                            if(optionArr.hasOwnProperty('condschedule_days')) {
+                                const selDays = optionArr.condschedule_days.split(",");
                                 if(selDays.length > 0) {
                                     for(let ii = 0; ii < dayBtns.length; ii++) {
                                         const dayBtn = $(dayBtns[ii]).attr("data-val");
@@ -1104,20 +1103,20 @@
                                     }
                                 }
                             }
-                            const selInterval = $("#schedule-interval").val();
+                            const selInterval = $("#condschedule-interval").val();
                             if(selInterval === "DATE") {
                                 $(".term-schedule").show();
                             } else {
                                 $(".term-schedule").hide();
                             }
                         } else if(dataType === "ref_eval") {
-                            const referInput = $("#refer-condition");
-                            referInput.attr('condid', optionArr['refer_condition_condid']);
+                            const referInput = $("#condrefer-condition");
+                            referInput.attr('condid', optionArr['condrefer_condition_condid']);
                         } else if(dataType === "ref_evalgrp") {
-                            const referInput = $("#refer-condition-grp");
-                            referInput.attr('condgroupid', optionArr['refer_condition_condgroupid']);
+                            const referInput = $("#condrefer-condition-grp");
+                            referInput.attr('condgroupid', optionArr['condrefer_condition_condgroupid']);
                         } else if(dataType === "alarm") {
-                            $("#alarm-select").attr('selid', optionArr['alarm_select_selid']);
+                            $("#condalarm-select").attr('selid', optionArr['condalarm_select_selid']);
                         }
 
                         const inputSelects = $(selType + " select");
@@ -1162,10 +1161,10 @@
     }
 
     $(document).ready(function () {
-        $("#type-select").change(function() {
+        $("#condtype-select").change(function() {
             const selType = $(this).val();
             $(".type-div").hide();
-            $("#" + selType + "-input").show();
+            $("#cond" + selType + "-input").show();
         });
 
         $(".condition-select").change(function () {
@@ -1187,7 +1186,7 @@
             }
         });
 
-        $("#schedule-interval").change(function() {
+        $("#condschedule-interval").change(function() {
             const termSche = $(".term-schedule");
             if($(this).val() === "DATE") {
                 termSche.show();

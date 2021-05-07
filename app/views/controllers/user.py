@@ -250,90 +250,90 @@ def write_condition(section_name, condition, ind):
 
     optionArr = json.loads(condition.options) if len(condition.options) > 0 else {}
     if condition.type == config.V_DIGITAL:
-        if 'digital_variable_change_sellocstr' in optionArr:
-            config_helper.set_value(section_name, prefixStr + "VAR", optionArr['digital_variable_change_sellocstr'])    
+        if 'conddigital_variable_change_sellocstr' in optionArr:
+            config_helper.set_value(section_name, prefixStr + "VAR", optionArr['conddigital_variable_change_sellocstr'])    
         else:
-            config_helper.set_value(section_name, prefixStr + "VAR", optionArr['digital_variable_sellocstr'])
-        config_helper.set_value(section_name, prefixStr + "OPR", optionArr['digital_select'])
-        if optionArr['digital_select'] in ['!=', '=']:
-            if 'digital_condition_change_sellocstr' in optionArr:
-                config_helper.set_value(section_name, prefixStr + "VAL", optionArr['digital_condition_change_sellocstr'])
+            config_helper.set_value(section_name, prefixStr + "VAR", optionArr['conddigital_variable_sellocstr'])
+        config_helper.set_value(section_name, prefixStr + "OPR", optionArr['conddigital_select'])
+        if optionArr['conddigital_select'] in ['!=', '=']:
+            if 'conddigital_condition_change_sellocstr' in optionArr:
+                config_helper.set_value(section_name, prefixStr + "VAL", optionArr['conddigital_condition_change_sellocstr'])
             else:
-                config_helper.set_value(section_name, prefixStr + "VAL", optionArr['digital_condition_sellocstr'])
-        if optionArr['digital_option'] in varOptions:
-            config_helper.set_value(section_name, prefixStr + "OPTION", optionArr['digital_option'])
-            if optionArr['digital_option'] == 'MIN_PEND_TIME':
-                if 'digital_option_val_change_sellocstr' in optionArr:
-                    config_helper.set_value(section_name, prefixStr + optionArr['digital_option'], optionArr['digital_option_val_change_sellocstr'])    
-                elif 'digital_option_val_sellocstr' in optionArr:
-                    config_helper.set_value(section_name, prefixStr + optionArr['digital_option'], optionArr['digital_option_val_sellocstr'])
-                elif 'digital_option_val' in optionArr:
-                    config_helper.set_value(section_name, prefixStr + optionArr['digital_option'], optionArr['digital_option_val'])
+                config_helper.set_value(section_name, prefixStr + "VAL", optionArr['conddigital_condition_sellocstr'])
+        if optionArr['conddigital_option'] in varOptions:
+            config_helper.set_value(section_name, prefixStr + "OPTION", optionArr['conddigital_option'])
+            if optionArr['conddigital_option'] == 'MIN_PEND_TIME':
+                if 'conddigital_option_val_change_sellocstr' in optionArr:
+                    config_helper.set_value(section_name, prefixStr + optionArr['conddigital_option'], optionArr['conddigital_option_val_change_sellocstr'])    
+                elif 'conddigital_option_val_sellocstr' in optionArr:
+                    config_helper.set_value(section_name, prefixStr + optionArr['conddigital_option'], optionArr['conddigital_option_val_sellocstr'])
+                elif 'conddigital_option_val' in optionArr:
+                    config_helper.set_value(section_name, prefixStr + optionArr['conddigital_option'], optionArr['conddigital_option_val'])
     elif condition.type == config.V_ANALOG:
-        if 'analog_variable_change_sellocstr' in optionArr:
-            config_helper.set_value(section_name, prefixStr + "VAR", optionArr['analog_variable_change_sellocstr'])
+        if 'condanalog_variable_change_sellocstr' in optionArr:
+            config_helper.set_value(section_name, prefixStr + "VAR", optionArr['condanalog_variable_change_sellocstr'])
         else:
-            config_helper.set_value(section_name, prefixStr + "VAR", optionArr['analog_variable_sellocstr'])
+            config_helper.set_value(section_name, prefixStr + "VAR", optionArr['condanalog_variable_sellocstr'])
 
-        config_helper.set_value(section_name, prefixStr + "OPR", optionArr['analog_condition'])
+        config_helper.set_value(section_name, prefixStr + "OPR", optionArr['condanalog_condition'])
         
-        if 'analog_value_change_sellocstr' in optionArr:
-            config_helper.set_value(section_name, prefixStr + "VAL", optionArr['analog_value_change_sellocstr'])
-        elif 'analog_value_sellocstr' in optionArr:
-            config_helper.set_value(section_name, prefixStr + "VAL", optionArr['analog_value_sellocstr'])
+        if 'condanalog_value_change_sellocstr' in optionArr:
+            config_helper.set_value(section_name, prefixStr + "VAL", optionArr['condanalog_value_change_sellocstr'])
+        elif 'condanalog_value_sellocstr' in optionArr:
+            config_helper.set_value(section_name, prefixStr + "VAL", optionArr['condanalog_value_sellocstr'])
         else:
-            config_helper.set_value(section_name, prefixStr + "VAL", optionArr['analog_value'])
+            config_helper.set_value(section_name, prefixStr + "VAL", optionArr['condanalog_value'])
 
-        if optionArr['condition_option'] in varOptions:
-            config_helper.set_value(section_name, prefixStr + "OPTION", optionArr['condition_option'])
-            if optionArr['condition_option'] == 'MIN_PEND_TIME':
-                if 'analog_option_val_change_sellocstr' in optionArr:
-                    config_helper.set_value(section_name, prefixStr + optionArr['condition_option'], optionArr['analog_option_val_change_sellocstr'])    
-                elif 'analog_option_val_sellocstr' in optionArr:
-                    config_helper.set_value(section_name, prefixStr + optionArr['condition_option'], optionArr['analog_option_val_sellocstr'])
-                elif 'analog_option_val' in optionArr:
-                    config_helper.set_value(section_name, prefixStr + optionArr['condition_option'], optionArr['analog_option_val'])
+        if optionArr['condcondition_option'] in varOptions:
+            config_helper.set_value(section_name, prefixStr + "OPTION", optionArr['condcondition_option'])
+            if optionArr['condcondition_option'] == 'MIN_PEND_TIME':
+                if 'condanalog_option_val_change_sellocstr' in optionArr:
+                    config_helper.set_value(section_name, prefixStr + optionArr['condcondition_option'], optionArr['condanalog_option_val_change_sellocstr'])    
+                elif 'condanalog_option_val_sellocstr' in optionArr:
+                    config_helper.set_value(section_name, prefixStr + optionArr['condcondition_option'], optionArr['condanalog_option_val_sellocstr'])
+                elif 'condanalog_option_val' in optionArr:
+                    config_helper.set_value(section_name, prefixStr + optionArr['condcondition_option'], optionArr['condanalog_option_val'])
 
     elif condition.type == config.V_STRING:
-        if 'string_variable_change_sellocstr' in optionArr:
-            config_helper.set_value(section_name, prefixStr + "VAR", optionArr['string_variable_change_sellocstr'])
+        if 'condstring_variable_change_sellocstr' in optionArr:
+            config_helper.set_value(section_name, prefixStr + "VAR", optionArr['condstring_variable_change_sellocstr'])
         else:     
-            config_helper.set_value(section_name, prefixStr + "VAR", optionArr['string_variable_sellocstr'])
+            config_helper.set_value(section_name, prefixStr + "VAR", optionArr['condstring_variable_sellocstr'])
 
-        config_helper.set_value(section_name, prefixStr + "OPR", optionArr['string_condition'])
+        config_helper.set_value(section_name, prefixStr + "OPR", optionArr['condstring_condition'])
         
-        if 'string_value_change_sellocstr' in optionArr:
-            config_helper.set_value(section_name, prefixStr + "VAL", optionArr['string_value_change_sellocstr'])    
-        elif 'string_value_sellocstr' in optionArr:
-            config_helper.set_value(section_name, prefixStr + "VAL", optionArr['string_value_sellocstr'])    
-        elif 'string_value' in optionArr:
-            config_helper.set_value(section_name, prefixStr + "VAL", optionArr['string_value'])    
+        if 'condstring_value_change_sellocstr' in optionArr:
+            config_helper.set_value(section_name, prefixStr + "VAL", optionArr['condstring_value_change_sellocstr'])    
+        elif 'condstring_value_sellocstr' in optionArr:
+            config_helper.set_value(section_name, prefixStr + "VAL", optionArr['condstring_value_sellocstr'])    
+        elif 'condstring_value' in optionArr:
+            config_helper.set_value(section_name, prefixStr + "VAL", optionArr['condstring_value'])    
         
-        if optionArr['string_option'] in varOptions:
-            config_helper.set_value(section_name, prefixStr + "OPTION", optionArr['string_option'])
-            if optionArr['string_option'] == "MIN_PEND_TIME":
-                if 'string_option_val_change_sellocstr' in optionArr:
-                    config_helper.set_value(section_name, prefixStr + optionArr['string_option'], optionArr['string_option_val_change_sellocstr'])    
-                elif 'string_option_val_sellocstr' in optionArr:
-                    config_helper.set_value(section_name, prefixStr + optionArr['string_option'], optionArr['string_option_val_sellocstr'])    
-                elif 'string_option_val' in optionArr:
-                    config_helper.set_value(section_name, prefixStr + optionArr['string_option'], optionArr['string_option_val'])    
+        if optionArr['condstring_option'] in varOptions:
+            config_helper.set_value(section_name, prefixStr + "OPTION", optionArr['condstring_option'])
+            if optionArr['condstring_option'] == "MIN_PEND_TIME":
+                if 'condstring_option_val_change_sellocstr' in optionArr:
+                    config_helper.set_value(section_name, prefixStr + optionArr['condstring_option'], optionArr['condstring_option_val_change_sellocstr'])    
+                elif 'condstring_option_val_sellocstr' in optionArr:
+                    config_helper.set_value(section_name, prefixStr + optionArr['condstring_option'], optionArr['condstring_option_val_sellocstr'])    
+                elif 'condstring_option_val' in optionArr:
+                    config_helper.set_value(section_name, prefixStr + optionArr['condstring_option'], optionArr['condstring_option_val'])    
 
     elif condition.type == config.V_SCHEDULE:
-        config_helper.set_value(section_name, prefixStr + "SCH_START_DATE", optionArr['schedule_start'])
-        termialVal = optionArr['schedule_terminal']
-        intervalVal = optionArr['schedule_interval']
+        config_helper.set_value(section_name, prefixStr + "SCH_START_DATE", optionArr['condschedule_start'])
+        termialVal = optionArr['condschedule_terminal']
+        intervalVal = optionArr['condschedule_interval']
         if termialVal == "DATE":
-            config_helper.set_value(section_name, prefixStr + "SCH_END_DATE", optionArr['schedule_end'])
-        config_helper.set_value(section_name, prefixStr + "SCH_REPEAT_CYCLE", optionArr['schedule_repeat'])
+            config_helper.set_value(section_name, prefixStr + "SCH_END_DATE", optionArr['condschedule_end'])
+        config_helper.set_value(section_name, prefixStr + "SCH_REPEAT_CYCLE", optionArr['condschedule_repeat'])
         config_helper.set_value(section_name, prefixStr + "SCH_REPEAT_UNIT", intervalVal)
         config_helper.set_value(section_name, prefixStr + "SCH_END_OPTION", termialVal)
         if intervalVal == "WEEK":
-            schedule_days = optionArr['schedule_days'].split(',')
+            schedule_days = optionArr['condschedule_days'].split(',')
             for i in range(7):
                 config_helper.set_value(section_name, prefixStr + "SCH_WEEK_SEL." + str(i), 'TRUE' if str(i) in schedule_days else 'FALSE')
         if termialVal == "EXEC_NUM":
-            config_helper.set_value(section_name, prefixStr + "SCH_EXEC_NUM", optionArr['schedule_count'])
+            config_helper.set_value(section_name, prefixStr + "SCH_EXEC_NUM", optionArr['condschedule_count'])
 
     elif condition.type == config.V_PERIOD:
         for i in range(100):
@@ -351,61 +351,61 @@ def write_condition(section_name, condition, ind):
                 break
 
     elif condition.type == config.V_CHANGE:
-        if 'differ_variable_change_sellocstr' in optionArr:
-            config_helper.set_value(section_name, prefixStr + "VAR", optionArr['differ_variable_change_sellocstr'])
+        if 'conddiffer_variable_change_sellocstr' in optionArr:
+            config_helper.set_value(section_name, prefixStr + "VAR", optionArr['conddiffer_variable_change_sellocstr'])
         else:
-            config_helper.set_value(section_name, prefixStr + "VAR", optionArr['differ_variable_sellocstr'])
+            config_helper.set_value(section_name, prefixStr + "VAR", optionArr['conddiffer_variable_sellocstr'])
 
     elif condition.type == config.V_CLOCK:
-        if 'cycle_value_change_sellocstr' in optionArr:
-            config_helper.set_value(section_name, prefixStr + "CLOCK", optionArr['cycle_value_change_sellocstr'])
-        elif 'cycle_value_sellocstr' in optionArr:
-            config_helper.set_value(section_name, prefixStr + "CLOCK", optionArr['cycle_value_sellocstr'])
-        elif 'cycle_value' in optionArr:
-            config_helper.set_value(section_name, prefixStr + "CLOCK", optionArr['cycle_value'])
+        if 'condcycle_value_change_sellocstr' in optionArr:
+            config_helper.set_value(section_name, prefixStr + "CLOCK", optionArr['condcycle_value_change_sellocstr'])
+        elif 'condcycle_value_sellocstr' in optionArr:
+            config_helper.set_value(section_name, prefixStr + "CLOCK", optionArr['condcycle_value_sellocstr'])
+        elif 'condcycle_value' in optionArr:
+            config_helper.set_value(section_name, prefixStr + "CLOCK", optionArr['condcycle_value'])
 
     elif condition.type == config.V_REFER:
-        config_helper.set_value(section_name, prefixStr + "OPR", optionArr['refer_cond_select'])
-        if 'refer_condition_condid' in optionArr:
-            config_helper.set_value(section_name, prefixStr + "REF_INDEX", get_group_index(models.Condition, optionArr['refer_condition_condid']))    
+        config_helper.set_value(section_name, prefixStr + "OPR", optionArr['condrefer_cond_select'])
+        if 'condrefer_condition_condid' in optionArr:
+            config_helper.set_value(section_name, prefixStr + "REF_INDEX", get_group_index(models.Condition, optionArr['condrefer_condition_condid']))    
         
-        if optionArr['differ_option'] in varOptions:
-            config_helper.set_value(section_name, prefixStr + "OPTION", optionArr['differ_option'])
-            if optionArr['differ_option'] == "MIN_PEND_TIME":
-                if 'differ_option_time_change_sellocstr' in optionArr:
-                    config_helper.set_value(section_name, prefixStr + optionArr['differ_option'], optionArr['differ_option_time_change_sellocstr'])    
-                elif 'differ_option_time_sellocstr' in optionArr:
-                    config_helper.set_value(section_name, prefixStr + optionArr['differ_option'], optionArr['differ_option_time_sellocstr'])    
-                elif 'differ_option_time' in optionArr:
-                    config_helper.set_value(section_name, prefixStr + optionArr['differ_option'], optionArr['differ_option_time'])
+        if optionArr['conddiffer_option'] in varOptions:
+            config_helper.set_value(section_name, prefixStr + "OPTION", optionArr['conddiffer_option'])
+            if optionArr['conddiffer_option'] == "MIN_PEND_TIME":
+                if 'conddiffer_option_time_change_sellocstr' in optionArr:
+                    config_helper.set_value(section_name, prefixStr + optionArr['conddiffer_option'], optionArr['conddiffer_option_time_change_sellocstr'])    
+                elif 'conddiffer_option_time_sellocstr' in optionArr:
+                    config_helper.set_value(section_name, prefixStr + optionArr['conddiffer_option'], optionArr['conddiffer_option_time_sellocstr'])    
+                elif 'conddiffer_option_time' in optionArr:
+                    config_helper.set_value(section_name, prefixStr + optionArr['conddiffer_option'], optionArr['conddiffer_option_time'])
 
     elif condition.type == config.V_REFER_GRP:
-        config_helper.set_value(section_name, prefixStr + "OPR", optionArr['refer_cond_grp_select'])
-        if 'refer_condition_condgroupid' in optionArr:
-            config_helper.set_value(section_name, prefixStr + "REF_INDEX", get_group_index(models.ConditionGroup, optionArr['refer_condition_condgroupid']))    
+        config_helper.set_value(section_name, prefixStr + "OPR", optionArr['condrefer_cond_grp_select'])
+        if 'condrefer_condition_condgroupid' in optionArr:
+            config_helper.set_value(section_name, prefixStr + "REF_INDEX", get_group_index(models.ConditionGroup, optionArr['condrefer_condition_condgroupid']))    
         
-        if optionArr['refer-condition-grp_option'] in varOptions:
-            config_helper.set_value(section_name, prefixStr + "OPTION", optionArr['refer-condition-grp_option'])
-            if optionArr['refer-condition-grp_option'] == "MIN_PEND_TIME":
-                if 'refer_condition_grp_option_time_change_sellocstr' in optionArr:
-                    config_helper.set_value(section_name, prefixStr + optionArr['refer-condition-grp_option'], optionArr['refer_condition_grp_option_time_change_sellocstr'])    
-                elif 'refer_condition_grp_option_time_sellocstr' in optionArr:
-                    config_helper.set_value(section_name, prefixStr + optionArr['refer-condition-grp_option'], optionArr['refer_condition_grp_option_time_sellocstr'])    
-                elif 'refer_condition_grp_option_time' in optionArr:
-                    config_helper.set_value(section_name, prefixStr + optionArr['refer-condition-grp_option'], optionArr['refer_condition_grp_option_time']) 
+        if optionArr['condrefer-condition-grp_option'] in varOptions:
+            config_helper.set_value(section_name, prefixStr + "OPTION", optionArr['condrefer-condition-grp_option'])
+            if optionArr['condrefer-condition-grp_option'] == "MIN_PEND_TIME":
+                if 'condrefer_condition_grp_option_time_change_sellocstr' in optionArr:
+                    config_helper.set_value(section_name, prefixStr + optionArr['condrefer-condition-grp_option'], optionArr['condrefer_condition_grp_option_time_change_sellocstr'])    
+                elif 'condrefer_condition_grp_option_time_sellocstr' in optionArr:
+                    config_helper.set_value(section_name, prefixStr + optionArr['condrefer-condition-grp_option'], optionArr['condrefer_condition_grp_option_time_sellocstr'])    
+                elif 'condrefer_condition_grp_option_time' in optionArr:
+                    config_helper.set_value(section_name, prefixStr + optionArr['condrefer-condition-grp_option'], optionArr['condrefer_condition_grp_option_time']) 
 
     elif condition.type == config.V_ALARM:
-        config_helper.set_value(section_name, prefixStr + "ALARM_INDEX", get_group_index(models.Alarm, optionArr['alarm_select_selid']))
+        config_helper.set_value(section_name, prefixStr + "ALARM_INDEX", get_group_index(models.Alarm, optionArr['condalarm_select_selid']))
 
-        if optionArr['alarm_option'] in varOptions:
-            config_helper.set_value(section_name, prefixStr + "OPTION", optionArr['alarm_option'])
-            if optionArr['alarm_option'] == "MIN_PEND_TIME":
-                if 'alarm_option_time_change_sellocstr' in optionArr:
-                    config_helper.set_value(section_name, prefixStr + optionArr['alarm_option'], optionArr['alarm_option_time_change_sellocstr'])    
-                elif 'alarm_option_time_sellocstr' in optionArr:
-                    config_helper.set_value(section_name, prefixStr + optionArr['alarm_option'], optionArr['alarm_option_time_sellocstr'])    
-                elif 'alarm_option_time' in optionArr:
-                    config_helper.set_value(section_name, prefixStr + optionArr['alarm_option'], optionArr['alarm_option_time']) 
+        if optionArr['condalarm_option'] in varOptions:
+            config_helper.set_value(section_name, prefixStr + "OPTION", optionArr['condalarm_option'])
+            if optionArr['condalarm_option'] == "MIN_PEND_TIME":
+                if 'condalarm_option_time_change_sellocstr' in optionArr:
+                    config_helper.set_value(section_name, prefixStr + optionArr['condalarm_option'], optionArr['condalarm_option_time_change_sellocstr'])    
+                elif 'condalarm_option_time_sellocstr' in optionArr:
+                    config_helper.set_value(section_name, prefixStr + optionArr['condalarm_option'], optionArr['condalarm_option_time_sellocstr'])    
+                elif 'condalarm_option_time' in optionArr:
+                    config_helper.set_value(section_name, prefixStr + optionArr['condalarm_option'], optionArr['condalarm_option_time']) 
 
 def write_condgroup(section_name, condgroup, ind):
     prefixStr = 'EVAL_GROUP.' + str(ind) + "."
@@ -521,8 +521,8 @@ def write_action(section_name, action, ind):
 
     elif action.type == config.V_SHELLEXEC:
         config_helper.set_value(section_name, prefixStr + "SHELL_APP", optionArr['shell_application'])
-        config_helper.set_value(section_name, prefixStr + "SHELL_CMD", optionArr['shell_param'])
-        config_helper.set_value(section_name, prefixStr + "HIDE_START", optionArr['shell_exec'])
+        config_helper.set_value(section_name, prefixStr + "SHELL_PARAM", optionArr['shell_param'])
+        config_helper.set_value(section_name, prefixStr + "HIDE_START", "TRUE" if optionArr['shell_exec'] == "1" else "FASLE")
         config_helper.set_value(section_name, prefixStr + "EXEC_OPTION", optionArr['shell_duplicate'])
 
     elif action.type == config.V_CUSTOM:
