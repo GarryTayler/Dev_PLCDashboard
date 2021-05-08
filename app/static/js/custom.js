@@ -410,6 +410,8 @@ function doAltInput(selItem) {
         selectInput.attr(attrName, groupInput.attr('id').replaceAll('-', repStr)).show();
         groupInput.removeAttr('id');
     }
+    if(!(selItem.attr('recipe') == undefined || selItem.attr('recipe') == '' || selItem.attr('recipe') == null))
+        updateRecipeVariable(selItem);
 }
 
 $(document).ready(function() {

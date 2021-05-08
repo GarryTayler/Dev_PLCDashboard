@@ -2,7 +2,8 @@
     const defLimit = parseInt("{{defLimit}}");
     const varLimit = parseInt("{{recipeVarLimit}}");
     const recipeLimit = parseInt("{{recipeLimit}}");
-    const attrArr = ['selid', 'sellocstr', 'seltype'];
+    const attrArr1 = ['selid', 'sellocstr', 'seltype'];
+    const attrArr2 = ['selid', 'sellocstr', 'seltype', 'deviceid', 'change_sellocstr'];
     const recipeTbl = $("#recipe-table");
     const clsArr = {
         'time': 'mask-time',
@@ -24,15 +25,15 @@
         <td class="recipe-td">
             <div class="value-radio">
                 <div class="form-check mb-2">
-                    <input type="checkbox" class="form-check-input" id="recipe-val-data.id-radio" chkStr>
+                    <input type="checkbox" class="form-check-input" id="recipe-val-data.id-radio" chkStr recipe="true">
                     <label class="form-check-label" for="recipe-val-data.id-radio">변수</label>
                 </div>
     `;
 
     const altSelect = `
         <select class="form-control alt-input" style="style.str" val.attr>
-            <option value="0">FALSE</option>
-            <option value="1">TRUE</option>
+            <option value="FALSE">FALSE</option>
+            <option value="TRUE">TRUE</option>
         </select>
     `;
 
@@ -42,7 +43,7 @@
 
     const altFoot = `
                 <div class="input-group" style="style.str">
-                    <input disabled type="text" class="form-control" id.str readonly data.attr >
+                    <input disabled type="text" class="form-control variable-input" id.str readonly data.attr >
                     <span class="input-group-append dropdown">
                         <button disabled class="btn btn-primary dropdown-toggle" data-toggle="dropdown"></button>
                         <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
@@ -270,11 +271,22 @@
                                                 itemVal = valItem.value;
                                                 selAttr = "value='" + valItem.value + "' origin='" + valItem.value + "'";
                                                 const valOpts = valItem.options.length > 0 ? JSON.parse(valItem.options) : {};
-                                                hasOpt = valOpts.hasOwnProperty(attrArr[0]);
-                                                for(let ll = 0; ll < attrArr.length; ll++) {
-                                                    const attrItem = attrArr[ll];
-                                                    if(valOpts.hasOwnProperty(attrItem)) {
-                                                        selAttr += " " + attrItem + "='" + valOpts[attrItem] + "'";
+                                                hasOpt = valOpts.hasOwnProperty(attrArr1[0]);
+                                                //attrArr1
+                                                if(valOpts.hasOwnProperty('deviceid')) {
+                                                    for(let ll = 0; ll < attrArr2.length; ll++) {
+                                                        const attrItem = attrArr2[ll];
+                                                        if(valOpts.hasOwnProperty(attrItem)) {
+                                                            selAttr += " " + attrItem + "='" + valOpts[attrItem] + "'";
+                                                        }
+                                                    }
+                                                }
+                                                else {
+                                                    for(let ll = 0; ll < attrArr1.length; ll++) {
+                                                        const attrItem = attrArr1[ll];
+                                                        if(valOpts.hasOwnProperty(attrItem)) {
+                                                            selAttr += " " + attrItem + "='" + valOpts[attrItem] + "'";
+                                                        }
                                                     }
                                                 }
 
@@ -286,18 +298,19 @@
                                         const inputID = varItem.id + "-" + nameItem.id;
                                         const nameBool = itemVal.length === 0;
                                         html += altHead.replace('chkStr', hasOpt || nameBool ? 'checked' : '').replaceAll('data.id', inputID);
+
                                         html += selType === "digital" ?
                                             altSelect.replace('style.str', hasOpt || nameBool ? '' : 'display: block')
-                                                    .replace('val.attr', hasOpt ? '' : selAttr + " id='recipe-val-'" + inputID + "'")
+                                                    .replace('val.attr', hasOpt ? '' : selAttr + ' id="recipe-value-' + inputID + '" name="recipe_val_' + inputID.replaceAll('_', '-') + '"')
                                             :
                                             altInput.replace('cls.attr', clsArr[selType] ? clsArr[selType] : '')
                                                     .replace('style.str', hasOpt || nameBool ? '' : 'display: block')
                                                     .replace('text.str', selType === "analog" ? "number" : "text")
-                                                    .replace('val.attr', hasOpt ? '' : selAttr + " id='recipe-val-'" + inputID + "'");
+                                                    .replace('val.attr', hasOpt ? '' : selAttr + ' id="recipe-value-' + inputID + '"');
 
                                         html += altFoot.replace('style.str', hasOpt || nameBool ? '' : 'display: none')
                                             .replace('data.attr', hasOpt ? selAttr : '')
-                                            .replace('id.str', hasOpt || nameBool ? "id='recipe-val-'" + inputID + "'" : '')
+                                            .replace('id.str', hasOpt || nameBool ? 'id="recipe-val-' + inputID + '"' : '')
                                             .replaceAll('data.id', inputID)
                                             .replaceAll('data.type', selType);
                                     }
@@ -306,7 +319,6 @@
                                 html += "</tr>";
                             }
                         }
-
                         $("#variable-tbody").html(removeDisable(html));
                         initTimeMask("#variable-tbody");
                         $("#detail-panel").show();
@@ -325,6 +337,50 @@
         }
     }
 
+    function doServerRecipeval(_obj) {
+        const inputName = _obj.val().trim();     
+        const idStr = _obj.attr('id') ? _obj.attr('id') : _obj.attr('name').replaceAll('_', '-');
+        const selID = idStr.replace('recipe-val-', '').replace('recipe-value-', '').split('-');
+        const postData = {
+                inputName,
+                recipeDefID,
+                var_id: selID[0],
+                name_id: selID[1]
+        };
+
+        if(_obj.attr('deviceid') == '' || _obj.attr('deviceid') == null || _obj.attr('deviceid') == undefined) {
+            for(let ii = 0; ii < attrArr1.length; ii++) {
+                const attrItem = attrArr1[ii];
+                if(_obj.attr(attrItem)) {
+                    postData[attrItem] = _obj.attr(attrItem);
+                }
+            }
+        }
+        else {
+            for(let ii = 0; ii < attrArr2.length; ii++) {
+                const attrItem = attrArr2[ii];
+                if(_obj.attr(attrItem)) {
+                    postData[attrItem] = _obj.attr(attrItem);
+                }
+            }
+        }
+
+        sendAjax("{{url_for('logic_setting.recipe_val')}}", postData, false);
+    }
+
+    function updateRecipeVariable(selItem) {
+        const parentDiv = selItem.closest('div.value-radio');
+        let _obj = null;
+        if(selItem.prop('checked') == true) {
+            _obj = parentDiv.find('.variable-input');
+        }
+        else {
+            _obj = parentDiv.find('.alt-input');
+        }
+        
+        doServerRecipeval(_obj);
+    }
+
     $(document).ready(function () {
         recipeTbl.on('click', 'tbody tr', function() {
             recipeDetail();
@@ -332,9 +388,11 @@
 
         $("#recipe-val-table").on('click', 'td, th', function(e) {
             if($(this).hasClass('recipe-td') && !$(e.target).is('input') &&
-                !$(e.target).is('label') && !$(e.target).is('select')) {
+                !$(e.target).is('label') && !$(e.target).is('select') && 
+                !$(e.target).is('button') && !$(e.target).is('a')) {
                 const selChk = $(this).find('input[type="checkbox"]');
                 selChk.prop('checked', !selChk.prop('checked'));
+                doAltInput(selChk);
             }
         });
 
@@ -350,25 +408,13 @@
 
         $("#variable-tbody").on('change', 'input[type="text"], .alt-input', function() {
             if(curMode === "stop" && curAuth) {
-                const inputName = $(this).val().trim();
-                const idStr = $(this).attr('id') ? $(this).attr('id') : $(this).attr('name').replaceAll('_', '-');
-                const selID = idStr.replace('recipe-val-', '').split('-');
-                const postData = {
-                    inputName,
-                    recipeDefID,
-                    var_id: selID[0],
-                    name_id: selID[1]
-                };
-
-                for(let ii = 0; ii < attrArr.length; ii++) {
-                    const attrItem = attrArr[ii];
-                    if($(this).attr(attrItem)) {
-                        postData[attrItem] = $(this).attr(attrItem);
-                    }
-                }
-
-                sendAjax("{{url_for('logic_setting.recipe_val')}}", postData, false);
+                doServerRecipeval($(this));
             }
+        });
+
+
+        $("div.value-radio input[type='checkbox']").on('click', function() {
+            alert('asdfsadfsadf');
         });
 
         recipeDefTbl = recipeTbl.DataTable({

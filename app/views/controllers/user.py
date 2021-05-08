@@ -645,11 +645,18 @@ def recipe_write(section, recipe, ind):
         recipe_val = models.RecipeValue.query.filter_by(def_id=recipe.id).filter_by(var_id=recipeVar.id).all()
         for ind1 in range(len(recipe_val)):
             recipeVal = recipe_val[ind1]
+            selVal = ''
             if len(recipeVal.options) > 5:
-                selVal = json.loads(recipeVal.options)['sellocstr']
+                recipe_options = json.loads(recipeVal.options)
+                if 'change_sellocstr' in recipe_options:
+                    selVal = json.loads(recipeVal.options)['change_sellocstr']
+                else: 
+                    selVal = json.loads(recipeVal.options)['sellocstr']
             else:
                 selVal = recipeVal.value
-            varArr[prefixStr1 + str(ind) + "." + str(ind1)] = selVal
+
+            if len(selVal) > 0:
+                varArr[prefixStr1 + str(ind) + "." + str(ind1)] = selVal
 
     for key, val in varArr.items():
         config_helper.set_value(section, key, val)
