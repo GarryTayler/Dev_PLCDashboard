@@ -212,11 +212,11 @@ function getTblChk(tableID, suffix = '') {
     return selIDs.length > 0 ? selIDs.join(',') : "";
 }
 
-function removeAction(tableID, url, suffix = '', flag = true) {
+function removeAction(tableID, url, suffix = '', flag = true, respFunc = null) {
     const selRow = getTblChk(tableID, suffix);
     if(selRow.length > 0) {
         if(confirm('삭제하시겠습니까?')) {
-            sendAjax(url, {selRow}, flag);
+            sendAjax(url, {selRow}, flag, false, respFunc);
         }
     } else {
         alert('삭제할 행을 선택하세요');
