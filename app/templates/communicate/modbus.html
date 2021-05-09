@@ -146,7 +146,7 @@
                                         <label class="form-check-label" for="rtu-master-port">Port</label>
                                     </div>
                                     <div class="col-5">
-                                        <input type="number" class="form-control" id="rtu-master-port" min="1" />
+                                        <input type="number" class="form-control" id="rtu-master-port" />
                                     </div>
                                 </div>
                                 <div class="form-group row">
@@ -208,7 +208,7 @@
                                         <label class="form-check-label" for="tcp-slave-port">Port</label>
                                     </div>
                                     <div class="col-5">
-                                        <input type="number" class="form-control" id="tcp-slave-port" min="1" placeholder="502">
+                                        <input type="number" class="form-control" id="tcp-slave-port" value="502">
                                     </div>
                                 </div>
                             </div>
@@ -218,7 +218,7 @@
                                         <label class="form-check-label" for="rtu-slave-unit">UNIT ID</label>
                                     </div>
                                     <div class="col-5">
-                                        <input type="number" class="form-control" id="rtu-slave-unit" min="1" max="247" placeholder="1">
+                                        <input type="number" class="form-control" id="rtu-slave-unit" value="1">
                                     </div>
                                 </div>
                                 <div class="form-group row">
@@ -226,7 +226,7 @@
                                         <label class="form-check-label" for="rtu-slave-port">Port</label>
                                     </div>
                                     <div class="col-5">
-                                        <input type="number" class="form-control" id="rtu-slave-port" min="1" placeholder="1">
+                                        <input type="number" class="form-control" id="rtu-slave-port" value="1">
                                     </div>
                                 </div>
                                 <div class="form-group row">
@@ -737,6 +737,15 @@
         });
         $('#tcp-master-delay').inputFilter(function(value) {
             return /^-?\d*[.]?\d*$/.test(value) && (parseFloat(value) >= 0); });
+        $("#rtu-master-port").inputFilter(function(value) {
+            return /^\d*$/.test(value) && (parseInt(value) >= 1); });
+        $("#tcp-slave-port").inputFilter(function(value) {
+            return /^\d*$/.test(value) && (parseInt(value) >= 1); });
+        $("#rtu-slave-port").inputFilter(function(value) {
+            return /^\d*$/.test(value) && (parseInt(value) >= 1); });
+        $('#rtu-slave-unit').inputFilter(function(value) {
+            return /^\d*$/.test(value) && (parseInt(value) >= 1 && parseInt(value) <= 247);
+        });
         //
         
         function addModbus() {
@@ -940,10 +949,22 @@
 
         function saveCommon() {
             let postData = getPostData(commonPanel);
-            postData['tcp_master_port'] = parseInt(postData['tcp_master_port']);
-            postData['tcp_master_timeout'] = parseFloat(postData['tcp_master_timeout']);
-            postData['tcp_master_unit'] = parseInt(postData['tcp_master_unit']);
-            postData['tcp_master_delay'] = parseFloat(postData['tcp_master_delay']);
+            if(postData.hasOwnProperty('tcp_master_port')) {
+                postData['tcp_master_port'] = parseInt(postData['tcp_master_port']);
+                postData['tcp_master_timeout'] = parseFloat(postData['tcp_master_timeout']);
+                postData['tcp_master_unit'] = parseInt(postData['tcp_master_unit']);
+                postData['tcp_master_delay'] = parseFloat(postData['tcp_master_delay']);
+            }
+            else if(postData.hasOwnProperty('rtu-master-port')) {
+                postData['rtu-master-port'] = parseInt(postData['rtu-master-port']);
+            }
+            else if(postData.hasOwnProperty('tcp_slave_port')) {
+                postData['tcp_slave_port'] = parseInt(postData['tcp_slave_port']);
+            }
+            else if(postData.hasOwnProperty('rtu-slave-port')) {
+                postData['rtu-slave-port'] = parseInt(postData['rtu-slave-port']);
+                postData['rtu-slave-unit'] = parseInt(postData['rtu-slave-unit']);
+            }
 
             $("#check-row-modbus-" + selModbus).attr('options', JSON.stringify(postData));
 
