@@ -127,7 +127,7 @@
         setRecipeID();
         if(recipeDefID > 0) {
             if(varCnt < varLimit) {
-                $("#variable-name").val('').removeAttr('selid').removeAttr('seltype').removeAttr('sellocstr');
+                $("#variable-name").val('').removeAttr('selid').removeAttr('seltype').removeAttr('sellocstr').removeAttr('deviceid').removeAttr('change_sellocstr');
                 $("#var-modal").modal('show');
             } else {
                 alert(limitMsg);
@@ -141,14 +141,25 @@
         const varInput = $("#variable-name");
         const inputVal = varInput.val().trim();
         if(inputVal.length > 0) {
-            const postData = {
-                inputVal,
-                recipeDefID,
-                selid: varInput.attr('selid'),
-                seltype: varInput.attr('seltype'),
-                sellocstr: varInput.attr('sellocstr')
-            };
-
+            let postData = {};
+            if(!(varInput.attr('deviceid') == undefined || varInput.attr('deviceid') == null || varInput.attr('deviceid') == '')) {
+                postData = {
+                    inputVal,
+                    recipeDefID,
+                    selid: varInput.attr('selid'),
+                    seltype: varInput.attr('seltype'),
+                    sellocstr: varInput.attr('change_sellocstr')
+                };
+            }
+            else {
+                postData = {
+                    inputVal,
+                    recipeDefID,
+                    selid: varInput.attr('selid'),
+                    seltype: varInput.attr('seltype'),
+                    sellocstr: varInput.attr('sellocstr')
+                };
+            }
             sendAjax("{{url_for('logic_setting.recipe_variable')}}", postData, false, false, function() {
                 recipeDetail();
             });

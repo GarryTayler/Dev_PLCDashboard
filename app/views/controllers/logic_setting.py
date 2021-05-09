@@ -599,7 +599,7 @@ def control():
 @logic_setting.route('/recipe')
 @login_required
 def recipe_panel():
-    return render_template('logic_setting/recipe.html', defLimit=const.uiSizeRecipeDef,
+    return render_template('logic_setting/recipe.html', defLimit=const.uiSizeRecipeDef, remotes=get_remotes(),
                            recipeLimit=const.uiSizeRecipe, recipeVarLimit=const.uiSizeRecipeVars)
 
 
