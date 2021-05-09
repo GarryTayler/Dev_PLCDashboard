@@ -156,7 +156,7 @@ def doregister():
     return json.dumps(response)
 
 
-@userbp.route('/authority')
+@userbp.route('-ority')
 @login_required
 def authority():
     selModel = models.User
@@ -176,7 +176,7 @@ def authority():
         {'id': 'remote', 'name': '리모트디바이스'}
     ]
     return render_template('setting/authority.html', menu_list=menuList,
-                           users=selModel.query.with_entities(selModel.id, selModel.userid).all())
+                           users=selModel.query.filter_by(usertype='user').with_entities(selModel.id, selModel.userid).all())
 
 
 @userbp.route('/remove_user', methods=['POST'])
@@ -200,7 +200,8 @@ def remove_user():
 @userbp.route('/export_setting')
 @login_required
 def export_setting():
-    return render_template('setting/setting_export.html')
+    setting_list = models.SettingList.query.all()
+    return render_template('setting/setting_export.html', setting_list=setting_list)
 
 
 @userbp.route('/import_setting')
@@ -1114,19 +1115,34 @@ def error():
     
     return render_template('setting/error.html', error=int_list)
 
-@userbp.route('/csv_export', defaults={'csvType': 'collect'})
-@userbp.route('/csv_export/<csvType>')
+
+@userbp.route('/setting_export', methods=['POST'])
 @login_required
-def csv_export(csvType='collect'):
+def setting_export(csvType='collect'):
+    postData = request.form.to_dict()
     with open(config.CONFIG_PATH + '\setting.csv', "w", encoding='utf-8-sig', newline='') as csv_file:
         writer = csv.writer(csv_file)
-        writer.writerow(['항목', ''])
-        writer.writerow(['모니터링', ''])
-        writer.writerow(['로직구성', ''])
-        writer.writerow(['로직설정', ''])
-        writer.writerow(['데이터설정', ''])
-        writer.writerow(['통신설정', ''])
+        for key, val in postData.items():
+            code = key.replace('setting-', '')
+        
+            writer.writerow([code, val])
 
     fileName = '설정.csv'
-    return send_file(config.CONFIG_PATH + '\setting.csv', mimetype='text/csv', attachment_filename=fileName,
-                     as_attachment=True)
+    send_file(config.CONFIG_PATH + '\setting.csv', mimetype='text/csv', attachment_filename=fileName,
+                    as_attachment=True)
+    response = {'status': True}
+
+    return json.dumps(response)
+
+@userbp.route('/setting_import', methods=['POST'])
+@login_required
+def setting_import():
+    postData = request.form.to_dict()
+    selFile = request.files['file']
+    reader = csv.reader(selFile)
+    for row in reader:
+        print(row)
+        
+    response = {'status': True}
+
+    return json.dumps(response)
