@@ -440,3 +440,11 @@ class Timezone(db.Model, UserMixin):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.Text)
     zone = db.Column(db.String)
+
+class SettingList(db.Model, UserMixin):
+    __tablename__ = 'setting_list'
+    __table_args__ = {'sqlite_autoincrement': True}
+
+    id = db.Column(db.Integer, primary_key=True)
+    code = db.Column(db.Integer)
+    name = db.Column(db.String)

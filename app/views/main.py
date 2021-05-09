@@ -31,8 +31,8 @@ def current_time():
     selModel = models.Authority
     userID = session.get('user_id')
     auths = selModel.query.filter_by(userid=userID).with_entities(selModel.edit, selModel.menu, selModel.read).all() if userID is not None else []
-    auth_list = [auth.menu for auth in auths if auth.edit == "0" and auth.read == "0"] if userID is not None else []
-
+    auth_list = [auth.menu for auth in auths if auth.read == "0"] if userID is not None else []
+    
     edit_auth = False
     noExist = True
     curMenu = get_menu()
@@ -41,10 +41,10 @@ def current_time():
             noExist = False
             edit_auth = True if auth.edit == "1" else False
             break
-
+    
     if noExist and session.get('usertype') == "admin":
         edit_auth = True
-
+    
     now = datetime.now()
     logicModel = models.Logic
     logic = logicModel.query.with_entities(logicModel.id, logicModel.name, logicModel.logicid).all()

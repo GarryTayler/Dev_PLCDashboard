@@ -9,7 +9,7 @@
             <div class="row">
                 <div class="col-3">
                     <div class="table-responsive">
-                        <table class="table table-bordered dataTable">
+                        <table class="table table-bordered dataTable" id="setting-output">
                             <thead>
                                 <tr>
                                     <th>항목</th>
@@ -24,52 +24,30 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                <tr>
-                                    <td>변수</td>
-                                    <td>
-                                        <div class="form-check">
+                                {% for setting in setting_list %}
+                                    <tr>
+                                        <td>{{setting.name}}</td>
+                                        <td>
                                             <div class="form-check">
-                                                <input type="checkbox" class="form-check-input check-row">
-                                                <label class="form-check-label"></label>
+                                                <input type="checkbox" class="form-check-input check-row" id="setting-{{setting.code}}">
+                                                <label class="form-check-label" for="setting-{{setting.code}}"></label>
                                             </div>
-                                        </div>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td>조건</td>
-                                    <td>
-                                        <div class="form-check">
-                                            <div class="form-check">
-                                                <input type="checkbox" class="form-check-input check-row">
-                                                <label class="form-check-label"></label>
-                                            </div>
-                                        </div>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td>조건그룹</td>
-                                    <td>
-                                        <div class="form-check">
-                                            <div class="form-check">
-                                                <input type="checkbox" class="form-check-input check-row">
-                                                <label class="form-check-label"></label>
-                                            </div>
-                                        </div>
-                                    </td>
-                                </tr>
+                                        </td>
+                                    </tr>
+                                {% endfor %}
                             </tbody>
                         </table>
                     </div>
                 </div>
             </div>
-            <a href="{{url_for('userbp.csv_export', csvType='collect')}}" target="_blank">
-                <button class="btn btn-primary btn-icon-split">
-                    <span class="icon text-white-50">
-                        <i class="fas fa-file-export"></i>
-                    </span>
-                    <span class="text">다운로드</span>
-                </button>
-            </a>
+            
+            <button class="btn btn-primary btn-icon-split" onclick="saveSettingList()">
+                <span class="icon text-white-50">
+                    <i class="fas fa-file-export"></i>
+                </span>
+                <span class="text">다운로드</span>
+            </button>
+            
             <button class="btn btn-secondary btn-icon-split">
                 <span class="icon text-white-50">
                     <i class="fas fa-times"></i>
@@ -78,4 +56,19 @@
             </button>
         </div>
     </div>
+{% endblock %}
+
+{% block script %}
+    <script>
+        function saveSettingList() {
+            let postData = {};
+            const inputChk = $("#setting-output tbody input[type='checkbox']");
+            for(let ii = 0; ii < inputChk.length; ii++) {
+                const chkItem = $(inputChk[ii]);
+                postData[chkItem.attr('id')] = chkItem.prop('checked') ? '1' : '0';
+            }
+            sendAjax("{{url_for('userbp.setting_export')}}", postData, false);
+            //alert(saveMsg);
+        }
+    </script>
 {% endblock %}
