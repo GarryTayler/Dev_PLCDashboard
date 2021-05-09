@@ -1,0 +1,151 @@
+<div class="modal fade" id="channel-modal" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">채널 추가</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="alert alert-danger" role="alert" id="insert-alert">
+                    값을 입력하세요
+                </div>
+
+                <!-- RTU - Master인 경우 -->
+                <div id="rtu-channel" class="tab-part">
+                    <div class="form-group row">
+                        <div class="col-3">
+                            <label class="input-label" for="channel-unit">UNIT ID</label>
+                        </div>
+                        <div class="col-9">
+                            <input type="number" class="form-control" min="1" max="247" id="channel-unit" />
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <div class="col-3">
+                            <label class="input-label" for="channel-timeout">Timeout(ms)</label>
+                        </div>
+                        <div class="col-9">
+                            <input type="number" class="form-control" min="1" value="1000" id="channel-timeout" />
+                        </div>
+                    </div>
+                </div>
+                <!-- 트리거 (사이클 시간 or 트리거 변수) -->
+                <div class="form-group row">
+                    <div class="col-3">
+                        <label class="input-label" for="channel-trigger">트리거</label>
+                    </div>
+                    <div class="col-9">
+                        <select class="form-control condition-select" id="channel-trigger">
+                            <option value="CYCLE_TIME">사이클시간</option>
+                            <option value="TRIGGER_VARIABLE">트리거변수</option>
+                        </select>
+                    </div>
+                </div>
+                <!-- 사이클 시간 -->
+                <div id="cycle-panel">
+                    <div class="form-group row">
+                        <div class="col-3">
+                            <label class="input-label" for="channel-cycle">사이클시간(ms)</label>
+                        </div>
+                        <div class="col-9">
+                            <input type="number" class="form-control" min="20" value="100" id="channel-cycle" />
+                        </div>
+                    </div>
+                </div>
+                <!-- 트리거 변수 -->
+                <div class="tab-part" id="trigger-panel">
+                    <div class="form-group row">
+                        <div class="col-3">
+                            <label class="input-label" for="channel-trigger-variable">트리거변수</label>
+                        </div>
+                        <div class="col-9">
+                            <div class="input-group">
+                                <input type="text" class="form-control" id="channel-trigger-variable" readonly>
+                                <span class="input-group-append dropdown">
+                                    <button class="btn btn-primary dropdown-toggle" data-toggle="dropdown"></button>
+                                    <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                                        <a class="dropdown-item" href="#" onclick="showFixed('channel-trigger-variable');">고정변수</a>
+                                        <a class="dropdown-item" href="#" onclick="showFluid('channel-trigger-variable');">가변변수</a>
+                                    </div>
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- Function Code -->
+                <div class="form-group row">
+                    <div class="col-3">
+                        <label class="input-label" for="channel-code">Function Code</label>
+                    </div>
+                    <div class="col-9">
+                        <select class="form-control condition-select" id="channel-code">
+                            <option value="1">1: Read Coils</option>
+                            <option value="2">2: Read Inputs</option>
+                            <option value="3">3: Read Holding Registers</option>
+                            <option value="4">4: Read Input Registers</option>
+                            <option value="5">5: Force Single Coil</option>
+                            <option value="6">6: Preset Single Register</option>
+                            <option value="15">15: Force Multiple Coils</option>
+                            <option value="16">16: Preset Multiple Registers</option>
+                            <option value="23">23: Read/Write Registers</option>
+                        </select>
+                    </div>
+                </div>
+                <!-- Read Offset/Length -->
+                <div id="read-offset-panel">
+                    <div class="form-group row">
+                        <div class="col-3">
+                            <label class="input-label" for="channel-readoffset">Read Offset</label>
+                        </div>
+                        <div class="col-9">
+                            <input type="number" class="form-control" id="channel-readoffset" onkeypress="return event.charCode >= 48 && event.charCode <= 57"/>
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <div class="col-3">
+                            <label class="input-label" for="channel-readlen">Read Length</label>
+                        </div>
+                        <div class="col-9">
+                            <input type="number" class="form-control" id="channel-readlen" onkeypress="return event.charCode >= 48 && event.charCode <= 57"/>
+                        </div>
+                    </div>
+                </div>
+                <!-- Write Offset/Length -->
+                <div id="write-offset-panel" class="tab-part">
+                    <div class="form-group row">
+                        <div class="col-3">
+                            <label class="input-label" for="channel-writeoffset">Write Offset</label>
+                        </div>
+                        <div class="col-9">
+                            <input type="number" class="form-control" id="channel-writeoffset" onkeypress="return event.charCode >= 48 && event.charCode <= 57"/>
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <div class="col-3">
+                            <label class="input-label" for="channel-writelen">Write Length</label>
+                        </div>
+                        <div class="col-9">
+                            <input type="number" class="form-control" id="channel-writelen" onkeypress="return event.charCode >= 48 && event.charCode <= 57"/>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary btn-icon-split" data-dismiss="modal">
+                    <span class="icon text-white-50">
+                        <i class="fas fa-times"></i>
+                    </span>
+                    <span class="text">취소</span>
+                </button>
+                <button class="btn btn-primary btn-icon-split" onclick="doChannelAdd();">
+                    <span class="icon text-white-50">
+                        <i class="fas fa-check"></i>
+                    </span>
+                    <span class="text">확인</span>
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
