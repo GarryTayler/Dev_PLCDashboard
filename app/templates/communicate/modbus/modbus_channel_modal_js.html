@@ -1,0 +1,116 @@
+<script>
+// define event
+$('#channel-trigger').on('change', function() {
+    if($('#channel-trigger').val() == 'CYCLE_TIME') {
+        $('#cycle-panel').show();
+        $('#trigger-panel').hide();
+    }
+    else if($('#channel-trigger').val() == 'TRIGGER_VARIABLE') {
+        $('#cycle-panel').hide();
+        $('#trigger-panel').show();
+    }
+});
+
+function doChannelAdd() {
+    let postData = {};
+    let inputValid = true;
+    $("#insert-alert").hide();
+    $("#channel-modal input").removeClass('border-danger');
+    const inputArr = $("#channel-modal input, #channel-modal select");
+    for(let ii = 0; ii < inputArr.length; ii++) {
+        const inputItem = $(inputArr[ii]);
+        const inputID = inputItem.attr('id');
+        const inputID1 = $("#" + inputID);
+        const inputVal = inputItem.val().trim();
+
+        const filterParents = inputID1.parents("div")
+            .filter(function() {
+                return $(this).css('display') === "none";
+            }).length;
+
+        if(filterParents === 0 && !inputID1.attr("disabled") && inputVal.length === 0) {
+            showErr(inputID);
+            inputValid = false;
+            return false;
+        } else if(filterParents === 0) {
+            const inputKey = inputID.replaceAll('-', '_');
+            postData[inputKey] = inputVal;
+            if(inputID1.attr("seltype")) {
+                postData[inputKey + "_selid"] = inputID1.attr("selid");
+                postData[inputKey + "_seltype"] = inputID1.attr("seltype");
+                postData[inputKey + "_sellocstr"] = inputID1.attr("sellocstr");
+            }
+        }
+    }
+
+    if(inputValid && chkCodes()) {
+        const chlModal = $("#channel-modal");
+        postData['modbusid'] = selModbus;
+        postData['selid'] = chlModal.attr('selid');
+        sendAjax("{{url_for('communicate.add_channel')}}", postData, false);
+        const modalType = $("#rtu-channel").css('display') === 'none';
+        updateVariable(modalType ? modbusChlTbl : rtuChlTbl);
+        chlModal.modal('hide');
+    }        
+}
+
+function chkCodes() {
+    const selCode = parseInt($("#channel-code").val());
+    let len = 0, errMsg = "";
+    if(selCode <= 4) {
+        len = parseInt($("#channel-readlen").val().trim());
+        if (selCode < 3 && (len < 1 || len > 2000)) {
+            errMsg = "Read길이는 1 ~ 2000의 정수여야 합니다";
+        } else if (selCode > 2 && (len < 1 || len > 125)) {
+            errMsg = "Read길이는 1 ~ 125의 정수여야 합니다";
+        }
+    } else if(selCode > 4 && selCode < 17) {
+        len = parseInt($("#channel-writelen").val().trim());
+        if(selCode === 15 && (len < 1 || len > 1968)) {
+            errMsg = "Write길이는 1 ~ 1968의 정수여야 합니다";
+        } else if(selCode === 16 && (len < 1 || len > 123)) {
+            errMsg = "Write길이는 1 ~ 123의 정수여야 합니다";
+        }
+    } else if(selCode === 23) {
+        len = parseInt($("#channel-readlen").val().trim());
+        if(len < 1 || len > 125) {
+            errMsg = "Read길이는 1 ~ 125의 정수여야 합니다";
+        }
+
+        if(errMsg.length === 0) {
+            len = parseInt($("#channel-writelen").val().trim());
+            if(len < 1 || len > 121) {
+                errMsg = "Write길이는 1 ~ 121의 정수여야 합니다";
+            }
+        }
+    }
+
+    if(errMsg.length > 0) {
+        alert(errMsg);
+        return false;
+    } else {
+        return true;
+    }   
+}
+
+$("#channel-code").on('change', function() {
+    const selVal = parseInt($(this).val());
+    if(selVal <= 4) {
+        $("#read-offset-panel").show();
+        $("#write-offset-panel").hide();
+    } else if(selVal < 23) {
+        $("#read-offset-panel").hide();
+        $("#write-offset-panel").show();
+    } else {
+        $("#read-offset-panel").show();
+        $("#write-offset-panel").show();
+    }
+
+    const chlWriteLen = $("#channel-writelen");
+    if(selVal === 5 || selVal === 6) {
+        chlWriteLen.attr('readonly', true).val('1');
+    } else {
+        chlWriteLen.removeAttr('readonly');
+    }
+});
+</script>

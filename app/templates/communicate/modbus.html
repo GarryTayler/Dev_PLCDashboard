@@ -545,6 +545,7 @@
 
 {% block script %}
     {% include 'communicate/modbus/modbus_channel_modal.html' %}
+    {% include 'communicate/modbus/modbus_channel_modal_js.html' %}
     {% include 'common/datatable.html' %}
     {% include 'common/variable_modal.html' %}
     <script src="{{ url_for('static', filename='js/jquery.inputmask.min.js') }}"></script>
@@ -557,7 +558,7 @@
             '2': '2: Read Inputs',
             '3': '3: Read Holding Registers',
             '4': '4: Read Input Registers',
-            '5': '5:Force Single Coil',
+            '5': '5: Force Single Coil',
             '6': '6: Preset Single Register',
             '15': '15: Force Multiple Coils',
             '16': '16: Preset Multiple Registers',
@@ -630,8 +631,9 @@
                 use_flag: $("#ckbx-style-1-1").prop('checked') ? '1' : '0'
             };
 
-            sendAjax("{{url_for('communicate.add_modbus')}}", postData, false);
-            updateVariable(modbusTbl);
+            sendAjax("{{url_for('communicate.add_modbus')}}", postData, false, false, function() {
+                updateVariable(modbusTbl);
+            });
             modbusModal.modal('hide');
         }
 
@@ -665,92 +667,13 @@
         function removeChannel(type = 'modbus') {
             const isDefault = type === "modbus";
             const tableID = isDefault ? "#modbus-channel-tbl" : "#rtu-channel-tbl";
-            removeCustom(tableID, '{{url_for("communicate.remove_modbus")}}', "channel-", {selType: 'channel'}, false);
-            updateVariable(isDefault ? modbusChlTbl : rtuChlTbl);
+            removeCustom(tableID, '{{url_for("communicate.remove_modbus")}}', "channel-", {selType: 'channel'}, false, function() {
+                updateVariable(isDefault ? modbusChlTbl : rtuChlTbl);
+            });
         }
 
-        function doChannelAdd() {
-            let postData = {};
-            let inputValid = true;
-            $("#insert-alert").hide();
-            $("#channel-modal input").removeClass('border-danger');
-            const inputArr = $("#channel-modal input, #channel-modal select");
-            for(let ii = 0; ii < inputArr.length; ii++) {
-                const inputItem = $(inputArr[ii]);
-                const inputID = inputItem.attr('id');
-                const inputID1 = $("#" + inputID);
-                const inputVal = inputItem.val().trim();
-
-                const filterParents = inputID1.parents("div")
-                    .filter(function() {
-                        return $(this).css('display') === "none";
-                    }).length;
-
-                if(filterParents === 0 && !inputID1.attr("disabled") && inputVal.length === 0) {
-                    showErr(inputID);
-                    inputValid = false;
-                    return false;
-                } else if(filterParents === 0) {
-                    const inputKey = inputID.replaceAll('-', '_');
-                    postData[inputKey] = inputVal;
-                    if(inputID1.attr("seltype")) {
-                        postData[inputKey + "_selid"] = inputID1.attr("selid");
-                        postData[inputKey + "_seltype"] = inputID1.attr("seltype");
-                        postData[inputKey + "_sellocstr"] = inputID1.attr("sellocstr");
-                    }
-                }
-            }
-
-            if(inputValid && chkCodes()) {
-                const chlModal = $("#channel-modal");
-                postData['modbusid'] = selModbus;
-                postData['selid'] = chlModal.attr('selid');
-                sendAjax("{{url_for('communicate.add_channel')}}", postData, false);
-                const modalType = $("#rtu-channel").css('display') === 'none';
-                updateVariable(modalType ? modbusChlTbl : rtuChlTbl);
-                chlModal.modal('hide');
-            }
-        }
-
-        function chkCodes() {
-            const selCode = parseInt($("#channel-code").val());
-            let len = 0, errMsg = "";
-            if(selCode < 4) {
-                len = parseInt($("#channel-readlen").val().trim());
-                if (selCode < 3 && (len < 1 || len > 2000)) {
-                    errMsg = "Read길이는 1 ~ 2000의 정수여야 합니다";
-                } else if (selCode > 2 && (len < 1 || len > 125)) {
-                    errMsg = "Read길이는 1 ~ 125의 정수여야 합니다";
-                }
-            } else if(selCode > 4 && selCode < 17) {
-                len = parseInt($("#channel-writelen").val().trim());
-                if(selCode === 15 && (len < 1 || len > 1968)) {
-                    errMsg = "Write길이는 1 ~ 1968의 정수여야 합니다";
-                } else if(selCode === 16 && (len < 1 || len > 123)) {
-                    errMsg = "Write길이는 1 ~ 123의 정수여야 합니다";
-                }
-            } else if(selCode === 23) {
-                len = parseInt($("#channel-readlen").val().trim());
-                if(len < 1 || len > 125) {
-                    errMsg = "Read길이는 1 ~ 125의 정수여야 합니다";
-                }
-
-                if(errMsg.length === 0) {
-                    len = parseInt($("#channel-writelen").val().trim());
-                    if(len < 1 || len > 121) {
-                        errMsg = "Write길이는 1 ~ 121의 정수여야 합니다";
-                    }
-                }
-            }
-
-            if(errMsg.length > 0) {
-                alert(errMsg);
-                return false;
-            } else {
-                return true;
-            }
-        }
-
+        //채널탭에서 추가버튼을 클릭한 경우
+        //rtu인 케이스만 type='rtu' 입니다.
         function addChannel(type='') {
             if(chlCnt < chlLimit) {
                 const rtuChl = $("#rtu-channel");
@@ -1009,27 +932,6 @@
                 }
             });
 
-            $("#channel-code").on('change', function() {
-                const selVal = parseInt($(this).val());
-                if(selVal <= 4) {
-                    $("#read-offset-panel").show();
-                    $("#write-offset-panel").hide();
-                } else if(selVal < 23) {
-                    $("#read-offset-panel").hide();
-                    $("#write-offset-panel").show();
-                } else {
-                    $("#read-offset-panel").show();
-                    $("#write-offset-panel").show();
-                }
-
-                const chlWriteLen = $("#channel-writelen");
-                if(selVal === 5 || selVal === 6) {
-                    chlWriteLen.attr('readonly', true).val('1');
-                } else {
-                    chlWriteLen.removeAttr('readonly');
-                }
-            });
-
             $("#tcp-master-trigger").on('change', function() {
                 const selVal = $(this).val();
                 if(selVal === "CYCLE_TIME") {
@@ -1104,7 +1006,11 @@
                         return row.channel_trigger === "CYCLE_TIME" ? '사이클시간' : '트리거변수';
                     }
                 },
-                {"data": "channel_cycle"},
+                {
+                    render: function(data, type, row) {
+                        return getObjVal(row, 'channel_cycle');
+                    }
+                },
                 {
                     render: function(data, type, row) {
                         return getObjVal(row, 'channel_trigger_variable');
@@ -1194,7 +1100,11 @@
                         return row.channel_trigger === "CYCLE_TIME" ? '사이클시간' : '트리거변수';
                     }
                 },
-                {"data": "channel_cycle"},
+                {
+                    render: function(data, type, row) {
+                        return getObjVal(row, 'channel_cycle');
+                    }
+                },
                 {
                     render: function(data, type, row) {
                         return getObjVal(row, 'channel_trigger_variable');

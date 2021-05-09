@@ -38,7 +38,6 @@ const dataTableLang = {
     }
 };
 const dataTableObj = {
-    // 'lengthMenu': [ [5, 10, 25, 50], [5, 10, 25, 50] ],
     'bAutoWidth': false,
     'processing': true,
     'serverSide': true,
@@ -130,8 +129,7 @@ function sendAjax(url, data, refresh = true, isFile = false, respFunc = null) {
                 }
             }
         },
-        error: function(err) {
-            console.log("error=====", err);
+        error: function() {
             alert(refreshMsg);
         }
     });
@@ -227,7 +225,7 @@ function updateVariable(selTbl = dataTables, flag = false) {
     if(selTbl) selTbl.ajax.reload(null, flag);
 }
 
-function removeCustom(tableID, url, replaceStr = '', customData = {}, refresh = true) {
+function removeCustom(tableID, url, replaceStr = '', customData = {}, refresh = true, respFunc = null) {
     const rowArr = $(tableID + " input.check-row").filter(':checked');
     const totalCnt = rowArr.length;
     if(totalCnt > 0) {
@@ -240,7 +238,7 @@ function removeCustom(tableID, url, replaceStr = '', customData = {}, refresh = 
 
         if(selIDs.length > 0) {
             if(confirm('삭제하시겠습니까?')) {
-                sendAjax(url, {...customData, selRow: selIDs.join(',')}, refresh);
+                sendAjax(url, {...customData, selRow: selIDs.join(',')}, refresh, false, respFunc);
             }
         }
     } else {
@@ -503,6 +501,7 @@ $(document).ready(function() {
             const selRow = urlArr[3];
             urlArr.splice(-1, 1);
             const urlStr = urlArr.join('/');
+
             sendAjax(urlStr, {selRow});
         }
     });
